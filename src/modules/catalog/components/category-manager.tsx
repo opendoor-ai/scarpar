@@ -80,7 +80,7 @@ function CategoryManager({ categories }: CategoryManagerProps) {
         toast.error(result.error)
         return
       }
-      toast.success(editing ? 'Category updated' : 'Category created')
+      toast.success(editing ? '카테고리가 수정되었습니다' : '카테고리가 추가되었습니다')
       setDialogOpen(false)
       router.refresh()
     } finally {
@@ -94,7 +94,7 @@ function CategoryManager({ categories }: CategoryManagerProps) {
       toast.error(result.error)
       return
     }
-    toast.success('Category deleted')
+    toast.success('카테고리가 삭제되었습니다')
     router.refresh()
   }
 
@@ -102,21 +102,21 @@ function CategoryManager({ categories }: CategoryManagerProps) {
   const parentOptions = categories.filter((c) => c.id !== editing?.id)
 
   const columns: ColumnDef<CategoryRow>[] = [
-    { accessorKey: 'name', header: 'Name' },
-    { accessorKey: 'slug', header: 'Slug' },
+    { accessorKey: 'name', header: '이름' },
+    { accessorKey: 'slug', header: '주소(영문)' },
     {
       accessorKey: 'parentName',
-      header: 'Parent',
+      header: '상위 카테고리',
       cell: ({ row }) => row.original.parentName ?? <span className="text-muted-foreground">—</span>,
     },
     {
       accessorKey: 'productCount',
-      header: () => <div className="text-right">Products</div>,
+      header: () => <div className="text-right">상품 수</div>,
       cell: ({ row }) => <div className="text-right tabular-nums">{row.original.productCount}</div>,
     },
     {
       accessorKey: 'sortOrder',
-      header: () => <div className="text-right">Sort</div>,
+      header: () => <div className="text-right">순서</div>,
       cell: ({ row }) => <div className="text-right tabular-nums">{row.original.sortOrder}</div>,
     },
     {
@@ -134,9 +134,9 @@ function CategoryManager({ categories }: CategoryManagerProps) {
                 <Trash2 className="text-destructive size-4" />
               </Button>
             }
-            title={`Delete "${row.original.name}"?`}
-            description="Sub-categories and products keep their data — they just become uncategorized."
-            confirmLabel="Delete"
+            title={`"${row.original.name}" 카테고리를 삭제할까요?`}
+            description="하위 카테고리와 상품은 그대로 남고, 카테고리만 비게 됩니다."
+            confirmLabel="삭제"
             destructive
             onConfirm={() => handleDelete(row.original)}
           />
@@ -150,18 +150,18 @@ function CategoryManager({ categories }: CategoryManagerProps) {
       <div className="flex justify-end">
         <Button type="button" onClick={openCreate}>
           <Plus className="size-4" />
-          New category
+새 카테고리
         </Button>
       </div>
 
       {categories.length === 0 ? (
         <EmptyState
           icon={FolderTree}
-          title="No categories yet"
-          description="Group products so customers can browse by type."
+          title="아직 카테고리가 없습니다"
+          description="고객이 종류별로 찾아볼 수 있게 상품을 분류하세요."
           action={
             <Button type="button" onClick={openCreate}>
-              New category
+    새 카테고리
             </Button>
           }
         />
@@ -172,7 +172,7 @@ function CategoryManager({ categories }: CategoryManagerProps) {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editing ? 'Edit category' : 'New category'}</DialogTitle>
+            <DialogTitle>{editing ? '카테고리 수정' : '새 카테고리'}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -181,7 +181,7 @@ function CategoryManager({ categories }: CategoryManagerProps) {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>이름</FormLabel>
                     <FormControl>
                       <Input {...field} onChange={(e) => handleNameChange(e.target.value)} />
                     </FormControl>
@@ -194,7 +194,7 @@ function CategoryManager({ categories }: CategoryManagerProps) {
                 name="slug"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Slug</FormLabel>
+                    <FormLabel>주소(영문)</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -213,7 +213,7 @@ function CategoryManager({ categories }: CategoryManagerProps) {
                 name="parent_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Parent category</FormLabel>
+                    <FormLabel>상위 카테고리</FormLabel>
                     <Select
                       value={field.value ?? NONE_PARENT}
                       onValueChange={(v) => field.onChange(v === NONE_PARENT ? null : v)}
@@ -224,7 +224,7 @@ function CategoryManager({ categories }: CategoryManagerProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value={NONE_PARENT}>No parent (top level)</SelectItem>
+                        <SelectItem value={NONE_PARENT}>없음 (최상위)</SelectItem>
                         {parentOptions.map((c) => (
                           <SelectItem key={c.id} value={c.id}>
                             {c.name}
@@ -238,10 +238,10 @@ function CategoryManager({ categories }: CategoryManagerProps) {
               />
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                  Cancel
+  취소
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving...' : editing ? 'Save changes' : 'Create'}
+                  {isSubmitting ? '저장 중...' : editing ? '변경사항 저장' : '추가'}
                 </Button>
               </DialogFooter>
             </form>

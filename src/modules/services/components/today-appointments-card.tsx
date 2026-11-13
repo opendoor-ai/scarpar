@@ -31,18 +31,18 @@ function TodayAppointmentsCard({ appointments }: TodayAppointmentsCardProps) {
   return (
     <Card className="mb-4">
       <CardHeader>
-        <CardTitle>Today&apos;s appointments</CardTitle>
+        <CardTitle>오늘 예약</CardTitle>
       </CardHeader>
       <CardContent>
         {appointments.length === 0 ? (
-          <p className="text-muted-foreground text-[13px]">Nothing scheduled for today.</p>
+          <p className="text-muted-foreground text-[13px]">오늘은 예약이 없습니다.</p>
         ) : (
           <ul className="flex flex-col gap-2">
             {appointments.map((appointment) => (
               <li key={appointment.id} className="flex items-center justify-between gap-3 text-[13px]">
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground tabular-nums">
-                    {format(new Date(appointment.starts_at), 'h:mm a')}
+                    {format(new Date(appointment.starts_at), 'HH:mm')}
                   </span>
                   <span className="text-foreground font-medium">{appointment.title}</span>
                   {appointment.customer?.name ? (
@@ -54,10 +54,10 @@ function TodayAppointmentsCard({ appointments }: TodayAppointmentsCardProps) {
                   {appointment.status === 'booked' ? (
                     <div className="flex gap-1">
                       <Button size="sm" variant="ghost" onClick={() => handleStatus(appointment.id, 'done')}>
-                        Done
+                        완료
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => handleStatus(appointment.id, 'cancelled')}>
-                        Cancel
+                        취소
                       </Button>
                     </div>
                   ) : null}

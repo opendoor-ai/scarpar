@@ -44,11 +44,11 @@ export function CustomerTagsEditor({ customerId, tags }: { customerId: string; t
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tags</CardTitle>
+        <CardTitle>태그</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-3 pb-4">
         <div className="flex flex-wrap gap-1.5">
-          {current.length === 0 ? <span className="text-muted-foreground text-xs">No tags yet.</span> : null}
+          {current.length === 0 ? <span className="text-muted-foreground text-xs">아직 태그가 없습니다.</span> : null}
           {current.map((tag) => (
             <Badge key={tag} variant="secondary" className="gap-1">
               {tag}
@@ -68,12 +68,12 @@ export function CustomerTagsEditor({ customerId, tags }: { customerId: string; t
                 handleAdd()
               }
             }}
-            placeholder="Add a tag..."
+            placeholder="태그 추가..."
             disabled={saving}
             className="h-8"
           />
           <Button type="button" variant="outline" size="sm" onClick={handleAdd} disabled={saving || !draft.trim()}>
-            <Plus /> Add
+            <Plus /> 추가
           </Button>
         </div>
       </CardContent>

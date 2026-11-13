@@ -25,8 +25,8 @@ export default async function CustomersPage() {
   return (
     <div className="px-6 py-6">
       <PageHeader
-        title="Customers"
-        description="Customer profiles, order history, and blocklist."
+        title="고객관리"
+        description="고객 정보, 주문 이력, 차단 목록"
         actions={<NewCustomerDialog />}
       />
       <CustomersTable customers={customers} />

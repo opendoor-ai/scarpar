@@ -46,7 +46,7 @@ export function NewCustomerDialog() {
       toast.error(result.error)
       return
     }
-    toast.success('Customer created')
+    toast.success('고객이 추가되었습니다')
     setOpen(false)
     form.reset()
     router.refresh()
@@ -63,12 +63,12 @@ export function NewCustomerDialog() {
     >
       <DialogTrigger asChild>
         <Button>
-          <Plus /> New customer
+          <Plus /> 새 고객
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>New customer</DialogTitle>
+          <DialogTitle>새 고객</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -77,9 +77,9 @@ export function NewCustomerDialog() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>이름</FormLabel>
                   <FormControl>
-                    <Input placeholder="Customer name" {...field} />
+                    <Input placeholder="고객 이름" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -90,7 +90,7 @@ export function NewCustomerDialog() {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone</FormLabel>
+                  <FormLabel>전화번호</FormLabel>
                   <FormControl>
                     <Input placeholder="01xxxxxxxxx" {...field} />
                   </FormControl>
@@ -103,7 +103,7 @@ export function NewCustomerDialog() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email (optional)</FormLabel>
+                  <FormLabel>이메일 (선택)</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="name@example.com" {...field} />
                   </FormControl>
@@ -113,16 +113,16 @@ export function NewCustomerDialog() {
             />
 
             <div className="border-t pt-3">
-              <p className="text-muted-foreground mb-2 text-xs font-medium">Address (optional)</p>
+              <p className="text-muted-foreground mb-2 text-xs font-medium">주소 (선택)</p>
               <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={form.control}
                   name="address.line1"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>Address line</FormLabel>
+                      <FormLabel>주소</FormLabel>
                       <FormControl>
-                        <Input placeholder="House, road, area" {...field} />
+                        <Input placeholder="도로명 주소, 상세 주소" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -133,7 +133,7 @@ export function NewCustomerDialog() {
                   name="address.area"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Area</FormLabel>
+                      <FormLabel>동/읍/면</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -146,11 +146,11 @@ export function NewCustomerDialog() {
                   name="address.district"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>District</FormLabel>
+                      <FormLabel>지역</FormLabel>
                       <Select value={field.value || undefined} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select district" />
+                            <SelectValue placeholder="지역 선택" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -170,7 +170,7 @@ export function NewCustomerDialog() {
                   name="address.postcode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Postcode</FormLabel>
+                      <FormLabel>우편번호</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -183,7 +183,7 @@ export function NewCustomerDialog() {
 
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Creating...' : 'Create customer'}
+                {form.formState.isSubmitting ? '추가 중...' : '고객 추가'}
               </Button>
             </DialogFooter>
           </form>

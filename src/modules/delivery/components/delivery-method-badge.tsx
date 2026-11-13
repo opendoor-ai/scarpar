@@ -7,7 +7,7 @@ const COURIER_LABELS: Record<DeliveryCourier, string> = {
   steadfast: "Steadfast",
   pathao: "Pathao",
   redx: "RedX",
-  manual: "Manual",
+  manual: "직접 배송",
 }
 
 interface DeliveryMethodBadgeProps {
@@ -23,7 +23,7 @@ function DeliveryMethodBadge({ method, riderName, courier, className }: Delivery
     return (
       <Badge variant="outline" className={className}>
         <Bike className="size-3" />
-        {riderName ?? "Rider (unassigned)"}
+        {riderName ?? "배송기사 (미배정)"}
       </Badge>
     )
   }
@@ -32,7 +32,7 @@ function DeliveryMethodBadge({ method, riderName, courier, className }: Delivery
     return (
       <Badge variant="outline" className={className}>
         <Truck className="size-3" />
-        {courier ? COURIER_LABELS[courier] : "Courier"}
+        {courier ? COURIER_LABELS[courier] : "택배"}
       </Badge>
     )
   }
@@ -40,7 +40,7 @@ function DeliveryMethodBadge({ method, riderName, courier, className }: Delivery
   return (
     <Badge variant="outline" className={className}>
       <Store className="size-3" />
-      Pickup
+      방문 수령
     </Badge>
   )
 }

@@ -19,7 +19,7 @@ interface OrgPickerProps {
 export function OrgPicker({ memberships }: OrgPickerProps) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-sm font-semibold text-foreground">Choose an organization</h2>
+      <h2 className="text-sm font-semibold text-foreground">조직 선택</h2>
       <div className="flex flex-col gap-2">
         {memberships.map(({ org, role }) => {
           const preset = VERTICAL_PRESETS[org.vertical]
@@ -40,7 +40,7 @@ export function OrgPicker({ memberships }: OrgPickerProps) {
               </div>
               <form action={setActiveOrg.bind(null, org.id)}>
                 <Button type="submit" size="sm" variant="secondary">
-                  Select
+선택
                 </Button>
               </form>
             </Card>

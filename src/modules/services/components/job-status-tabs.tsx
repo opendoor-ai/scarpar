@@ -6,13 +6,13 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { ServiceJobStatus } from '@/types/db'
 
 const STATUSES: { label: string; value: ServiceJobStatus | 'all' }[] = [
-  { label: 'All', value: 'all' },
-  { label: 'Quoted', value: 'quoted' },
-  { label: 'Scheduled', value: 'scheduled' },
-  { label: 'In progress', value: 'in_progress' },
-  { label: 'Done', value: 'done' },
-  { label: 'Invoiced', value: 'invoiced' },
-  { label: 'Cancelled', value: 'cancelled' },
+  { label: '전체', value: 'all' },
+  { label: '견적', value: 'quoted' },
+  { label: '예약됨', value: 'scheduled' },
+  { label: '진행 중', value: 'in_progress' },
+  { label: '완료', value: 'done' },
+  { label: '청구 완료', value: 'invoiced' },
+  { label: '취소', value: 'cancelled' },
 ]
 
 interface JobStatusTabsProps {

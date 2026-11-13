@@ -16,7 +16,7 @@ function OrgActiveSwitch({ orgId, isActive }: { orgId: string; isActive: boolean
     try {
       const result = await toggleOrgActiveAction({ orgId, isActive: next })
       if (result.ok) {
-        toast.success(next ? 'Organization activated' : 'Organization deactivated')
+        toast.success(next ? '조직이 활성화되었습니다' : '조직이 비활성화되었습니다')
         router.refresh()
       } else {
         toast.error(result.error)

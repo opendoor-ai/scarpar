@@ -23,9 +23,9 @@ interface QuickAction {
 }
 
 const QUICK_ACTION_DEFS: (QuickAction & { moduleKey: string })[] = [
-  { label: 'New product', href: '/admin/products/new', icon: FilePlus, moduleKey: 'catalog' },
-  { label: 'New order', href: '/admin/orders/new', icon: ShoppingCart, moduleKey: 'orders' },
-  { label: 'POS', href: '/admin/pos', icon: CreditCard, moduleKey: 'pos' },
+  { label: '새 상품 등록', href: '/admin/products/new', icon: FilePlus, moduleKey: 'catalog' },
+  { label: '새 주문', href: '/admin/orders/new', icon: ShoppingCart, moduleKey: 'orders' },
+  { label: '매장 판매(POS)', href: '/admin/pos', icon: CreditCard, moduleKey: 'pos' },
 ]
 
 interface CommandPaletteProps {
@@ -63,12 +63,12 @@ export function CommandPalette({ open, onOpenChange, nav, enabledModules }: Comm
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandInput placeholder="Search pages, or jump to an action…" />
+      <CommandInput placeholder="메뉴 검색 또는 바로가기…" />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
         {quickActions.length > 0 && (
           <>
-            <CommandGroup heading="Quick actions">
+            <CommandGroup heading="빠른 실행">
               {quickActions.map((action) => (
                 <CommandItem key={action.href} value={action.label} onSelect={() => go(action.href)}>
                   <action.icon className="size-4" />
@@ -79,7 +79,7 @@ export function CommandPalette({ open, onOpenChange, nav, enabledModules }: Comm
             <CommandSeparator />
           </>
         )}
-        <CommandGroup heading="Go to">
+        <CommandGroup heading="이동">
           {allNav.map((item) => {
             const Icon = getIcon(item.icon)
             return (

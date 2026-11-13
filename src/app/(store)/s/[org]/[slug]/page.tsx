@@ -1,3 +1,4 @@
+import { decodeParam } from '@/lib/utils'
 import { cache } from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
@@ -38,7 +39,8 @@ export async function generateMetadata({
 }: {
   params: Promise<{ org: string; slug: string }>
 }): Promise<Metadata> {
-  const { org: orgSlug, slug } = await params
+  const { org: orgSlug, slug: rawSlug } = await params
+  const slug = decodeParam(rawSlug)
   const org = await getStoreOrg(orgSlug)
   if (!org) return {}
 
@@ -59,7 +61,8 @@ export async function generateMetadata({
  * collides with /s/[org]/[slug]). notFound() for missing or unpublished slugs.
  */
 export default async function CmsPageRoute({ params }: PageProps<{ org: string; slug: string }>) {
-  const { org: orgSlug, slug } = await params
+  const { org: orgSlug, slug: rawSlug } = await params
+  const slug = decodeParam(rawSlug)
   const org = await getStoreOrg(orgSlug)
   if (!org) notFound()
 

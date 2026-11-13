@@ -13,7 +13,7 @@ const COURIER_LABELS: Record<string, string> = {
   steadfast: 'Steadfast',
   pathao: 'Pathao',
   redx: 'RedX',
-  manual: 'Manual Courier',
+  manual: '직접 배송',
 }
 
 export default async function LabelPage({ params }: PageProps<{ deliveryId: string }>) {
@@ -70,13 +70,13 @@ export default async function LabelPage({ params }: PageProps<{ deliveryId: stri
       <BarcodeBlock code={trackingText} caption={trackingText} />
 
       <div className="label-address">
-        <div className="label-address-kind">Deliver To</div>
+        <div className="label-address-kind">받는 분</div>
         <div className="label-recipient">{delivery.recipient_name || order.customer_name}</div>
         <div>{delivery.recipient_phone || order.customer_phone}</div>
         <div>{formatAddress(address)}</div>
       </div>
 
-      {delivery.cod_amount > 0 ? <CodBig amountPaisa={delivery.cod_amount} label="Collect COD" /> : null}
+      {delivery.cod_amount > 0 ? <CodBig amountPaisa={delivery.cod_amount} label="착불 수금액" /> : null}
 
       <div className="label-meta-row">
         <span>Order {order.order_no}</span>
@@ -86,7 +86,7 @@ export default async function LabelPage({ params }: PageProps<{ deliveryId: stri
       </div>
       {totalWeightGrams > 0 ? (
         <div className="label-meta-row">
-          <span>Weight</span>
+          <span>무게</span>
           <span>{(totalWeightGrams / 1000).toFixed(2)} kg</span>
         </div>
       ) : null}

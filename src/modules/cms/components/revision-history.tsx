@@ -32,7 +32,7 @@ function RevisionHistory({ pageId, revisions }: RevisionHistoryProps) {
       toast.error(result.error)
       return
     }
-    toast.success('Revision restored to draft.')
+    toast.success('이전 버전을 임시저장본으로 불러왔습니다.')
     router.refresh()
   }
 
@@ -53,23 +53,23 @@ function RevisionHistory({ pageId, revisions }: RevisionHistoryProps) {
       {open ? (
         <div className="flex flex-col divide-y border-t">
           {revisions.length === 0 ? (
-            <p className="px-4 py-3 text-sm text-muted-foreground">No published revisions yet.</p>
+            <p className="px-4 py-3 text-sm text-muted-foreground">아직 게시된 버전이 없습니다.</p>
           ) : (
             revisions.map((revision) => (
               <div key={revision.id} className="flex items-center justify-between gap-2 px-4 py-2.5">
                 <div className="flex flex-col">
-                  <span className="text-[13px]">{format(new Date(revision.created_at), 'd MMM yyyy, h:mm a')}</span>
+                  <span className="text-[13px]">{format(new Date(revision.created_at), 'yyyy.MM.dd HH:mm')}</span>
                   <span className="text-xs text-muted-foreground">by {revision.savedByName}</span>
                 </div>
                 <ConfirmDialog
                   trigger={
                     <Button type="button" variant="outline" size="sm">
-                      Restore
+복원
                     </Button>
                   }
-                  title="Restore this revision?"
-                  description="This loads the revision into your draft. It won't go live until you publish."
-                  confirmLabel="Restore to draft"
+                  title="이 버전으로 복원할까요?"
+                  description="이 버전을 임시저장본으로 불러옵니다. 게시하기 전까지는 고객에게 보이지 않습니다."
+                  confirmLabel="임시저장본으로 복원"
                   onConfirm={() => handleRestore(revision.id)}
                 />
               </div>

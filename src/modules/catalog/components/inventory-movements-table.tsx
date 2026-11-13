@@ -25,22 +25,22 @@ export interface MovementRow {
 }
 
 const TYPE_LABELS: Record<InventoryMovementType, string> = {
-  purchase: 'Purchase',
-  sale: 'Sale',
-  adjustment: 'Adjustment',
-  return: 'Return',
-  release: 'Release',
+  purchase: '입고',
+  sale: '판매',
+  adjustment: '조정',
+  return: '반품',
+  release: '주문 취소 복구',
 }
 
 const columns: ColumnDef<MovementRow>[] = [
   {
     accessorKey: 'createdAt',
-    header: 'Date',
-    cell: ({ row }) => format(new Date(row.original.createdAt), 'd MMM yyyy, h:mm a'),
+    header: '날짜',
+    cell: ({ row }) => format(new Date(row.original.createdAt), 'yyyy.MM.dd HH:mm'),
   },
   {
     accessorKey: 'productName',
-    header: 'Product',
+    header: '상품',
     cell: ({ row }) => (
       <div className="flex flex-col">
         <span className="font-medium">{row.original.productName}</span>
@@ -52,7 +52,7 @@ const columns: ColumnDef<MovementRow>[] = [
   },
   {
     accessorKey: 'type',
-    header: 'Type',
+    header: '구분',
     cell: ({ row }) => <Badge variant="outline">{TYPE_LABELS[row.original.type]}</Badge>,
   },
   {
@@ -75,18 +75,18 @@ const columns: ColumnDef<MovementRow>[] = [
   },
   {
     accessorKey: 'reference',
-    header: 'Reference',
+    header: '참조',
     cell: ({ row }) => row.original.reference ?? <span className="text-muted-foreground">—</span>,
   },
   {
     accessorKey: 'note',
-    header: 'Note',
+    header: '메모',
     cell: ({ row }) => row.original.note ?? <span className="text-muted-foreground">—</span>,
   },
   {
     accessorKey: 'actorName',
-    header: 'Actor',
-    cell: ({ row }) => row.original.actorName ?? <span className="text-muted-foreground">System</span>,
+    header: '처리자',
+    cell: ({ row }) => row.original.actorName ?? <span className="text-muted-foreground">시스템</span>,
   },
 ]
 

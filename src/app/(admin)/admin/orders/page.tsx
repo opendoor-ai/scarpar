@@ -86,12 +86,12 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
   return (
     <div className="px-6 py-6">
       <PageHeader
-        title="Orders"
+        title="주문관리"
         actions={
           <Button asChild size="sm">
             <Link href="/admin/orders/new">
               <Plus className="size-4" />
-              New order
+새 주문
             </Link>
           </Button>
         }

@@ -41,7 +41,7 @@ export function ThemeToggle() {
   }
 
   return (
-    <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme">
+    <Button variant="ghost" size="icon" onClick={toggle} aria-label="화면 테마 변경">
       {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
     </Button>
   )

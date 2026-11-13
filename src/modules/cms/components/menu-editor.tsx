@@ -24,8 +24,8 @@ function MenuEditor({ header, footer, linkSuggestions }: MenuEditorProps) {
           <option key={href} value={href} />
         ))}
       </datalist>
-      <MenuCard handle="header" title="Header menu" initialItems={header} allowChildren />
-      <MenuCard handle="footer" title="Footer menu" initialItems={footer} allowChildren={false} />
+      <MenuCard handle="header" title="상단 메뉴" initialItems={header} allowChildren />
+      <MenuCard handle="footer" title="하단 메뉴" initialItems={footer} allowChildren={false} />
     </div>
   )
 }
@@ -102,7 +102,7 @@ function MenuCard({ handle, title, initialItems, allowChildren }: MenuCardProps)
       toast.error(result.error)
       return
     }
-    toast.success(`${title} saved.`)
+    toast.success(`${title}가 저장되었습니다.`)
   }
 
   return (
@@ -110,12 +110,12 @@ function MenuCard({ handle, title, initialItems, allowChildren }: MenuCardProps)
       <CardHeader className="flex-row items-center justify-between">
         <CardTitle className="text-base">{title}</CardTitle>
         <Button type="button" size="sm" disabled={saving} onClick={handleSave}>
-          {saving ? 'Saving...' : 'Save'}
+          {saving ? '저장 중...' : '저장'}
         </Button>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {items.length === 0 ? (
-          <p className="py-4 text-center text-sm text-muted-foreground">No items yet.</p>
+          <p className="py-4 text-center text-sm text-muted-foreground">아직 메뉴 항목이 없습니다.</p>
         ) : (
           items.map((item, index) => (
             <div key={index} className="flex flex-col gap-2 rounded-md border p-2.5">
@@ -123,7 +123,7 @@ function MenuCard({ handle, title, initialItems, allowChildren }: MenuCardProps)
                 <Input
                   value={item.label}
                   onChange={(e) => updateItem(index, { label: e.target.value })}
-                  placeholder="Label"
+                  placeholder="메뉴 이름"
                   className="flex-1"
                 />
                 <Input
@@ -163,7 +163,7 @@ function MenuCard({ handle, title, initialItems, allowChildren }: MenuCardProps)
                       <Input
                         value={child.label}
                         onChange={(e) => updateChild(index, childIndex, { label: e.target.value })}
-                        placeholder="Label"
+                        placeholder="메뉴 이름"
                         className="h-7 flex-1 text-xs"
                       />
                       <Input
@@ -186,7 +186,7 @@ function MenuCard({ handle, title, initialItems, allowChildren }: MenuCardProps)
                   ))}
                   <Button type="button" variant="ghost" size="sm" className="w-fit" onClick={() => addChild(index)}>
                     <Plus className="size-3" />
-                    Add sub-item
+하위 항목 추가
                   </Button>
                 </div>
               ) : null}
@@ -195,7 +195,7 @@ function MenuCard({ handle, title, initialItems, allowChildren }: MenuCardProps)
         )}
         <Button type="button" variant="outline" onClick={addItem}>
           <Plus className="size-4" />
-          Add item
+항목 추가
         </Button>
       </CardContent>
     </Card>

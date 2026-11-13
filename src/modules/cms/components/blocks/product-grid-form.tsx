@@ -62,11 +62,11 @@ function ProductGridForm({ block, categories, onChange }: ProductGridFormProps) 
 
   return (
     <div className="flex flex-col gap-4">
-      <Field label="Title">
+      <Field label="제목">
         <Input value={block.title ?? ''} onChange={(e) => onChange({ ...block, title: e.target.value })} />
       </Field>
 
-      <Field label="Source">
+      <Field label="가져올 곳">
         <Select
           value={block.mode}
           onValueChange={(value) => onChange({ ...block, mode: value as ProductGridBlock['mode'] })}
@@ -75,21 +75,21 @@ function ProductGridForm({ block, categories, onChange }: ProductGridFormProps) 
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="featured">Featured products</SelectItem>
-            <SelectItem value="category">A category</SelectItem>
-            <SelectItem value="manual">Hand-picked products</SelectItem>
+            <SelectItem value="featured">추천 상품</SelectItem>
+            <SelectItem value="category">특정 카테고리</SelectItem>
+            <SelectItem value="manual">직접 고른 상품</SelectItem>
           </SelectContent>
         </Select>
       </Field>
 
       {block.mode === 'category' ? (
-        <Field label="Category">
+        <Field label="카테고리">
           <Select
             value={block.categoryId ?? ''}
             onValueChange={(value) => onChange({ ...block, categoryId: value })}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a category" />
+              <SelectValue placeholder="카테고리 선택" />
             </SelectTrigger>
             <SelectContent>
               {categories.map((category) => (
@@ -103,8 +103,8 @@ function ProductGridForm({ block, categories, onChange }: ProductGridFormProps) 
       ) : null}
 
       {block.mode === 'manual' ? (
-        <Field label="Products" help="Search and add products to feature, in order.">
-          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search products..." />
+        <Field label="상품" help="보여줄 상품을 검색해서 순서대로 추가하세요.">
+          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="상품 검색..." />
           {results.length > 0 ? (
             <div className="flex flex-col gap-1 rounded-md border p-1.5">
               {results.map((product) => (
@@ -136,7 +136,7 @@ function ProductGridForm({ block, categories, onChange }: ProductGridFormProps) 
         </Field>
       ) : null}
 
-      <Field label="Limit">
+      <Field label="표시 개수">
         <Input
           type="number"
           min={1}

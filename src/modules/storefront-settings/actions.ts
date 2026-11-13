@@ -22,7 +22,7 @@ const updateStorefrontSettingsSchema = z.object({
   org: z.object({
     name: z.string().trim().min(1, 'Business name is required').max(200),
     phone: z.string().trim().max(32),
-    email: z.union([z.string().trim().email('Invalid email'), z.literal('')]),
+    email: z.union([z.string().trim().email('이메일 형식이 올바르지 않습니다'), z.literal('')]),
     address: z.string().trim().max(500),
     logo_path: z.string().nullable(),
   }),
@@ -42,7 +42,7 @@ export async function updateOrgSettingsAction(input: UpdateStorefrontSettingsInp
 
   const parsed = updateStorefrontSettingsSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid settings.' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '설정값이 올바르지 않습니다.' }
   }
 
   const { announcement, whatsapp_number, primary_color, org } = parsed.data

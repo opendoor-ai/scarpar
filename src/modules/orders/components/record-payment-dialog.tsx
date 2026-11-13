@@ -23,19 +23,19 @@ import { recordPaymentAction } from '@/modules/orders/actions'
 import { RecordPaymentSchema, type RecordPaymentInput } from '@/modules/orders/schemas'
 
 const KIND_OPTIONS = [
-  { value: 'advance', label: 'Advance' },
-  { value: 'full', label: 'Full' },
-  { value: 'balance', label: 'Balance' },
+  { value: 'advance', label: '선결제' },
+  { value: 'full', label: '전액' },
+  { value: 'balance', label: '잔금' },
 ]
 
 const METHOD_OPTIONS = [
-  { value: 'cod', label: 'COD' },
+  { value: 'cod', label: '착불' },
   { value: 'bkash', label: 'bKash' },
   { value: 'nagad', label: 'Nagad' },
   { value: 'uddoktapay', label: 'UddoktaPay' },
   { value: 'sslcommerz', label: 'SSLCommerz' },
-  { value: 'bank', label: 'Bank' },
-  { value: 'cash', label: 'Cash' },
+  { value: 'bank', label: '계좌이체' },
+  { value: 'cash', label: '현금' },
 ]
 
 const DEFAULT_VALUES = {
@@ -66,7 +66,7 @@ function RecordPaymentDialog({ orderId }: RecordPaymentDialogProps) {
       toast.error(result.error)
       return
     }
-    toast.success('Payment recorded — pending verification')
+    toast.success('결제가 기록되었습니다 — 확인 대기')
     setOpen(false)
     form.reset({ orderId, ...DEFAULT_VALUES })
     router.refresh()
@@ -75,11 +75,11 @@ function RecordPaymentDialog({ orderId }: RecordPaymentDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">Record payment</Button>
+        <Button size="sm">결제 기록</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Record payment</DialogTitle>
+          <DialogTitle>결제 기록</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -89,7 +89,7 @@ function RecordPaymentDialog({ orderId }: RecordPaymentDialogProps) {
                 name="kind"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Kind</FormLabel>
+                    <FormLabel>구분</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -113,7 +113,7 @@ function RecordPaymentDialog({ orderId }: RecordPaymentDialogProps) {
                 name="method"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Method</FormLabel>
+                    <FormLabel>결제 방법</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -138,7 +138,7 @@ function RecordPaymentDialog({ orderId }: RecordPaymentDialogProps) {
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Amount (taka)</FormLabel>
+                  <FormLabel>금액 (원)</FormLabel>
                   <FormControl>
                     <Input inputMode="decimal" placeholder="0.00" {...field} />
                   </FormControl>
@@ -152,7 +152,7 @@ function RecordPaymentDialog({ orderId }: RecordPaymentDialogProps) {
                 name="provider_ref"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Transaction ID</FormLabel>
+                    <FormLabel>거래 번호</FormLabel>
                     <FormControl>
                       <Input placeholder="trxID" {...field} />
                     </FormControl>
@@ -165,7 +165,7 @@ function RecordPaymentDialog({ orderId }: RecordPaymentDialogProps) {
                 name="sender_number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Sender number</FormLabel>
+                    <FormLabel>입금자 번호</FormLabel>
                     <FormControl>
                       <Input placeholder="017XXXXXXXX" {...field} />
                     </FormControl>
@@ -179,7 +179,7 @@ function RecordPaymentDialog({ orderId }: RecordPaymentDialogProps) {
               name="note"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Note</FormLabel>
+                  <FormLabel>메모</FormLabel>
                   <FormControl>
                     <Textarea rows={2} {...field} />
                   </FormControl>
@@ -189,7 +189,7 @@ function RecordPaymentDialog({ orderId }: RecordPaymentDialogProps) {
             />
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Saving…' : 'Record payment'}
+                {form.formState.isSubmitting ? '저장 중…' : '결제 기록'}
               </Button>
             </DialogFooter>
           </form>

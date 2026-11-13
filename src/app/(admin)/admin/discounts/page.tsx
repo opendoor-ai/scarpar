@@ -28,12 +28,12 @@ export default async function DiscountsPage() {
   return (
     <div className="px-6 py-6">
       <PageHeader
-        title="Discounts"
-        description="Discount codes and automatic promotions."
+        title="할인관리"
+        description="할인 코드와 자동 할인"
         actions={
           <Button asChild>
             <Link href="/admin/discounts/new">
-              <Plus /> New discount
+              <Plus /> 새 할인
             </Link>
           </Button>
         }

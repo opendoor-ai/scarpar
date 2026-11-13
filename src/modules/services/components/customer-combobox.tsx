@@ -17,7 +17,7 @@ interface CustomerComboboxProps {
   placeholder?: string
 }
 
-function CustomerCombobox({ value, onChange, placeholder = 'Search by name or phone...' }: CustomerComboboxProps) {
+function CustomerCombobox({ value, onChange, placeholder = '이름 또는 전화번호로 검색...' }: CustomerComboboxProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<CustomerSearchResult[]>([])
@@ -43,8 +43,8 @@ function CustomerCombobox({ value, onChange, placeholder = 'Search by name or ph
         <Command shouldFilter={false}>
           <CommandInput value={query} onValueChange={handleQueryChange} placeholder={placeholder} />
           <CommandList>
-            {searching ? <div className="text-muted-foreground p-3 text-[13px]">Searching...</div> : null}
-            <CommandEmpty>No customers found.</CommandEmpty>
+            {searching ? <div className="text-muted-foreground p-3 text-[13px]">검색 중...</div> : null}
+            <CommandEmpty>고객을 찾을 수 없습니다.</CommandEmpty>
             <CommandGroup>
               {results.map((customer) => (
                 <CommandItem

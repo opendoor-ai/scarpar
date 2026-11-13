@@ -15,8 +15,8 @@ function ProductsTab({ topProducts }: ProductsTabProps) {
     return (
       <EmptyState
         icon={Package}
-        title="No product sales in this range"
-        description="Sales will appear here once orders are placed."
+        title="이 기간에 판매된 상품이 없습니다"
+        description="주문이 들어오면 여기에 표시됩니다."
       />
     )
   }
@@ -29,7 +29,7 @@ function ProductsTab({ topProducts }: ProductsTabProps) {
   return (
     <div className="flex flex-col gap-6">
       <div className="rounded-lg border bg-card p-4">
-        <p className="mb-3 text-[13px] font-medium text-foreground">Top products by revenue</p>
+        <p className="mb-3 text-[13px] font-medium text-foreground">매출 상위 상품</p>
         <MiniBarChart data={chartData} formatValue={(v) => formatMoney(v)} height={160} />
       </div>
 
@@ -37,9 +37,9 @@ function ProductsTab({ topProducts }: ProductsTabProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Product</TableHead>
-              <TableHead className="text-right">Units</TableHead>
-              <TableHead className="text-right">Revenue</TableHead>
+              <TableHead>상품</TableHead>
+              <TableHead className="text-right">수량</TableHead>
+              <TableHead className="text-right">매출</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

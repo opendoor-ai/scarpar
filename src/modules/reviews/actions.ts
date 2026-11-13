@@ -20,7 +20,7 @@ async function setReviewStatus(id: string, status: ReviewStatus): Promise<Action
     .eq('org_id', ctx.org.id)
     .single()
 
-  if (fetchError || !before) return { ok: false, error: 'Review not found.' }
+  if (fetchError || !before) return { ok: false, error: '리뷰를 찾을 수 없습니다.' }
 
   const { error } = await supabase.from('reviews').update({ status }).eq('id', id).eq('org_id', ctx.org.id)
   if (error) return { ok: false, error: error.message }

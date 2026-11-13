@@ -9,7 +9,7 @@ interface QrBlockProps {
   className?: string
 }
 
-export function QrBlock({ dataUrl, alt = 'Scan to track this order', className }: QrBlockProps) {
+export function QrBlock({ dataUrl, alt = '스캔하여 주문 조회', className }: QrBlockProps) {
   return (
     <div className={className ? `qr-block ${className}` : 'qr-block'}>
       {/* eslint-disable-next-line @next/next/no-img-element -- data: URL, next/image can't optimize it */}

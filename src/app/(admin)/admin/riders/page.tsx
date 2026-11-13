@@ -41,13 +41,13 @@ export default async function RidersPage() {
   return (
     <div className="flex flex-col gap-6 px-6 py-6">
       <PageHeader
-        title="Riders"
+        title="배송기사"
         actions={
           <RiderDialog
             trigger={
               <Button>
                 <Plus className="size-4" />
-                New Rider
+                새 배송기사
               </Button>
             }
           />

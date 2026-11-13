@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 
 export function RatingStars({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center gap-0.5" aria-label={`${rating} out of 5 stars`}>
+    <div className="flex items-center gap-0.5" aria-label={`별점 5점 중 ${rating}점`}>
       {Array.from({ length: 5 }, (_, i) => i + 1).map((n) => (
         <Star
           key={n}

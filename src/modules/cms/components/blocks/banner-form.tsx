@@ -13,13 +13,13 @@ interface BannerFormProps {
 function BannerForm({ block, onChange }: BannerFormProps) {
   return (
     <div className="flex flex-col gap-4">
-      <Field label="Image">
+      <Field label="이미지">
         <MediaPicker
           value={block.image ? { id: '', path: block.image } : null}
           onChange={(m) => onChange({ ...block, image: m?.path ?? '' })}
         />
       </Field>
-      <Field label="Link">
+      <Field label="링크">
         <Input
           value={block.href ?? ''}
           placeholder="/products/sale"

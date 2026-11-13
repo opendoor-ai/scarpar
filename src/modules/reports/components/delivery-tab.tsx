@@ -22,13 +22,13 @@ function DeliveryTab({ performance, codByDistrict }: DeliveryTabProps) {
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <StatCard
-          label="Avg. delivery time"
-          value={performance.avgHours !== null ? `${performance.avgHours.toFixed(1)}h` : '—'}
+          label="평균 배송 시간"
+          value={performance.avgHours !== null ? `${performance.avgHours.toFixed(1)}시간` : '—'}
           icon={Clock}
           hint="Assigned to delivered"
         />
         <StatCard
-          label="Failure rate"
+          label="실패율"
           value={`${performance.failureRate.toFixed(1)}%`}
           icon={Percent}
           hint="Of delivered + failed"
@@ -36,18 +36,18 @@ function DeliveryTab({ performance, codByDistrict }: DeliveryTabProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="text-[13px] font-medium text-foreground">COD success by district</p>
+        <p className="text-[13px] font-medium text-foreground">지역별 착불 성공률</p>
         {codByDistrict.length === 0 ? (
-          <EmptyState icon={Truck} title="No deliveries in this range" />
+          <EmptyState icon={Truck} title="이 기간에 배송이 없습니다" />
         ) : (
           <div className="overflow-hidden rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>District</TableHead>
-                  <TableHead className="text-right">Delivered</TableHead>
-                  <TableHead className="text-right">Failed</TableHead>
-                  <TableHead className="text-right">Success rate</TableHead>
+                  <TableHead>지역</TableHead>
+                  <TableHead className="text-right">완료</TableHead>
+                  <TableHead className="text-right">실패</TableHead>
+                  <TableHead className="text-right">성공률</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -69,18 +69,18 @@ function DeliveryTab({ performance, codByDistrict }: DeliveryTabProps) {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="flex flex-col gap-2">
-          <p className="text-[13px] font-medium text-foreground">By rider</p>
+          <p className="text-[13px] font-medium text-foreground">배송기사별</p>
           {performance.byRider.length === 0 ? (
-            <p className="text-[13px] text-muted-foreground">No rider deliveries in this range.</p>
+            <p className="text-[13px] text-muted-foreground">이 기간에 배송기사 배송이 없습니다.</p>
           ) : (
             <div className="overflow-hidden rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Rider</TableHead>
-                    <TableHead className="text-right">Delivered</TableHead>
-                    <TableHead className="text-right">Failed</TableHead>
-                    <TableHead className="text-right">Avg. hours</TableHead>
+                    <TableHead>배송기사</TableHead>
+                    <TableHead className="text-right">완료</TableHead>
+                    <TableHead className="text-right">실패</TableHead>
+                    <TableHead className="text-right">평균 시간</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -101,18 +101,18 @@ function DeliveryTab({ performance, codByDistrict }: DeliveryTabProps) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <p className="text-[13px] font-medium text-foreground">By courier</p>
+          <p className="text-[13px] font-medium text-foreground">택배사별</p>
           {performance.byCourier.length === 0 ? (
-            <p className="text-[13px] text-muted-foreground">No courier deliveries in this range.</p>
+            <p className="text-[13px] text-muted-foreground">이 기간에 택배 배송이 없습니다.</p>
           ) : (
             <div className="overflow-hidden rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Courier</TableHead>
-                    <TableHead className="text-right">Delivered</TableHead>
-                    <TableHead className="text-right">Failed</TableHead>
-                    <TableHead className="text-right">Avg. hours</TableHead>
+                    <TableHead>택배사</TableHead>
+                    <TableHead className="text-right">완료</TableHead>
+                    <TableHead className="text-right">실패</TableHead>
+                    <TableHead className="text-right">평균 시간</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

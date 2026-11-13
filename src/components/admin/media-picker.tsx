@@ -89,7 +89,7 @@ function MediaPicker({ value, onChange, label }: MediaPickerProps) {
             className="absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full bg-foreground text-background"
           >
             <X className="size-2.5" />
-            <span className="sr-only">Clear</span>
+            <span className="sr-only">지우기</span>
           </button>
         </div>
       ) : (
@@ -101,20 +101,20 @@ function MediaPicker({ value, onChange, label }: MediaPickerProps) {
           )}
         >
           <ImagePlus className="size-4" />
-          <span className="text-2xs">Select</span>
+          <span className="text-2xs">선택</span>
         </button>
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Select media</DialogTitle>
+            <DialogTitle>미디어 선택</DialogTitle>
           </DialogHeader>
 
           <Tabs defaultValue="library">
             <TabsList>
-              <TabsTrigger value="library">Library</TabsTrigger>
-              <TabsTrigger value="upload">Upload</TabsTrigger>
+              <TabsTrigger value="library">보관함</TabsTrigger>
+              <TabsTrigger value="upload">업로드</TabsTrigger>
             </TabsList>
 
             <TabsContent value="library" className="min-h-[320px]">
@@ -131,9 +131,9 @@ function MediaPicker({ value, onChange, label }: MediaPickerProps) {
               />
               <Button type="button" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
                 {uploading ? <Loader2 className="size-4 animate-spin" /> : <ImagePlus className="size-4" />}
-                {uploading ? 'Uploading...' : 'Choose a file'}
+                {uploading ? '업로드 중...' : '파일 선택'}
               </Button>
-              <p className="text-xs text-muted-foreground">Uploads to your media library and selects it.</p>
+              <p className="text-xs text-muted-foreground">미디어 보관함에 올리고 바로 선택합니다.</p>
             </TabsContent>
           </Tabs>
         </DialogContent>

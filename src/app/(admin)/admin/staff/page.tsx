@@ -61,8 +61,8 @@ export default async function StaffPage() {
   return (
     <div>
       <PageHeader
-        title="Staff"
-        description="Manage who has access to this organization."
+        title="직원관리"
+        description="관리자 화면을 쓸 수 있는 사람을 관리합니다."
         actions={<InviteMemberDialog currentRole={ctx.role} />}
       />
 
@@ -71,7 +71,7 @@ export default async function StaffPage() {
 
         <div className="flex flex-col gap-3">
           <Separator />
-          <h2 className="text-sm font-semibold">Pending invitations</h2>
+          <h2 className="text-sm font-semibold">대기 중인 초대</h2>
           <InvitesSection invites={inviteRows} />
         </div>
       </div>

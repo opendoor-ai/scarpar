@@ -33,7 +33,7 @@ export function MobileNav({
       <SheetTrigger asChild>
         <button
           type="button"
-          aria-label="Open menu"
+          aria-label="메뉴 열기"
           className="inline-flex size-8 items-center justify-center rounded-md transition-colors hover:bg-accent md:hidden"
         >
           <Menu className="size-4" />

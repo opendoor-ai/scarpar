@@ -45,7 +45,7 @@ function EnrollCustomerDialog({ courseId }: EnrollCustomerDialogProps) {
     setSubmitting(false)
 
     if (result.ok) {
-      toast.success('Customer enrolled')
+      toast.success('수강 등록되었습니다')
       setOpen(false)
       reset()
     } else {
@@ -64,19 +64,19 @@ function EnrollCustomerDialog({ courseId }: EnrollCustomerDialogProps) {
       <DialogTrigger asChild>
         <Button size="sm">
           <UserPlus />
-          Enroll customer
+          수강생 등록
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Enroll customer</DialogTitle>
+          <DialogTitle>수강생 등록</DialogTitle>
         </DialogHeader>
 
         <Command shouldFilter={false} className="rounded-md border">
-          <CommandInput value={query} onValueChange={handleQueryChange} placeholder="Search by name or phone..." />
+          <CommandInput value={query} onValueChange={handleQueryChange} placeholder="이름 또는 전화번호로 검색..." />
           <CommandList>
-            {searching ? <div className="text-muted-foreground p-3 text-[13px]">Searching...</div> : null}
-            <CommandEmpty>No customers found.</CommandEmpty>
+            {searching ? <div className="text-muted-foreground p-3 text-[13px]">검색 중...</div> : null}
+            <CommandEmpty>고객을 찾을 수 없습니다.</CommandEmpty>
             <CommandGroup>
               {results.map((customer) => (
                 <CommandItem
@@ -98,7 +98,7 @@ function EnrollCustomerDialog({ courseId }: EnrollCustomerDialogProps) {
 
         <DialogFooter>
           <Button onClick={handleEnroll} disabled={!selected || submitting}>
-            {submitting ? 'Enrolling...' : 'Enroll'}
+            {submitting ? '등록 중...' : '등록'}
           </Button>
         </DialogFooter>
       </DialogContent>

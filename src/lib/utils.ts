@@ -48,3 +48,12 @@ export function slugify(text: string): string {
     .replace(/[^\p{L}\p{N}]+/gu, '-')
     .replace(/^-+|-+$/g, '')
 }
+
+/** Next.js keeps non-ASCII route params (e.g. Korean slugs) percent-encoded — decode before DB lookups. */
+export function decodeParam(value: string): string {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}

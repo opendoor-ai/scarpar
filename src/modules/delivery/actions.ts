@@ -61,7 +61,7 @@ async function loadDeliveryForOrg(
 
 function assertTransition(current: DeliveryStatus, next: DeliveryStatus): string | null {
   if (!DELIVERY_STATUS_FLOW[current]?.includes(next)) {
-    return `Cannot move a delivery from "${current}" to "${next}"`
+    return `배송 상태를 "${current}"에서 "${next}"(으)로 바꿀 수 없습니다`
   }
   return null
 }
@@ -80,7 +80,7 @@ export async function createDeliveryAction(
 
     const parsed = createDeliverySchema.safeParse(input)
     if (!parsed.success) {
-      return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+      return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
     }
     const data = parsed.data
 
@@ -94,14 +94,14 @@ export async function createDeliveryAction(
       .single()
 
     if (orderError || !order) {
-      return { ok: false, error: 'Order not found' }
+      return { ok: false, error: '주문을 찾을 수 없습니다' }
     }
 
     let consignmentId: string | null = null
     let trackingCode: string | null = null
 
     if (data.method === 'courier') {
-      if (!data.courier) return { ok: false, error: 'Select a courier' }
+      if (!data.courier) return { ok: false, error: '택배사를 선택하세요' }
 
       try {
         const adapter = getAdapter(data.courier)
@@ -132,7 +132,7 @@ export async function createDeliveryAction(
     })
 
     if (seqError || !deliveryNo) {
-      return { ok: false, error: 'Could not allocate a delivery number' }
+      return { ok: false, error: '배송 번호를 만들지 못했습니다' }
     }
 
     const isRiderAssigned = data.method === 'rider' && !!data.rider_id
@@ -165,14 +165,14 @@ export async function createDeliveryAction(
       .single()
 
     if (insertError || !delivery) {
-      return { ok: false, error: insertError?.message ?? 'Could not create delivery' }
+      return { ok: false, error: insertError?.message ?? '배송을 등록하지 못했습니다' }
     }
 
     await supabase.from('delivery_events').insert({
       org_id: ctx.org.id,
       delivery_id: delivery.id,
       status,
-      note: isRiderAssigned ? 'Delivery created and assigned to rider.' : 'Delivery created.',
+      note: isRiderAssigned ? '배송 등록 및 배송기사 배정 완료.' : '배송 등록 완료.',
       actor_id: ctx.user.id,
     })
 
@@ -180,7 +180,7 @@ export async function createDeliveryAction(
       org_id: ctx.org.id,
       order_id: order.id,
       type: 'delivery',
-      message: `Delivery ${delivery.delivery_no} created (${data.method}).`,
+      message: `배송 ${delivery.delivery_no} 등록 (${data.method}).`,
       actor_id: ctx.user.id,
     })
 
@@ -192,7 +192,7 @@ export async function createDeliveryAction(
   } catch (err) {
     unstable_rethrow(err)
     console.error('[createDeliveryAction]', err)
-    return { ok: false, error: 'Something went wrong creating the delivery' }
+    return { ok: false, error: '배송 등록 중 문제가 발생했습니다' }
   }
 }
 
@@ -202,12 +202,12 @@ export async function assignRiderAction(input: AssignRiderInput): Promise<Action
     requireRole(ctx, 'staff')
 
     const parsed = assignRiderSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
     const { delivery_id, rider_id } = parsed.data
 
     const supabase = await getServerClient()
     const delivery = await loadDeliveryForOrg(supabase, ctx.org.id, delivery_id)
-    if (!delivery) return { ok: false, error: 'Delivery not found' }
+    if (!delivery) return { ok: false, error: '배송을 찾을 수 없습니다' }
 
     const transitionError = assertTransition(delivery.status, 'assigned')
     if (transitionError) return { ok: false, error: transitionError }
@@ -218,7 +218,7 @@ export async function assignRiderAction(input: AssignRiderInput): Promise<Action
       .eq('id', rider_id)
       .eq('org_id', ctx.org.id)
       .single()
-    if (riderError || !rider) return { ok: false, error: 'Rider not found' }
+    if (riderError || !rider) return { ok: false, error: '배송기사를 찾을 수 없습니다' }
 
     const { error: updateError } = await supabase
       .from('deliveries')
@@ -230,7 +230,7 @@ export async function assignRiderAction(input: AssignRiderInput): Promise<Action
       org_id: ctx.org.id,
       delivery_id,
       status: 'assigned',
-      note: `Assigned to rider ${rider.name}.`,
+      note: `배송기사 ${rider.name}에게 배정.`,
       actor_id: ctx.user.id,
     })
 
@@ -241,7 +241,7 @@ export async function assignRiderAction(input: AssignRiderInput): Promise<Action
   } catch (err) {
     unstable_rethrow(err)
     console.error('[assignRiderAction]', err)
-    return { ok: false, error: 'Something went wrong assigning the rider' }
+    return { ok: false, error: '배송기사 배정 중 문제가 발생했습니다' }
   }
 }
 
@@ -251,11 +251,11 @@ export async function markPickedUpAction(input: { delivery_id: string }): Promis
     requireRole(ctx, 'staff')
 
     const parsed = markPickedUpSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: 'Invalid input' }
+    if (!parsed.success) return { ok: false, error: '입력값이 올바르지 않습니다' }
 
     const supabase = await getServerClient()
     const delivery = await loadDeliveryForOrg(supabase, ctx.org.id, parsed.data.delivery_id)
-    if (!delivery) return { ok: false, error: 'Delivery not found' }
+    if (!delivery) return { ok: false, error: '배송을 찾을 수 없습니다' }
 
     const transitionError = assertTransition(delivery.status, 'picked_up')
     if (transitionError) return { ok: false, error: transitionError }
@@ -275,7 +275,7 @@ export async function markPickedUpAction(input: { delivery_id: string }): Promis
       org_id: ctx.org.id,
       delivery_id: delivery.id,
       status: 'picked_up',
-      note: 'Picked up.',
+      note: '집하 완료.',
       actor_id: ctx.user.id,
     })
 
@@ -283,13 +283,13 @@ export async function markPickedUpAction(input: { delivery_id: string }): Promis
       org_id: ctx.org.id,
       order_id: delivery.order.id,
       type: 'delivery',
-      message: 'Order picked up for delivery — dispatched.',
+      message: '배송 집하 완료 — 출고 처리.',
       actor_id: ctx.user.id,
     })
 
     audit(ctx, 'delivery.picked_up', 'delivery', delivery.id, { status: delivery.status }, { status: 'picked_up' })
     await notify(ctx.org.id, 'order_dispatched', {
-      title: `Order ${delivery.order.order_no} dispatched`,
+      title: `주문 ${delivery.order.order_no} 출고됨`,
       link: `/admin/orders/${delivery.order.id}`,
     })
 
@@ -299,7 +299,7 @@ export async function markPickedUpAction(input: { delivery_id: string }): Promis
   } catch (err) {
     unstable_rethrow(err)
     console.error('[markPickedUpAction]', err)
-    return { ok: false, error: 'Something went wrong updating the delivery' }
+    return { ok: false, error: '배송 상태 변경 중 문제가 발생했습니다' }
   }
 }
 
@@ -309,11 +309,11 @@ export async function markInTransitAction(input: { delivery_id: string }): Promi
     requireRole(ctx, 'staff')
 
     const parsed = markInTransitSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: 'Invalid input' }
+    if (!parsed.success) return { ok: false, error: '입력값이 올바르지 않습니다' }
 
     const supabase = await getServerClient()
     const delivery = await loadDeliveryForOrg(supabase, ctx.org.id, parsed.data.delivery_id)
-    if (!delivery) return { ok: false, error: 'Delivery not found' }
+    if (!delivery) return { ok: false, error: '배송을 찾을 수 없습니다' }
 
     const transitionError = assertTransition(delivery.status, 'in_transit')
     if (transitionError) return { ok: false, error: transitionError }
@@ -328,7 +328,7 @@ export async function markInTransitAction(input: { delivery_id: string }): Promi
       org_id: ctx.org.id,
       delivery_id: delivery.id,
       status: 'in_transit',
-      note: 'In transit.',
+      note: '배송 중.',
       actor_id: ctx.user.id,
     })
 
@@ -339,7 +339,7 @@ export async function markInTransitAction(input: { delivery_id: string }): Promi
   } catch (err) {
     unstable_rethrow(err)
     console.error('[markInTransitAction]', err)
-    return { ok: false, error: 'Something went wrong updating the delivery' }
+    return { ok: false, error: '배송 상태 변경 중 문제가 발생했습니다' }
   }
 }
 
@@ -349,18 +349,18 @@ export async function markDeliveredAction(input: MarkDeliveredInput): Promise<Ac
     requireRole(ctx, 'staff')
 
     const parsed = markDeliveredSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
     const { delivery_id, otp, cod_collected } = parsed.data
 
     const supabase = await getServerClient()
     const delivery = await loadDeliveryForOrg(supabase, ctx.org.id, delivery_id)
-    if (!delivery) return { ok: false, error: 'Delivery not found' }
+    if (!delivery) return { ok: false, error: '배송을 찾을 수 없습니다' }
 
     const transitionError = assertTransition(delivery.status, 'delivered')
     if (transitionError) return { ok: false, error: transitionError }
 
     if (delivery.otp_code && delivery.otp_code !== (otp ?? '').trim()) {
-      return { ok: false, error: 'Incorrect OTP' }
+      return { ok: false, error: '인증 번호가 맞지 않습니다' }
     }
 
     const now = new Date().toISOString()
@@ -397,7 +397,7 @@ export async function markDeliveredAction(input: MarkDeliveredInput): Promise<Ac
       org_id: ctx.org.id,
       delivery_id: delivery.id,
       status: 'delivered',
-      note: cod_collected ? 'Delivered, COD collected.' : 'Delivered.',
+      note: cod_collected ? '배송 완료, 착불금 수금.' : '배송 완료.',
       actor_id: ctx.user.id,
     })
 
@@ -405,13 +405,13 @@ export async function markDeliveredAction(input: MarkDeliveredInput): Promise<Ac
       org_id: ctx.org.id,
       order_id: delivery.order.id,
       type: 'delivery',
-      message: 'Order delivered.',
+      message: '배송 완료.',
       actor_id: ctx.user.id,
     })
 
     audit(ctx, 'delivery.delivered', 'delivery', delivery.id, { status: delivery.status }, { status: 'delivered', cod_collected })
     await notify(ctx.org.id, 'order_delivered', {
-      title: `Order ${delivery.order.order_no} delivered`,
+      title: `주문 ${delivery.order.order_no} 배송 완료`,
       link: `/admin/orders/${delivery.order.id}`,
     })
 
@@ -422,7 +422,7 @@ export async function markDeliveredAction(input: MarkDeliveredInput): Promise<Ac
   } catch (err) {
     unstable_rethrow(err)
     console.error('[markDeliveredAction]', err)
-    return { ok: false, error: 'Something went wrong marking the delivery delivered' }
+    return { ok: false, error: '배송 완료 처리 중 문제가 발생했습니다' }
   }
 }
 
@@ -432,12 +432,12 @@ export async function markFailedAction(input: MarkFailedInput): Promise<ActionRe
     requireRole(ctx, 'staff')
 
     const parsed = markFailedSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
     const { delivery_id, reason } = parsed.data
 
     const supabase = await getServerClient()
     const delivery = await loadDeliveryForOrg(supabase, ctx.org.id, delivery_id)
-    if (!delivery) return { ok: false, error: 'Delivery not found' }
+    if (!delivery) return { ok: false, error: '배송을 찾을 수 없습니다' }
 
     const transitionError = assertTransition(delivery.status, 'failed')
     if (transitionError) return { ok: false, error: transitionError }
@@ -460,7 +460,7 @@ export async function markFailedAction(input: MarkFailedInput): Promise<ActionRe
       org_id: ctx.org.id,
       order_id: delivery.order.id,
       type: 'delivery',
-      message: `Delivery failed: ${reason}`,
+      message: `배송 실패: ${reason}`,
       actor_id: ctx.user.id,
     })
 
@@ -471,7 +471,7 @@ export async function markFailedAction(input: MarkFailedInput): Promise<ActionRe
   } catch (err) {
     unstable_rethrow(err)
     console.error('[markFailedAction]', err)
-    return { ok: false, error: 'Something went wrong marking the delivery failed' }
+    return { ok: false, error: '배송 실패 처리 중 문제가 발생했습니다' }
   }
 }
 
@@ -481,12 +481,12 @@ export async function markReturnedAction(input: MarkReturnedInput): Promise<Acti
     requireRole(ctx, 'staff')
 
     const parsed = markReturnedSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: 'Invalid input' }
+    if (!parsed.success) return { ok: false, error: '입력값이 올바르지 않습니다' }
     const { delivery_id, note } = parsed.data
 
     const supabase = await getServerClient()
     const delivery = await loadDeliveryForOrg(supabase, ctx.org.id, delivery_id)
-    if (!delivery) return { ok: false, error: 'Delivery not found' }
+    if (!delivery) return { ok: false, error: '배송을 찾을 수 없습니다' }
 
     const transitionError = assertTransition(delivery.status, 'returned')
     if (transitionError) return { ok: false, error: transitionError }
@@ -511,7 +511,7 @@ export async function markReturnedAction(input: MarkReturnedInput): Promise<Acti
       org_id: ctx.org.id,
       order_id: delivery.order.id,
       type: 'delivery',
-      message: note ? `Order returned: ${note}` : 'Order returned.',
+      message: note ? `반송: ${note}` : '반송 처리.',
       actor_id: ctx.user.id,
     })
 
@@ -522,7 +522,7 @@ export async function markReturnedAction(input: MarkReturnedInput): Promise<Acti
   } catch (err) {
     unstable_rethrow(err)
     console.error('[markReturnedAction]', err)
-    return { ok: false, error: 'Something went wrong returning the delivery' }
+    return { ok: false, error: '반송 처리 중 문제가 발생했습니다' }
   }
 }
 
@@ -536,7 +536,7 @@ export async function upsertZoneAction(input: ZoneInput): Promise<ActionResult<{
     requireRole(ctx, 'manager')
 
     const parsed = zoneSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
     const { id, eta_text, ...rest } = parsed.data
 
     const supabase = await getServerClient()
@@ -558,14 +558,14 @@ export async function upsertZoneAction(input: ZoneInput): Promise<ActionResult<{
         .select('id')
         .single()
 
-      if (error || !data) return { ok: false, error: error?.message ?? 'Zone not found' }
+      if (error || !data) return { ok: false, error: error?.message ?? '배송 지역을 찾을 수 없습니다' }
       audit(ctx, 'delivery_zone.update', 'delivery_zone', id, before, row)
       revalidatePath('/admin/delivery-zones')
       return { ok: true, data: { id } }
     }
 
     const { data, error } = await supabase.from('delivery_zones').insert(row).select('id').single()
-    if (error || !data) return { ok: false, error: error?.message ?? 'Could not create zone' }
+    if (error || !data) return { ok: false, error: error?.message ?? '배송 지역을 만들지 못했습니다' }
 
     audit(ctx, 'delivery_zone.create', 'delivery_zone', data.id, undefined, row)
     revalidatePath('/admin/delivery-zones')
@@ -573,7 +573,7 @@ export async function upsertZoneAction(input: ZoneInput): Promise<ActionResult<{
   } catch (err) {
     unstable_rethrow(err)
     console.error('[upsertZoneAction]', err)
-    return { ok: false, error: 'Something went wrong saving the zone' }
+    return { ok: false, error: '배송 지역 저장 중 문제가 발생했습니다' }
   }
 }
 
@@ -581,7 +581,7 @@ export async function deleteZoneAction(input: { id: string }): Promise<ActionRes
   try {
     const ctx = await requireOrg()
     requireRole(ctx, 'manager')
-    if (!input?.id) return { ok: false, error: 'Missing zone id' }
+    if (!input?.id) return { ok: false, error: '배송 지역 정보가 없습니다' }
 
     const supabase = await getServerClient()
     const { data: before } = await supabase
@@ -600,7 +600,7 @@ export async function deleteZoneAction(input: { id: string }): Promise<ActionRes
   } catch (err) {
     unstable_rethrow(err)
     console.error('[deleteZoneAction]', err)
-    return { ok: false, error: 'Something went wrong deleting the zone' }
+    return { ok: false, error: '배송 지역 삭제 중 문제가 발생했습니다' }
   }
 }
 
@@ -614,7 +614,7 @@ export async function upsertRiderAction(input: RiderInput): Promise<ActionResult
     requireRole(ctx, 'staff')
 
     const parsed = riderSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
     const { id, vehicle, user_id, ...rest } = parsed.data
 
     const supabase = await getServerClient()
@@ -630,14 +630,14 @@ export async function upsertRiderAction(input: RiderInput): Promise<ActionResult
         .select('id')
         .single()
 
-      if (error || !data) return { ok: false, error: error?.message ?? 'Rider not found' }
+      if (error || !data) return { ok: false, error: error?.message ?? '배송기사를 찾을 수 없습니다' }
       audit(ctx, 'rider.update', 'rider', id, before, row)
       revalidatePath('/admin/riders')
       return { ok: true, data: { id } }
     }
 
     const { data, error } = await supabase.from('riders').insert(row).select('id').single()
-    if (error || !data) return { ok: false, error: error?.message ?? 'Could not create rider' }
+    if (error || !data) return { ok: false, error: error?.message ?? '배송기사를 추가하지 못했습니다' }
 
     audit(ctx, 'rider.create', 'rider', data.id, undefined, row)
     revalidatePath('/admin/riders')
@@ -645,7 +645,7 @@ export async function upsertRiderAction(input: RiderInput): Promise<ActionResult
   } catch (err) {
     unstable_rethrow(err)
     console.error('[upsertRiderAction]', err)
-    return { ok: false, error: 'Something went wrong saving the rider' }
+    return { ok: false, error: '배송기사 저장 중 문제가 발생했습니다' }
   }
 }
 
@@ -653,7 +653,7 @@ export async function deactivateRiderAction(input: { id: string }): Promise<Acti
   try {
     const ctx = await requireOrg()
     requireRole(ctx, 'staff')
-    if (!input?.id) return { ok: false, error: 'Missing rider id' }
+    if (!input?.id) return { ok: false, error: '배송기사 정보가 없습니다' }
 
     const supabase = await getServerClient()
     const { error } = await supabase
@@ -669,7 +669,7 @@ export async function deactivateRiderAction(input: { id: string }): Promise<Acti
   } catch (err) {
     unstable_rethrow(err)
     console.error('[deactivateRiderAction]', err)
-    return { ok: false, error: 'Something went wrong deactivating the rider' }
+    return { ok: false, error: '배송기사 비활성화 중 문제가 발생했습니다' }
   }
 }
 
@@ -683,7 +683,7 @@ export async function settleCodAction(input: SettleCodInput): Promise<ActionResu
     requireRole(ctx, 'staff')
 
     const parsed = settleCodSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
     const { rider_id, delivery_ids, note } = parsed.data
 
     const supabase = await getServerClient()
@@ -694,7 +694,7 @@ export async function settleCodAction(input: SettleCodInput): Promise<ActionResu
       .eq('id', rider_id)
       .eq('org_id', ctx.org.id)
       .single()
-    if (riderError || !rider) return { ok: false, error: 'Rider not found' }
+    if (riderError || !rider) return { ok: false, error: '배송기사를 찾을 수 없습니다' }
 
     // Never trust client-supplied amounts (docs/conventions.md) — recompute
     // from the org's own unsettled, COD-collected deliveries for this rider.
@@ -708,7 +708,7 @@ export async function settleCodAction(input: SettleCodInput): Promise<ActionResu
       .in('id', delivery_ids)
 
     if (deliveriesError || !deliveries || deliveries.length === 0) {
-      return { ok: false, error: 'No settleable deliveries found for that selection' }
+      return { ok: false, error: '정산할 배송이 없습니다' }
     }
 
     const matchedIds = deliveries.map((delivery) => delivery.id as string)
@@ -728,7 +728,7 @@ export async function settleCodAction(input: SettleCodInput): Promise<ActionResu
       .single()
 
     if (settlementError || !settlement) {
-      return { ok: false, error: settlementError?.message ?? 'Could not create settlement' }
+      return { ok: false, error: settlementError?.message ?? '정산을 만들지 못했습니다' }
     }
 
     await supabase.from('deliveries').update({ settlement_id: settlement.id }).in('id', matchedIds)
@@ -748,6 +748,6 @@ export async function settleCodAction(input: SettleCodInput): Promise<ActionResu
   } catch (err) {
     unstable_rethrow(err)
     console.error('[settleCodAction]', err)
-    return { ok: false, error: 'Something went wrong settling COD' }
+    return { ok: false, error: '착불 정산 중 문제가 발생했습니다' }
   }
 }

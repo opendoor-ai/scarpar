@@ -3,7 +3,8 @@ import { requireOrg } from '@/lib/auth'
 import { requireModule } from '@/lib/modules'
 import { getServerClient } from '@/lib/supabase/server'
 
-import { ProductForm, toCategoryOptions } from '@/modules/catalog/components/product-form'
+import { ProductForm } from '@/modules/catalog/components/product-form'
+import { toCategoryOptions } from '@/modules/catalog/category-options'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +25,7 @@ export default async function NewProductPage() {
 
   return (
     <div>
-      <PageHeader title="New product" backHref="/admin/products" />
+      <PageHeader title="새 상품 등록" backHref="/admin/products" />
       <ProductForm mode="create" categories={categories} />
     </div>
   )

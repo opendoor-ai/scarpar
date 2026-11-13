@@ -106,12 +106,12 @@ export default async function DeliveriesPage({ searchParams }: PageProps) {
   return (
     <div className="flex flex-col gap-6 px-6 py-6">
       <PageHeader
-        title="Deliveries"
+        title="배송관리"
         actions={
           <Button asChild>
             <Link href="/admin/deliveries/new">
               <Plus className="size-4" />
-              New Delivery
+              새 배송
             </Link>
           </Button>
         }

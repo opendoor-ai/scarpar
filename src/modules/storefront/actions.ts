@@ -169,7 +169,7 @@ async function priceCartItems(
     .eq('org_id', orgId)
     .in('id', productIds)
 
-  if (productError || !productRows) return { ok: false, error: 'Could not load product prices.' }
+  if (productError || !productRows) return { ok: false, error: '상품 가격을 불러오지 못했습니다.' }
   const products = new Map((productRows as PricedProductRow[]).map((p) => [p.id, p]))
 
   const variantIds = [...new Set(items.map((i) => i.variantId).filter((v): v is string => Boolean(v)))]
@@ -180,7 +180,7 @@ async function priceCartItems(
       .select('id, product_id, name, price, stock_qty')
       .eq('org_id', orgId)
       .in('id', variantIds)
-    if (variantError || !variantRows) return { ok: false, error: 'Could not load variant prices.' }
+    if (variantError || !variantRows) return { ok: false, error: '옵션 가격을 불러오지 못했습니다.' }
     variants = new Map((variantRows as PricedVariantRow[]).map((v) => [v.id, v]))
   }
 
@@ -190,12 +190,12 @@ async function priceCartItems(
   for (const item of items) {
     const product = products.get(item.productId)
     if (!product || product.status !== 'active') {
-      return { ok: false, error: 'One of the items in your cart is no longer available.' }
+      return { ok: false, error: '장바구니에 더 이상 판매하지 않는 상품이 있습니다.' }
     }
 
     const variant = item.variantId ? variants.get(item.variantId) : undefined
     if (item.variantId && (!variant || variant.product_id !== item.productId)) {
-      return { ok: false, error: 'One of the items in your cart is no longer available.' }
+      return { ok: false, error: '장바구니에 더 이상 판매하지 않는 상품이 있습니다.' }
     }
 
     const unitPrice = variant ? variant.price : product.price
@@ -264,13 +264,13 @@ export async function quoteDeliveryAction(input: QuoteDeliveryInput): Promise<Ac
 
   try {
     const org = await getStoreOrg(parsed.data.orgSlug)
-    if (!org) return { ok: false, error: 'Store not found' }
+    if (!org) return { ok: false, error: '쇼핑몰을 찾을 수 없습니다' }
 
     const settings = await getOrgSettings(org.id)
     return { ok: true, data: await resolveDeliveryZone(org.id, parsed.data.district, settings) }
   } catch (err) {
     console.error('[storefront:quoteDeliveryAction]', err)
-    return { ok: false, error: 'Could not calculate delivery charge. Please try again.' }
+    return { ok: false, error: '배송비를 계산하지 못했습니다. 다시 시도해 주세요.' }
   }
 }
 
@@ -293,11 +293,11 @@ export async function applyDiscountAction(input: ApplyDiscountInput): Promise<Ac
 
   try {
     const org = await getStoreOrg(parsed.data.orgSlug)
-    if (!org) return { ok: false, error: 'Store not found' }
+    if (!org) return { ok: false, error: '쇼핑몰을 찾을 수 없습니다' }
 
     const priced = await priceCartItems(org.id, parsed.data.items)
     if (!priced.ok) return priced
-    if (!priced.data) return { ok: false, error: 'Could not price your cart.' }
+    if (!priced.data) return { ok: false, error: '장바구니 금액을 계산하지 못했습니다.' }
     const { subtotal, productIds, categoryIds } = priced.data
 
     const result = await validateDiscountCode(org.id, parsed.data.code, subtotal, productIds, categoryIds)
@@ -314,7 +314,7 @@ export async function applyDiscountAction(input: ApplyDiscountInput): Promise<Ac
     }
   } catch (err) {
     console.error('[storefront:applyDiscountAction]', err)
-    return { ok: false, error: 'Could not apply this code. Please try again.' }
+    return { ok: false, error: '할인 코드를 적용하지 못했습니다. 다시 시도해 주세요.' }
   }
 }
 
@@ -337,14 +337,14 @@ export async function placeOrderAction(input: PlaceOrderInput): Promise<ActionRe
 
   try {
     const org = await getStoreOrg(data.orgSlug)
-    if (!org) return { ok: false, error: 'Store not found' }
+    if (!org) return { ok: false, error: '쇼핑몰을 찾을 수 없습니다' }
 
     const settings = await getOrgSettings(org.id)
 
     // 1. price + stock truth ------------------------------------------------------------------
     const priced = await priceCartItems(org.id, data.items)
     if (!priced.ok) return priced
-    if (!priced.data) return { ok: false, error: 'Could not price your cart.' }
+    if (!priced.data) return { ok: false, error: '장바구니 금액을 계산하지 못했습니다.' }
     const { lines, subtotal, productIds, categoryIds } = priced.data
 
     for (const line of lines) {
@@ -354,7 +354,7 @@ export async function placeOrderAction(input: PlaceOrderInput): Promise<ActionRe
     }
 
     if (subtotal < settingNum(settings, 'checkout.min_order')) {
-      return { ok: false, error: 'Your order is below the minimum order amount for this store.' }
+      return { ok: false, error: '최소 주문 금액보다 적습니다.' }
     }
 
     // 2. discount (re-validated server-side; client's applyDiscountAction result is not trusted) -
@@ -381,7 +381,7 @@ export async function placeOrderAction(input: PlaceOrderInput): Promise<ActionRe
     const risk = await checkBlocklist(org.id, data.contact.phone, data.address.line1)
     const highRiskAction = settingStr(settings, 'fraud.high_risk_action')
     if (risk.isRisk && highRiskAction === 'block') {
-      return { ok: false, error: 'Order cannot be placed, contact us' }
+      return { ok: false, error: '주문할 수 없습니다. 고객센터로 문의해 주세요' }
     }
 
     // 5. advance + payment method ---------------------------------------------------------------
@@ -403,13 +403,13 @@ export async function placeOrderAction(input: PlaceOrderInput): Promise<ActionRe
     }
 
     if (data.paymentMethod === 'cod' && !settingBool(settings, 'payments.cod_enabled')) {
-      return { ok: false, error: 'Cash on delivery is not available for this store.' }
+      return { ok: false, error: '이 쇼핑몰은 착불 결제를 지원하지 않습니다.' }
     }
     if (data.paymentMethod === 'cod' && !zone.codAvailable) {
-      return { ok: false, error: 'Cash on delivery is not available for your district — choose bKash/Nagad instead.' }
+      return { ok: false, error: '선택한 지역은 착불 결제를 할 수 없습니다. 다른 결제 방법을 선택하세요.' }
     }
     if (data.paymentMethod !== 'cod' && !settingBool(settings, 'payments.manual_mfs.enabled')) {
-      return { ok: false, error: 'This payment method is not available for this store.' }
+      return { ok: false, error: '이 결제 방법은 사용할 수 없습니다.' }
     }
 
     let paymentRow: {
@@ -422,12 +422,12 @@ export async function placeOrderAction(input: PlaceOrderInput): Promise<ActionRe
 
     if (data.paymentMethod === 'bkash' || data.paymentMethod === 'nagad') {
       if (!data.trxId || !data.senderNumber) {
-        return { ok: false, error: 'Enter the transaction ID and sender number for your payment.' }
+        return { ok: false, error: '거래 번호와 송금한 번호를 입력하세요.' }
       }
       paymentRow = { method: data.paymentMethod, kind: 'full', amount: total, trxId: data.trxId, senderNumber: data.senderNumber }
     } else if (advanceRequired) {
       if (!data.advanceMfsProvider || !data.trxId || !data.senderNumber) {
-        return { ok: false, error: 'Enter the advance payment details (provider, transaction ID, sender number).' }
+        return { ok: false, error: '선결제 정보(송금 방법, 거래 번호, 송금한 번호)를 입력하세요.' }
       }
       paymentRow = {
         method: data.advanceMfsProvider,
@@ -496,7 +496,7 @@ export async function placeOrderAction(input: PlaceOrderInput): Promise<ActionRe
     }
 
     await notify(org.id, 'order_placed', {
-      title: `New order ${result.orderNo}`,
+      title: `새 주문 ${result.orderNo}`,
       body: `${data.contact.name} — ${formatMoney(result.total)}`,
       link: `/admin/orders/${result.orderId}`,
     })
@@ -504,7 +504,7 @@ export async function placeOrderAction(input: PlaceOrderInput): Promise<ActionRe
     return { ok: true, data: { orderNo: result.orderNo } }
   } catch (err) {
     console.error('[storefront:placeOrderAction]', err)
-    return { ok: false, error: 'Could not place your order. Please try again.' }
+    return { ok: false, error: '주문하지 못했습니다. 다시 시도해 주세요.' }
   }
 }
 
@@ -519,7 +519,7 @@ export async function createReviewAction(input: ReviewInput): Promise<ActionResu
 
   try {
     const org = await getStoreOrg(data.orgSlug)
-    if (!org) return { ok: false, error: 'Store not found' }
+    if (!org) return { ok: false, error: '쇼핑몰을 찾을 수 없습니다' }
 
     const supabase = getAdminClient()
 
@@ -529,7 +529,7 @@ export async function createReviewAction(input: ReviewInput): Promise<ActionResu
       .eq('org_id', org.id)
       .eq('id', data.productId)
       .maybeSingle()
-    if (!product) return { ok: false, error: 'Product not found' }
+    if (!product) return { ok: false, error: '상품을 찾을 수 없습니다' }
 
     const { data: inserted, error } = await supabase
       .from('reviews')
@@ -547,11 +547,11 @@ export async function createReviewAction(input: ReviewInput): Promise<ActionResu
       .select('id')
       .single()
 
-    if (error || !inserted) return { ok: false, error: 'Could not submit your review. Please try again.' }
+    if (error || !inserted) return { ok: false, error: '리뷰를 등록하지 못했습니다. 다시 시도해 주세요.' }
     return { ok: true, data: { id: (inserted as { id: string }).id } }
   } catch (err) {
     console.error('[storefront:createReviewAction]', err)
-    return { ok: false, error: 'Could not submit your review. Please try again.' }
+    return { ok: false, error: '리뷰를 등록하지 못했습니다. 다시 시도해 주세요.' }
   }
 }
 
@@ -566,9 +566,9 @@ export async function inquiryAction(input: InquiryInput): Promise<ActionResult<{
 
   try {
     const org = await getStoreOrg(data.orgSlug)
-    if (!org) return { ok: false, error: 'Store not found' }
+    if (!org) return { ok: false, error: '쇼핑몰을 찾을 수 없습니다' }
     if (!data.phone && !data.email) {
-      return { ok: false, error: 'Add a phone number or email so we can reply.' }
+      return { ok: false, error: '답변받을 전화번호나 이메일을 입력하세요.' }
     }
 
     const supabase = getAdminClient()
@@ -587,10 +587,10 @@ export async function inquiryAction(input: InquiryInput): Promise<ActionResult<{
       .select('id')
       .single()
 
-    if (error || !inserted) return { ok: false, error: 'Could not send your message. Please try again.' }
+    if (error || !inserted) return { ok: false, error: '문의를 보내지 못했습니다. 다시 시도해 주세요.' }
 
     await notify(org.id, 'inquiry_received', {
-      title: `New inquiry from ${data.name}`,
+      title: `새 문의: ${data.name}`,
       body: data.message.slice(0, 140),
       link: '/admin',
     })
@@ -598,6 +598,6 @@ export async function inquiryAction(input: InquiryInput): Promise<ActionResult<{
     return { ok: true, data: { id: (inserted as { id: string }).id } }
   } catch (err) {
     console.error('[storefront:inquiryAction]', err)
-    return { ok: false, error: 'Could not send your message. Please try again.' }
+    return { ok: false, error: '문의를 보내지 못했습니다. 다시 시도해 주세요.' }
   }
 }

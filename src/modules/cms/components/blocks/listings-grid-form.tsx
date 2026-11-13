@@ -11,7 +11,7 @@ interface ListingsGridFormProps {
 
 function ListingsGridForm({ block, onChange }: ListingsGridFormProps) {
   return (
-    <Field label="Limit" help="Number of listings to show. Leave blank to show all active listings.">
+    <Field label="표시 개수" help="표시할 매물 수. 비워 두면 전체 표시">
       <Input
         type="number"
         min={1}

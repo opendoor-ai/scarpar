@@ -34,7 +34,7 @@ export async function createPageAction(input: {
   requireRole(ctx, 'manager')
 
   const parsed = createPageSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   const { title, slug, type } = parsed.data
 
   const supabase = await getServerClient()
@@ -46,7 +46,7 @@ export async function createPageAction(input: {
       .eq('org_id', ctx.org.id)
       .eq('type', 'home')
       .maybeSingle()
-    if (existingHome) return { ok: false, error: 'This org already has a home page.' }
+    if (existingHome) return { ok: false, error: '이미 메인(홈) 페이지가 있습니다.' }
   }
 
   const { data, error } = await supabase
@@ -56,7 +56,7 @@ export async function createPageAction(input: {
     .single()
 
   if (error) {
-    if (error.code === '23505') return { ok: false, error: 'A page with this slug already exists.' }
+    if (error.code === '23505') return { ok: false, error: '같은 주소의 페이지가 이미 있습니다.' }
     return { ok: false, error: error.message }
   }
 
@@ -74,7 +74,7 @@ export async function updatePageTitleAction(input: {
   requireRole(ctx, 'manager')
 
   const parsed = updatePageTitleSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid title' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '제목이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
   const { error } = await supabase
@@ -99,7 +99,7 @@ export async function saveDraftAction(input: {
   requireRole(ctx, 'manager')
 
   const parsed = saveDraftSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid blocks' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '블록 내용이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
   const { error } = await supabase
@@ -125,7 +125,7 @@ export async function publishAction(input: { pageId: string }): Promise<ActionRe
   requireRole(ctx, 'manager')
 
   const parsed = publishSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: '입력값이 올바르지 않습니다' }
   const { pageId } = parsed.data
 
   const supabase = await getServerClient()
@@ -137,7 +137,7 @@ export async function publishAction(input: { pageId: string }): Promise<ActionRe
     .eq('org_id', ctx.org.id)
     .single()
 
-  if (fetchError || !page) return { ok: false, error: 'Page not found.' }
+  if (fetchError || !page) return { ok: false, error: '페이지를 찾을 수 없습니다.' }
 
   const nextBlocks = page.draft_blocks ?? page.blocks
 
@@ -189,7 +189,7 @@ export async function discardDraftAction(input: { pageId: string }): Promise<Act
   requireRole(ctx, 'manager')
 
   const parsed = discardDraftSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: '입력값이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
   const { error } = await supabase
@@ -215,7 +215,7 @@ export async function restoreRevisionAction(input: {
   requireRole(ctx, 'manager')
 
   const parsed = restoreRevisionSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: '입력값이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
   const { data: revision, error: fetchError } = await supabase
@@ -226,7 +226,7 @@ export async function restoreRevisionAction(input: {
     .eq('org_id', ctx.org.id)
     .single()
 
-  if (fetchError || !revision) return { ok: false, error: 'Revision not found.' }
+  if (fetchError || !revision) return { ok: false, error: '버전을 찾을 수 없습니다.' }
 
   const { error } = await supabase
     .from('cms_pages')
@@ -248,7 +248,7 @@ export async function saveMenuAction(input: SaveMenuInput): Promise<ActionResult
   requireRole(ctx, 'manager')
 
   const parsed = saveMenuSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid menu' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '메뉴 내용이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
   const { error } = await supabase

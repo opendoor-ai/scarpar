@@ -49,14 +49,14 @@ export default async function CourseDetailPage({ params }: PageProps<{ id: strin
     <div className="px-6 py-6">
       <PageHeader
         title={courseRow.title}
-        description={`Created ${new Date(courseRow.created_at).toLocaleDateString()}`}
+        description={`등록일 ${new Date(courseRow.created_at).toLocaleDateString('ko-KR')}`}
         backHref="/admin/courses"
         actions={<StatusBadge kind="product" value={courseRow.status} />}
       />
 
       <Tabs defaultValue="details">
         <TabsList>
-          <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="details">정보</TabsTrigger>
           <TabsTrigger value="enrollments">Enrollments ({enrollmentRows.length})</TabsTrigger>
         </TabsList>
 

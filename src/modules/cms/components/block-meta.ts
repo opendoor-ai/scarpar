@@ -20,17 +20,17 @@ export const BLOCK_TYPES: CmsBlock['_type'][] = [
 ]
 
 export const BLOCK_LABELS: Record<CmsBlock['_type'], string> = {
-  hero: 'Hero',
-  richText: 'Rich Text',
-  productGrid: 'Product Grid',
-  banner: 'Banner',
-  imageWithText: 'Image with Text',
-  faq: 'FAQ',
-  testimonials: 'Testimonials',
-  contact: 'Contact',
-  listingsGrid: 'Listings Grid',
-  coursesGrid: 'Courses Grid',
-  html: 'Custom HTML',
+  hero: '메인 배너(히어로)',
+  richText: '글(텍스트)',
+  productGrid: '상품 목록',
+  banner: '배너',
+  imageWithText: '이미지 + 글',
+  faq: '자주 묻는 질문',
+  testimonials: '고객 후기',
+  contact: '문의하기',
+  listingsGrid: '매물 목록',
+  coursesGrid: '강의 목록',
+  html: '직접 입력 HTML',
 }
 
 function stripHtml(html: string): string {
@@ -43,27 +43,27 @@ export function blockSummary(block: CmsBlock): string {
     case 'hero':
       return block.heading || 'Untitled heading'
     case 'richText':
-      return block.html ? stripHtml(block.html).slice(0, 60) : 'Empty'
+      return block.html ? stripHtml(block.html).slice(0, 60) : '비어 있음'
     case 'productGrid': {
-      const modeLabel = block.mode === 'featured' ? 'Featured' : block.mode === 'category' ? 'Category' : 'Hand-picked'
-      return `${modeLabel}${block.limit ? ` · limit ${block.limit}` : ''}`
+      const modeLabel = block.mode === 'featured' ? '추천 상품' : block.mode === 'category' ? '카테고리' : '직접 선택'
+      return `${modeLabel}${block.limit ? ` · 최대 ${block.limit}개` : ''}`
     }
     case 'banner':
       return block.href || 'No link'
     case 'imageWithText':
       return block.heading || 'Untitled heading'
     case 'faq':
-      return `${block.items.length} question${block.items.length === 1 ? '' : 's'}`
+      return `질문 ${block.items.length}개`
     case 'testimonials':
-      return block.mode === 'reviews' ? 'From published reviews' : `${block.items?.length ?? 0} testimonial(s)`
+      return block.mode === 'reviews' ? '게시된 리뷰에서 가져옴' : `후기 ${block.items?.length ?? 0}개`
     case 'contact':
       return block.heading || 'Untitled heading'
     case 'listingsGrid':
-      return block.limit ? `Limit ${block.limit}` : 'All active listings'
+      return block.limit ? `최대 ${block.limit}개` : '활성 매물 전체'
     case 'coursesGrid':
-      return block.limit ? `Limit ${block.limit}` : 'All active courses'
+      return block.limit ? `최대 ${block.limit}개` : '활성 강의 전체'
     case 'html':
-      return block.raw ? block.raw.slice(0, 60) : 'Empty'
+      return block.raw ? block.raw.slice(0, 60) : '비어 있음'
     default:
       return ''
   }

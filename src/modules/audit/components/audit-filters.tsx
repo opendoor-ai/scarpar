@@ -51,13 +51,13 @@ function AuditFilters({ entityOptions }: AuditFiltersProps) {
   return (
     <div className="flex flex-wrap items-end gap-3">
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-muted-foreground">Entity</label>
+        <label className="text-xs font-medium text-muted-foreground">대상</label>
         <Select value={entity} onValueChange={setEntity}>
           <SelectTrigger className="w-40">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All entities</SelectItem>
+            <SelectItem value="all">전체</SelectItem>
             {entityOptions.map((opt) => (
               <SelectItem key={opt} value={opt}>
                 {opt}
@@ -68,32 +68,32 @@ function AuditFilters({ entityOptions }: AuditFiltersProps) {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-muted-foreground">Action</label>
+        <label className="text-xs font-medium text-muted-foreground">작업</label>
         <Input
           value={action}
           onChange={(e) => setAction(e.target.value)}
-          placeholder="e.g. settings.updated"
+          placeholder="예: settings.updated"
           className="w-48"
           onKeyDown={(e) => e.key === 'Enter' && apply()}
         />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-muted-foreground">From</label>
+        <label className="text-xs font-medium text-muted-foreground">시작일</label>
         <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-36" />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-muted-foreground">To</label>
+        <label className="text-xs font-medium text-muted-foreground">종료일</label>
         <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-36" />
       </div>
 
       <Button size="sm" onClick={apply}>
-        Apply
+적용
       </Button>
       {hasFilters ? (
         <Button size="sm" variant="ghost" onClick={reset}>
-          Reset
+초기화
         </Button>
       ) : null}
     </div>

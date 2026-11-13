@@ -80,7 +80,7 @@ export default async function AuditPage({ searchParams }: PageProps<Record<strin
     return {
       id: row.id,
       createdAt: row.created_at,
-      actorLabel: profile?.full_name ?? shortId(row.actor_id) ?? 'System',
+      actorLabel: profile?.full_name ?? shortId(row.actor_id) ?? '시스템',
       action: row.action,
       entity: row.entity,
       entityIdShort: shortId(row.entity_id),
@@ -91,7 +91,7 @@ export default async function AuditPage({ searchParams }: PageProps<Record<strin
 
   return (
     <div>
-      <PageHeader title="Audit Log" description="Every change made across this organization." />
+      <PageHeader title="활동 기록" description="이 회사에서 일어난 모든 변경 내역" />
 
       <div className="flex flex-col gap-4">
         <AuditFilters entityOptions={entityOptions} />

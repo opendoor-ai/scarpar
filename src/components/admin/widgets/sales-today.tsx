@@ -45,14 +45,14 @@ export async function SalesTodayWidget() {
   return (
     <Card className="gap-3 p-4">
       <div className="flex items-center justify-between">
-        <span className="text-[12px] font-medium text-muted-foreground">Sales Today</span>
+        <span className="text-[12px] font-medium text-muted-foreground">오늘 매출</span>
         <TrendingUp className="size-4 text-muted-foreground" />
       </div>
 
       <div className="flex flex-col gap-2">
-        <StatRow label="Revenue" value={formatCompact(revenue, { symbol: true })} first />
-        <StatRow label="Orders" value={String(orderCount)} />
-        <StatRow label="Pending" value={String(pendingCount)} />
+        <StatRow label="매출" value={formatCompact(revenue, { symbol: true })} first />
+        <StatRow label="주문" value={String(orderCount)} />
+        <StatRow label="대기" value={String(pendingCount)} />
       </div>
 
       <Link

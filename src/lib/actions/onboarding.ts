@@ -40,13 +40,13 @@ export async function createOrgAction(input: CreateOrgInput): Promise<ActionResu
 
   const parsed = createOrgSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input.' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다.' }
   }
 
   const { name, phone, vertical, seedDemo } = parsed.data
   const slug = slugify(parsed.data.slug) || slugify(name)
   if (!slug) {
-    return { ok: false, error: 'Enter a valid organization name.' }
+    return { ok: false, error: '회사(조직) 이름을 정확히 입력하세요.' }
   }
 
   const admin = getAdminClient()
@@ -55,7 +55,7 @@ export async function createOrgAction(input: CreateOrgInput): Promise<ActionResu
   try {
     const { data: taken } = await admin.from('orgs').select('id').eq('slug', slug).maybeSingle()
     if (taken) {
-      return { ok: false, error: 'That URL slug is already taken — try another.' }
+      return { ok: false, error: '이미 사용 중인 주소입니다. 다른 주소를 입력하세요.' }
     }
 
     const { data: orgRow, error: orgError } = await admin
@@ -65,14 +65,15 @@ export async function createOrgAction(input: CreateOrgInput): Promise<ActionResu
         slug,
         vertical,
         phone,
-        currency: 'BDT',
+        currency: 'KRW',
+        timezone: 'Asia/Seoul',
         enabled_modules: VERTICAL_PRESETS[vertical].modules,
       })
       .select('*')
       .single()
 
     if (orgError || !orgRow) {
-      return { ok: false, error: orgError?.message ?? 'Could not create organization.' }
+      return { ok: false, error: orgError?.message ?? '조직을 만들지 못했습니다.' }
     }
     org = orgRow as Org
 
@@ -102,7 +103,7 @@ export async function createOrgAction(input: CreateOrgInput): Promise<ActionResu
       return { ok: false, error: settingsError.message }
     }
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Could not create organization.' }
+    return { ok: false, error: err instanceof Error ? err.message : '조직을 만들지 못했습니다.' }
   }
 
   if (seedDemo) {

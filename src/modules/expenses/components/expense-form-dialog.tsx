@@ -74,9 +74,9 @@ function CategoryField({ value, onChange }: { value: string; onChange: (value: s
       </PopoverTrigger>
       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
         <Command shouldFilter={false}>
-          <CommandInput placeholder="Search or create category..." value={query} onValueChange={setQuery} />
+          <CommandInput placeholder="분류 검색 또는 새로 입력..." value={query} onValueChange={setQuery} />
           <CommandList>
-            <CommandEmpty>No category found.</CommandEmpty>
+            <CommandEmpty>분류가 없습니다.</CommandEmpty>
             <CommandGroup>
               {filtered.map((c) => (
                 <CommandItem
@@ -156,7 +156,7 @@ function ExpenseFormDialog({ trigger, expense }: ExpenseFormDialogProps) {
       return
     }
 
-    toast.success(isEdit ? 'Expense updated' : 'Expense added')
+    toast.success(isEdit ? '지출이 수정되었습니다' : '지출이 추가되었습니다')
     setOpen(false)
   }
 
@@ -165,9 +165,9 @@ function ExpenseFormDialog({ trigger, expense }: ExpenseFormDialogProps) {
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit expense' : 'New expense'}</DialogTitle>
+          <DialogTitle>{isEdit ? '지출 수정' : '새 지출'}</DialogTitle>
           <DialogDescription>
-            {isEdit ? 'Update this expense entry.' : 'Record a new business expense.'}
+            {isEdit ? '지출 내용을 수정합니다.' : '새 지출을 기록합니다.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -178,7 +178,7 @@ function ExpenseFormDialog({ trigger, expense }: ExpenseFormDialogProps) {
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>분류</FormLabel>
                   <FormControl>
                     <CategoryField value={field.value} onChange={field.onChange} />
                   </FormControl>
@@ -192,7 +192,7 @@ function ExpenseFormDialog({ trigger, expense }: ExpenseFormDialogProps) {
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Amount (৳)</FormLabel>
+                  <FormLabel>금액 (원)</FormLabel>
                   <FormControl>
                     <Input inputMode="decimal" placeholder="0.00" {...field} />
                   </FormControl>
@@ -206,7 +206,7 @@ function ExpenseFormDialog({ trigger, expense }: ExpenseFormDialogProps) {
               name="spent_at"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Date</FormLabel>
+                  <FormLabel>날짜</FormLabel>
                   <FormControl>
                     <Input type="date" {...field} />
                   </FormControl>
@@ -220,9 +220,9 @@ function ExpenseFormDialog({ trigger, expense }: ExpenseFormDialogProps) {
               name="note"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Note</FormLabel>
+                  <FormLabel>메모</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Optional note" {...field} />
+                    <Textarea placeholder="메모 (선택)" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -234,9 +234,9 @@ function ExpenseFormDialog({ trigger, expense }: ExpenseFormDialogProps) {
               name="media_id"
               render={() => (
                 <FormItem>
-                  <FormLabel>Receipt</FormLabel>
+                  <FormLabel>영수증</FormLabel>
                   <FormControl>
-                    <MediaPicker value={mediaValue} onChange={handleMediaChange} label="Attach receipt (optional)" />
+                    <MediaPicker value={mediaValue} onChange={handleMediaChange} label="영수증 첨부 (선택)" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -245,10 +245,10 @@ function ExpenseFormDialog({ trigger, expense }: ExpenseFormDialogProps) {
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                Cancel
+                취소
               </Button>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Saving...' : isEdit ? 'Save changes' : 'Add expense'}
+                {form.formState.isSubmitting ? '저장 중...' : isEdit ? '변경사항 저장' : '지출 추가'}
               </Button>
             </DialogFooter>
           </form>

@@ -27,7 +27,7 @@ function CustomerCard({ customerId, customerName, customerPhone, customerEmail, 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Customer</CardTitle>
+        <CardTitle>고객</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         <div className="flex items-center gap-2 text-[13px]">

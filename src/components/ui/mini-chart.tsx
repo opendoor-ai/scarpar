@@ -40,7 +40,7 @@ function MiniBarChart({
         className="w-full"
         style={{ height }}
         role="img"
-        aria-label="Bar chart"
+        aria-label="막대 그래프"
       >
         {data.map((d, i) => {
           const barHeight = Math.max(
@@ -110,7 +110,7 @@ function Sparkline({
       height={height}
       className={cn("text-primary overflow-visible", className)}
       role="img"
-      aria-label="Trend sparkline"
+      aria-label="추이 그래프"
     >
       <polyline
         points={points}

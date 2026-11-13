@@ -38,7 +38,7 @@ function CourseDetailForm({ course }: CourseDetailFormProps) {
   async function onSubmit(values: CourseFormValues) {
     const result = await updateCourse(course.id, { ...values, cover_media_id: cover?.id ?? null })
     if (result.ok) {
-      toast.success('Course saved')
+      toast.success('강의가 저장되었습니다')
     } else {
       toast.error(result.error)
     }
@@ -47,7 +47,7 @@ function CourseDetailForm({ course }: CourseDetailFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Course details</CardTitle>
+        <CardTitle>강의 정보</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -58,7 +58,7 @@ function CourseDetailForm({ course }: CourseDetailFormProps) {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>강의명</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -71,7 +71,7 @@ function CourseDetailForm({ course }: CourseDetailFormProps) {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price (৳)</FormLabel>
+                    <FormLabel>가격 (원)</FormLabel>
                     <FormControl>
                       <Input inputMode="decimal" {...field} />
                     </FormControl>
@@ -86,7 +86,7 @@ function CourseDetailForm({ course }: CourseDetailFormProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>설명</FormLabel>
                   <FormControl>
                     <Textarea rows={4} {...field} />
                   </FormControl>
@@ -102,7 +102,7 @@ function CourseDetailForm({ course }: CourseDetailFormProps) {
                   setCover(media)
                   form.setValue('cover_media_id', media?.id ?? null)
                 }}
-                label="Cover image"
+                label="대표 이미지"
               />
 
               <FormField
@@ -110,7 +110,7 @@ function CourseDetailForm({ course }: CourseDetailFormProps) {
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>상태</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -118,9 +118,9 @@ function CourseDetailForm({ course }: CourseDetailFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="draft">Draft</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="archived">Archived</SelectItem>
+                        <SelectItem value="draft">임시저장</SelectItem>
+                        <SelectItem value="active">공개</SelectItem>
+                        <SelectItem value="archived">보관</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -131,7 +131,7 @@ function CourseDetailForm({ course }: CourseDetailFormProps) {
 
             <div className="flex justify-end">
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Saving...' : 'Save changes'}
+                {form.formState.isSubmitting ? '저장 중...' : '변경사항 저장'}
               </Button>
             </div>
           </form>

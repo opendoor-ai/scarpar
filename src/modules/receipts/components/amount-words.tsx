@@ -4,5 +4,5 @@ import { moneyToWords } from '@/lib/money'
 // thermal/label are too condensed for this line).
 
 export function AmountWords({ paisa }: { paisa: number }) {
-  return <p className="amount-words">Amount in words: {moneyToWords(paisa)} only.</p>
+  return <p className="amount-words">합계 금액: {moneyToWords(paisa)}</p>
 }

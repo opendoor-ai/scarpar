@@ -26,7 +26,7 @@ export async function ListingsGridBlockView({ block, ctx }: { block: ListingsGri
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <h2 className="mb-5 text-lg font-semibold">Listings</h2>
+      <h2 className="mb-5 text-lg font-semibold">매물</h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {listings.map((l) => {
           const district = (l.address as { district?: string } | null)?.district

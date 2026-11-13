@@ -35,30 +35,28 @@ export default async function ReceiptsPage() {
   return (
     <div>
       <PageHeader
-        title="Receipts"
-        description="Print invoices, thermal receipts, and courier labels."
+        title="영수증·출력"
+        description="거래명세서, 영수증, 배송 라벨을 출력합니다."
       />
 
       <div className="flex flex-col gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>How printing works</CardTitle>
+            <CardTitle>출력 방법</CardTitle>
             <CardDescription>
-              Invoice, thermal, and label pages render as plain HTML styled for print — use your
-              browser&apos;s print dialog to save as PDF or send to a printer, thermal, or label
-              device. Invoice numbers (INV-…) are issued the first time an order&apos;s invoice is
-              printed and stay fixed after that.
+출력 화면에서 브라우저 인쇄(Ctrl+P)를 누르면 PDF로 저장하거나 프린터로 출력할 수 있습니다.
+              거래명세서 번호(INV-…)는 처음 출력할 때 정해지고 이후에는 바뀌지 않습니다.
             </CardDescription>
           </CardHeader>
         </Card>
 
         <div className="flex flex-col gap-3">
-          <h2 className="text-base font-semibold text-foreground">Recent orders</h2>
+          <h2 className="text-base font-semibold text-foreground">최근 주문</h2>
           <RecentOrdersTable orders={(orders ?? []) as RecentOrderRow[]} />
         </div>
 
         <div className="flex flex-col gap-3">
-          <h2 className="text-base font-semibold text-foreground">Recent deliveries</h2>
+          <h2 className="text-base font-semibold text-foreground">최근 배송</h2>
           <RecentDeliveriesTable deliveries={(deliveries ?? []) as RecentDeliveryRow[]} />
         </div>
       </div>

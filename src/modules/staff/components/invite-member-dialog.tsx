@@ -57,7 +57,7 @@ function InviteMemberDialog({ currentRole }: { currentRole: Role }) {
     const result = await createInviteAction(values)
     if (result.ok && result.data) {
       setCreatedLink(result.data.link)
-      toast.success('Invite created')
+      toast.success('초대 링크가 만들어졌습니다')
     } else if (!result.ok) {
       toast.error(result.error)
     }
@@ -68,16 +68,16 @@ function InviteMemberDialog({ currentRole }: { currentRole: Role }) {
       <DialogTrigger asChild>
         <Button size="sm">
           <UserPlus />
-          Invite member
+직원 초대
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Invite member</DialogTitle>
+          <DialogTitle>직원 초대</DialogTitle>
           <DialogDescription>
             {createdLink
-              ? 'Share this link with them — email delivery isn\'t wired up yet.'
-              : "They'll get access once they accept the invite."}
+              ? '이 링크를 초대할 분께 직접 보내 주세요. (메일 자동 발송은 아직 지원하지 않습니다)'
+              : "초대를 수락하면 관리자 화면을 쓸 수 있습니다."}
           </DialogDescription>
         </DialogHeader>
 
@@ -88,7 +88,7 @@ function InviteMemberDialog({ currentRole }: { currentRole: Role }) {
               <CopyButton text={createdLink} />
             </div>
             <DialogFooter>
-              <Button onClick={() => handleOpenChange(false)}>Done</Button>
+              <Button onClick={() => handleOpenChange(false)}>완료</Button>
             </DialogFooter>
           </div>
         ) : (
@@ -99,7 +99,7 @@ function InviteMemberDialog({ currentRole }: { currentRole: Role }) {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>이메일</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="name@example.com" {...field} />
                     </FormControl>
@@ -112,7 +112,7 @@ function InviteMemberDialog({ currentRole }: { currentRole: Role }) {
                 name="role"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Role</FormLabel>
+                    <FormLabel>권한</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -133,7 +133,7 @@ function InviteMemberDialog({ currentRole }: { currentRole: Role }) {
               />
               <DialogFooter>
                 <Button type="submit" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting ? 'Sending…' : 'Send invite'}
+                  {form.formState.isSubmitting ? '만드는 중…' : '초대 링크 만들기'}
                 </Button>
               </DialogFooter>
             </form>

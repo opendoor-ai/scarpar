@@ -63,7 +63,7 @@ export async function createListing(input: NewListingValues): Promise<ActionResu
 
   const parsed = newListingSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
 
   const supabase = await getServerClient()
@@ -91,7 +91,7 @@ export async function createListing(input: NewListingValues): Promise<ActionResu
     .single()
 
   if (error || !data) {
-    return { ok: false, error: error?.message ?? 'Failed to create listing' }
+    return { ok: false, error: error?.message ?? '매물을 등록하지 못했습니다' }
   }
 
   audit(ctx, 'listing.create', 'listing', data.id, undefined, { title: parsed.data.title, slug })
@@ -106,7 +106,7 @@ export async function updateListing(listingId: string, input: ListingFormValues)
 
   const parsed = listingFormSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
 
   const supabase = await getServerClient()
@@ -117,7 +117,7 @@ export async function updateListing(listingId: string, input: ListingFormValues)
     .eq('id', listingId)
     .maybeSingle()
 
-  if (!before) return { ok: false, error: 'Listing not found' }
+  if (!before) return { ok: false, error: '매물을 찾을 수 없습니다' }
 
   const address = {
     line1: parsed.data.address.line1,
@@ -164,7 +164,7 @@ export async function updateInquiryStatus(inquiryId: string, status: InquiryStat
 
   const parsed = updateInquiryStatusSchema.safeParse({ status })
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid status' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '상태값이 올바르지 않습니다' }
   }
 
   const supabase = await getServerClient()

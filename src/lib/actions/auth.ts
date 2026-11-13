@@ -35,7 +35,7 @@ function safeNextPath(next: string | undefined): string | null {
 export async function loginAction(input: LoginInput): Promise<ActionResult> {
   const parsed = loginSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input.' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다.' }
   }
 
   let signInError: string | null = null
@@ -47,7 +47,7 @@ export async function loginAction(input: LoginInput): Promise<ActionResult> {
     })
     signInError = error?.message ?? null
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Sign in failed.' }
+    return { ok: false, error: err instanceof Error ? err.message : '로그인에 실패했습니다.' }
   }
 
   if (signInError) {
@@ -64,7 +64,7 @@ export async function signupAction(
 ): Promise<ActionResult<{ needsEmailConfirmation: boolean }>> {
   const parsed = signupSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input.' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다.' }
   }
 
   let hasSession = false
@@ -83,7 +83,7 @@ export async function signupAction(
     if (error) return { ok: false, error: error.message }
     hasSession = Boolean(data.session)
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Sign up failed.' }
+    return { ok: false, error: err instanceof Error ? err.message : '회원가입에 실패했습니다.' }
   }
 
   if (!hasSession) {
@@ -97,7 +97,7 @@ export async function signupAction(
 export async function forgotAction(input: ForgotInput): Promise<ActionResult> {
   const parsed = forgotSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input.' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다.' }
   }
 
   try {
@@ -107,7 +107,7 @@ export async function forgotAction(input: ForgotInput): Promise<ActionResult> {
     })
     if (error) return { ok: false, error: error.message }
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Could not send reset email.' }
+    return { ok: false, error: err instanceof Error ? err.message : '비밀번호 재설정 메일을 보내지 못했습니다.' }
   }
 
   return { ok: true }
@@ -142,7 +142,7 @@ export async function acceptInviteAction(token: string): Promise<ActionResult> {
     .maybeSingle()
 
   if (inviteError || !invitationRow) {
-    return { ok: false, error: 'Invitation not found.' }
+    return { ok: false, error: '초대장을 찾을 수 없습니다.' }
   }
 
   const invitation = invitationRow as Invitation
@@ -151,7 +151,7 @@ export async function acceptInviteAction(token: string): Promise<ActionResult> {
   if (invitation.status !== 'pending' || isExpired) {
     return {
       ok: false,
-      error: isExpired ? 'This invitation has expired.' : 'This invitation is no longer valid.',
+      error: isExpired ? '초대장 유효기간이 지났습니다.' : '더 이상 유효하지 않은 초대장입니다.',
     }
   }
 
@@ -163,7 +163,7 @@ export async function acceptInviteAction(token: string): Promise<ActionResult> {
     .maybeSingle()
 
   if (orgError || !orgRow) {
-    return { ok: false, error: 'Organization not found.' }
+    return { ok: false, error: '조직을 찾을 수 없습니다.' }
   }
   const org = orgRow as Org
 

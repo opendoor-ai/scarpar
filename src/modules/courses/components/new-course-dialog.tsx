@@ -35,7 +35,7 @@ function NewCourseDialog() {
   async function onSubmit(values: CourseFormValues) {
     const result = await createCourse(values)
     if (result.ok && result.data) {
-      toast.success('Course created')
+      toast.success('강의가 만들어졌습니다')
       setOpen(false)
       form.reset()
       router.push(`/admin/courses/${result.data.id}`)
@@ -55,12 +55,12 @@ function NewCourseDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus />
-          New course
+          새 강의
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New course</DialogTitle>
+          <DialogTitle>새 강의</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -69,7 +69,7 @@ function NewCourseDialog() {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>강의명</FormLabel>
                   <FormControl>
                     <Input autoFocus {...field} />
                   </FormControl>
@@ -82,7 +82,7 @@ function NewCourseDialog() {
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price (৳)</FormLabel>
+                  <FormLabel>가격 (원)</FormLabel>
                   <FormControl>
                     <Input inputMode="decimal" {...field} />
                   </FormControl>
@@ -95,7 +95,7 @@ function NewCourseDialog() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>설명</FormLabel>
                   <FormControl>
                     <Textarea rows={3} {...field} />
                   </FormControl>
@@ -105,7 +105,7 @@ function NewCourseDialog() {
             />
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Creating...' : 'Create course'}
+                {form.formState.isSubmitting ? '만드는 중...' : '강의 만들기'}
               </Button>
             </DialogFooter>
           </form>

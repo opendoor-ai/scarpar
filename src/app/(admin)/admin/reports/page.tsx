@@ -44,17 +44,17 @@ export default async function ReportsPage({
   return (
     <div>
       <PageHeader
-        title="Reports"
-        description="Sales, delivery, and financial performance."
+        title="보고서"
+        description="매출, 배송, 재무 현황"
         actions={<DateRangePicker from={range.from} to={range.to} />}
       />
 
       <Tabs defaultValue="sales">
         <TabsList>
-          <TabsTrigger value="sales">Sales</TabsTrigger>
-          <TabsTrigger value="products">Products</TabsTrigger>
-          <TabsTrigger value="delivery">Delivery</TabsTrigger>
-          <TabsTrigger value="finance">Finance</TabsTrigger>
+          <TabsTrigger value="sales">매출</TabsTrigger>
+          <TabsTrigger value="products">상품</TabsTrigger>
+          <TabsTrigger value="delivery">배송</TabsTrigger>
+          <TabsTrigger value="finance">재무</TabsTrigger>
         </TabsList>
 
         <TabsContent value="sales" className="flex flex-col gap-4 pt-4">

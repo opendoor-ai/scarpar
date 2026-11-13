@@ -33,7 +33,7 @@ export function ContactForm({ orgSlug }: { orgSlug: string }) {
   if (submitted) {
     return (
       <p className="rounded-md border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-        Thanks for reaching out — we&apos;ll get back to you soon.
+문의가 접수되었습니다. 빠르게 연락드리겠습니다.
       </p>
     )
   }
@@ -46,9 +46,9 @@ export function ContactForm({ orgSlug }: { orgSlug: string }) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>이름</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Your name" />
+                <Input {...field} placeholder="홍길동" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -60,7 +60,7 @@ export function ContactForm({ orgSlug }: { orgSlug: string }) {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone</FormLabel>
+                <FormLabel>휴대폰 번호</FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="01XXXXXXXXX" />
                 </FormControl>
@@ -73,7 +73,7 @@ export function ContactForm({ orgSlug }: { orgSlug: string }) {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>이메일</FormLabel>
                 <FormControl>
                   <Input {...field} type="email" placeholder="you@example.com" />
                 </FormControl>
@@ -87,16 +87,16 @@ export function ContactForm({ orgSlug }: { orgSlug: string }) {
           name="message"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Message</FormLabel>
+              <FormLabel>문의 내용</FormLabel>
               <FormControl>
-                <Textarea {...field} rows={4} placeholder="How can we help?" />
+                <Textarea {...field} rows={4} placeholder="궁금하신 점을 남겨 주세요." />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto">
-          {form.formState.isSubmitting ? 'Sending…' : 'Send message'}
+          {form.formState.isSubmitting ? '보내는 중…' : '문의 보내기'}
         </Button>
       </form>
     </Form>

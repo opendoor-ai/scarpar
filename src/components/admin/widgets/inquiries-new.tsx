@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Inbox } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import { ko } from 'date-fns/locale'
 
 import { requireOrg } from '@/lib/auth'
 import { getServerClient } from '@/lib/supabase/server'
@@ -39,14 +40,14 @@ export async function InquiriesNewWidget() {
   return (
     <Card className="gap-3 p-4">
       <CardHeader className="flex-row items-center justify-between gap-2 p-0">
-        <CardTitle className="text-[13px]">New Inquiries</CardTitle>
+        <CardTitle className="text-[13px]">새 문의</CardTitle>
         <Link href="/admin/listings" className="text-xs text-primary hover:underline">
-          View all
+          전체 보기
         </Link>
       </CardHeader>
       <CardContent className="p-0">
         {inquiries.length === 0 ? (
-          <EmptyState icon={Inbox} title="No new inquiries" className="py-8" />
+          <EmptyState icon={Inbox} title="새 문의가 없습니다" className="py-8" />
         ) : (
           <ul className="flex flex-col gap-2">
             {inquiries.map((inquiry) => (
@@ -54,7 +55,7 @@ export async function InquiriesNewWidget() {
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="font-medium text-foreground">{inquiry.name}</span>
                   <span className="shrink-0 text-2xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(inquiry.created_at), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(inquiry.created_at), { addSuffix: true, locale: ko })}
                   </span>
                 </div>
                 {inquiry.message && (

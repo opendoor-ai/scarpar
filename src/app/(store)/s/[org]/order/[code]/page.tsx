@@ -88,12 +88,12 @@ export default async function OrderConfirmationPage({ params }: PageProps<{ org:
         <h1 className="text-xl font-semibold">{t('order_placed', lang)}</h1>
         <p className="text-2xl font-semibold tabular-nums">{order.order_no}</p>
         <p className="text-sm text-muted-foreground">
-          Thanks, {order.customer_name} — we&apos;ll be in touch shortly.
+          {order.customer_name}님, 주문해 주셔서 감사합니다. 곧 연락드리겠습니다.
         </p>
       </div>
 
       <div className="mt-8 flex flex-col gap-4 rounded-lg border border-border p-4">
-        <h2 className="text-sm font-semibold">Order summary</h2>
+        <h2 className="text-sm font-semibold">주문 내역</h2>
         <ul className="flex flex-col divide-y divide-border">
           {items.map((item) => (
             <li key={item.id} className="flex items-center justify-between py-2 text-sm">
@@ -114,7 +114,7 @@ export default async function OrderConfirmationPage({ params }: PageProps<{ org:
           </div>
           {order.discount_amount > 0 ? (
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Discount</span>
+              <span className="text-muted-foreground">할인</span>
               <span className="tabular-nums">-{formatMoney(order.discount_amount)}</span>
             </div>
           ) : null}
@@ -132,10 +132,10 @@ export default async function OrderConfirmationPage({ params }: PageProps<{ org:
       {pendingPayment ? (
         <div className="mt-4 flex flex-col gap-2 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-500/30 dark:bg-amber-500/10">
           <p className="font-medium text-amber-900 dark:text-amber-200">
-            {pendingPayment.kind === 'advance' ? t('advance_payable', lang) : 'Payment'} pending verification
+            {pendingPayment.kind === 'advance' ? t('advance_payable', lang) : '결제'} 확인 대기 중
           </p>
           <p className="text-amber-800 dark:text-amber-300">
-            {formatMoney(pendingPayment.amount)} via {pendingPayment.method === 'bkash' ? 'bKash' : 'Nagad'}
+            {formatMoney(pendingPayment.amount)} · {pendingPayment.method === 'bkash' ? 'bKash' : 'Nagad'}
             {pendingPayment.method === 'bkash' && mfsNumbers.bkash ? ` (${mfsNumbers.bkash})` : ''}
             {pendingPayment.method === 'nagad' && mfsNumbers.nagad ? ` (${mfsNumbers.nagad})` : ''}
             {pendingPayment.provider_ref ? ` — TrxID ${pendingPayment.provider_ref}` : ''}
@@ -152,7 +152,7 @@ export default async function OrderConfirmationPage({ params }: PageProps<{ org:
         </Button>
       </div>
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        Tracking activates once your order is dispatched.
+상품이 출고되면 배송 조회를 할 수 있습니다.
       </p>
     </div>
   )

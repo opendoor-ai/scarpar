@@ -15,19 +15,19 @@ const SETTING_DEFS_BY_KEY = new Map<string, SettingDef>(SETTING_DEFS.map((def) =
 function validateSettingValue(def: SettingDef, value: unknown): string | null {
   switch (def.type) {
     case 'boolean':
-      return typeof value === 'boolean' ? null : `${def.label}: must be true/false`
+      return typeof value === 'boolean' ? null : `${def.label}: 켜기/끄기 값이어야 합니다`
     case 'number':
       return typeof value === 'number' && Number.isFinite(value)
         ? null
-        : `${def.label}: must be a number`
+        : `${def.label}: 숫자를 입력하세요`
     case 'text':
-      return typeof value === 'string' ? null : `${def.label}: must be text`
+      return typeof value === 'string' ? null : `${def.label}: 글자를 입력하세요`
     case 'select':
       return typeof value === 'string' && def.options?.some((opt) => opt.value === value)
         ? null
-        : `${def.label}: invalid option`
+        : `${def.label}: 선택값이 올바르지 않습니다`
     case 'json':
-      return value === undefined ? `${def.label}: invalid JSON` : null
+      return value === undefined ? `${def.label}: JSON 형식이 올바르지 않습니다` : null
     default:
       return null
   }
@@ -46,7 +46,7 @@ export async function updateSettingsAction(input: {
 
   const parsed = updateSettingsSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
 
   const before: Record<string, unknown> = {}
@@ -56,9 +56,9 @@ export async function updateSettingsAction(input: {
 
   for (const entry of parsed.data.entries) {
     const def = SETTING_DEFS_BY_KEY.get(entry.key)
-    if (!def) return { ok: false, error: `Unknown setting: ${entry.key}` }
+    if (!def) return { ok: false, error: `알 수 없는 설정: ${entry.key}` }
     if (def.roles && !def.roles.includes(ctx.role)) {
-      return { ok: false, error: `You don't have permission to change "${def.label}".` }
+      return { ok: false, error: `"${def.label}" 설정을 바꿀 권한이 없습니다.` }
     }
     const validationError = validateSettingValue(def, entry.value)
     if (validationError) return { ok: false, error: validationError }
@@ -91,7 +91,7 @@ export async function updateSettingsAction(input: {
 
     return { ok: true }
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Failed to save settings' }
+    return { ok: false, error: err instanceof Error ? err.message : '설정을 저장하지 못했습니다' }
   }
 }
 
@@ -105,7 +105,7 @@ export async function updateOrgProfileAction(input: OrgProfileInput): Promise<Ac
 
   const parsed = orgProfileSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
   const data = parsed.data
 
@@ -143,6 +143,6 @@ export async function updateOrgProfileAction(input: OrgProfileInput): Promise<Ac
 
     return { ok: true }
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Failed to save organization' }
+    return { ok: false, error: err instanceof Error ? err.message : '회사 정보를 저장하지 못했습니다' }
   }
 }

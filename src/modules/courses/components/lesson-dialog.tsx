@@ -54,7 +54,7 @@ function LessonDialog({ courseId, lesson, open, onOpenChange }: LessonDialogProp
       isEdit && lesson ? await updateLesson(lesson.id, courseId, values) : await createLesson(courseId, values)
 
     if (result.ok) {
-      toast.success(isEdit ? 'Lesson updated' : 'Lesson added')
+      toast.success(isEdit ? '수업이 수정되었습니다' : '수업이 추가되었습니다')
       onOpenChange(false)
     } else {
       toast.error(result.error)
@@ -65,7 +65,7 @@ function LessonDialog({ courseId, lesson, open, onOpenChange }: LessonDialogProp
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit lesson' : 'Add lesson'}</DialogTitle>
+          <DialogTitle>{isEdit ? '수업 수정' : '수업 추가'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -74,7 +74,7 @@ function LessonDialog({ courseId, lesson, open, onOpenChange }: LessonDialogProp
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>수업명</FormLabel>
                   <FormControl>
                     <Input autoFocus {...field} />
                   </FormControl>
@@ -87,7 +87,7 @@ function LessonDialog({ courseId, lesson, open, onOpenChange }: LessonDialogProp
               name="video_url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Video URL</FormLabel>
+                  <FormLabel>영상 주소(URL)</FormLabel>
                   <FormControl>
                     <Input placeholder="https://..." {...field} />
                   </FormControl>
@@ -100,7 +100,7 @@ function LessonDialog({ courseId, lesson, open, onOpenChange }: LessonDialogProp
               name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notes / content</FormLabel>
+                  <FormLabel>내용</FormLabel>
                   <FormControl>
                     <Textarea rows={4} {...field} />
                   </FormControl>
@@ -116,13 +116,13 @@ function LessonDialog({ courseId, lesson, open, onOpenChange }: LessonDialogProp
                   <FormControl>
                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
-                  <FormLabel className="!mt-0">Free preview lesson</FormLabel>
+                  <FormLabel className="!mt-0">무료 미리보기</FormLabel>
                 </FormItem>
               )}
             />
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Saving...' : isEdit ? 'Save changes' : 'Add lesson'}
+                {form.formState.isSubmitting ? '저장 중...' : isEdit ? '변경사항 저장' : '수업 추가'}
               </Button>
             </DialogFooter>
           </form>

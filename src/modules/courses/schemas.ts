@@ -12,7 +12,7 @@ const moneyString = z
   .trim()
   .min(1, 'Price is required')
   .refine((v) => Number.isFinite(Number(v.replace(/,/g, ''))) && Number(v.replace(/,/g, '')) >= 0, {
-    message: 'Enter a valid amount',
+    message: '금액을 정확히 입력하세요',
   })
 
 export const courseFormSchema = z.object({
@@ -33,7 +33,7 @@ export const lessonFormSchema = z.object({
 export type LessonFormValues = z.infer<typeof lessonFormSchema>
 
 export const enrollCustomerSchema = z.object({
-  customer_id: z.string().uuid('Select a customer'),
+  customer_id: z.string().uuid('고객을 선택하세요'),
 })
 export type EnrollCustomerValues = z.infer<typeof enrollCustomerSchema>
 

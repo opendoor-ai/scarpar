@@ -35,7 +35,7 @@ export async function ReviewsSection({
   return (
     <section className="flex flex-col gap-6">
       <div className="flex items-center gap-3">
-        <h2 className="text-lg font-semibold">Reviews</h2>
+        <h2 className="text-lg font-semibold">리뷰</h2>
         {reviews.length > 0 ? (
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Star className="size-4 fill-amber-500 text-amber-500" />
@@ -46,7 +46,7 @@ export async function ReviewsSection({
       </div>
 
       {reviews.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No reviews yet — be the first to write one.</p>
+        <p className="text-sm text-muted-foreground">아직 리뷰가 없습니다. 첫 리뷰를 남겨 주세요.</p>
       ) : (
         <ul className="flex flex-col gap-4">
           {reviews.map((r) => (
@@ -66,7 +66,7 @@ export async function ReviewsSection({
                 <span className="text-xs font-medium">{r.customer_name}</span>
                 {r.is_verified ? (
                   <span className="text-2xs rounded-full bg-emerald-50 px-1.5 py-0.5 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
-                    Verified
+                    구매 인증
                   </span>
                 ) : null}
               </div>

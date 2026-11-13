@@ -13,8 +13,7 @@ export default function PrintLayout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-zinc-100">
       <div className="no-print sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-zinc-200 bg-white px-4 py-2 shadow-xs">
         <p className="text-sm text-zinc-600">
-          Use your browser&apos;s print dialog to save as PDF or send to a printer. This
-          toolbar never appears in the printed output — close the tab when you&apos;re done.
+브라우저 인쇄(Ctrl+P)로 PDF 저장 또는 프린터 출력을 하세요. 이 안내줄은 인쇄되지 않습니다.
         </p>
         <PrintButton />
       </div>

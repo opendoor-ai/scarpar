@@ -21,38 +21,38 @@ export interface RecentOrderRow {
 }
 
 const columns: ColumnDef<RecentOrderRow>[] = [
-  { accessorKey: 'order_no', header: 'Order No' },
-  { accessorKey: 'customer_name', header: 'Customer' },
+  { accessorKey: 'order_no', header: '주문번호' },
+  { accessorKey: 'customer_name', header: '고객' },
   {
     accessorKey: 'placed_at',
-    header: 'Date',
-    cell: ({ row }) => format(new Date(row.original.placed_at), 'd MMM yyyy'),
+    header: '날짜',
+    cell: ({ row }) => format(new Date(row.original.placed_at), 'yyyy.MM.dd'),
   },
   {
     accessorKey: 'total',
-    header: () => <div className="text-right">Total</div>,
+    header: () => <div className="text-right">합계</div>,
     cell: ({ row }) => <div className="text-right tabular-nums">{formatMoney(row.original.total)}</div>,
   },
   {
     accessorKey: 'payment_status',
-    header: 'Payment',
+    header: '결제',
     cell: ({ row }) => <StatusBadge kind="payment" value={row.original.payment_status} />,
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Print</div>,
+    header: () => <div className="text-right">인쇄</div>,
     cell: ({ row }) => (
       <div className="flex justify-end gap-2">
         <Button asChild variant="outline" size="sm">
           <Link href={`/print/invoice/${row.original.id}`} target="_blank" rel="noopener noreferrer">
             <ReceiptIcon className="size-4" />
-            Invoice
+            명세서
           </Link>
         </Button>
         <Button asChild variant="outline" size="sm">
           <Link href={`/print/thermal/${row.original.id}`} target="_blank" rel="noopener noreferrer">
             <Printer className="size-4" />
-            Thermal
+            영수증
           </Link>
         </Button>
       </div>
@@ -70,8 +70,8 @@ export function RecentOrdersTable({ orders }: { orders: RecentOrderRow[] }) {
       emptyState={
         <EmptyState
           icon={ReceiptIcon}
-          title="No orders yet"
-          description="Orders will appear here once placed."
+          title="아직 주문이 없습니다"
+          description="주문이 들어오면 여기에 표시됩니다."
         />
       }
     />

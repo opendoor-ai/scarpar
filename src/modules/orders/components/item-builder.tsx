@@ -93,15 +93,15 @@ function ItemBuilder({ value, onChange }: ItemBuilderProps) {
             setQuery(e.target.value)
             setOpen(true)
           }}
-          placeholder="Search products by name or SKU"
+          placeholder="상품명 또는 SKU로 검색"
           className="pl-8"
         />
         {open ? (
           <div className="bg-popover text-popover-foreground absolute z-10 mt-1 w-full rounded-md border shadow-xs">
             {searching ? (
-              <div className="text-muted-foreground p-3 text-[13px]">Searching…</div>
+              <div className="text-muted-foreground p-3 text-[13px]">검색 중…</div>
             ) : results.length === 0 ? (
-              <div className="text-muted-foreground p-3 text-[13px]">No matching products</div>
+              <div className="text-muted-foreground p-3 text-[13px]">일치하는 상품이 없습니다</div>
             ) : (
               <ul className="max-h-72 overflow-y-auto p-1">
                 {results.map((product) =>
@@ -116,7 +116,7 @@ function ItemBuilder({ value, onChange }: ItemBuilderProps) {
                         <span>{product.name}</span>
                         <span className="text-muted-foreground tabular-nums">
                           {formatMoney(product.price)}
-                          {product.track_stock ? ` · ${product.stock_qty} in stock` : ''}
+                          {product.track_stock ? ` · 재고 ${product.stock_qty}개` : ''}
                         </span>
                       </button>
                     </li>
@@ -149,10 +149,10 @@ function ItemBuilder({ value, onChange }: ItemBuilderProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Item</TableHead>
-              <TableHead className="text-right">Unit</TableHead>
-              <TableHead className="w-20 text-right">Qty</TableHead>
-              <TableHead className="text-right">Line total</TableHead>
+              <TableHead>상품</TableHead>
+              <TableHead className="text-right">단가</TableHead>
+              <TableHead className="w-20 text-right">수량</TableHead>
+              <TableHead className="text-right">금액</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
@@ -183,7 +183,7 @@ function ItemBuilder({ value, onChange }: ItemBuilderProps) {
                     type="button"
                     onClick={() => removeLine(item.key)}
                     className="text-muted-foreground hover:text-destructive"
-                    aria-label="Remove item"
+                    aria-label="상품 삭제"
                   >
                     <Trash2 className="size-4" />
                   </button>
@@ -193,7 +193,7 @@ function ItemBuilder({ value, onChange }: ItemBuilderProps) {
           </TableBody>
         </Table>
       ) : (
-        <p className="text-muted-foreground text-[13px]">No items added yet.</p>
+        <p className="text-muted-foreground text-[13px]">아직 추가한 상품이 없습니다.</p>
       )}
     </div>
   )

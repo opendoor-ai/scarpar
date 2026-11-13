@@ -4,8 +4,8 @@ import { z } from 'zod'
 // from src/modules/<key>/schemas.ts"). Consumed by src/modules/storefront/actions.ts and by
 // client forms (react-hook-form + zodResolver) in src/components/store/**.
 
-/** BD mobile: 11 digits, 01[3-9]XXXXXXXX. */
-export const BD_PHONE_REGEX = /^01[3-9]\d{8}$/
+/** 한국 휴대폰: 010-1234-5678 / 01012345678 (하이픈·공백 허용). Name kept for existing imports. */
+export const BD_PHONE_REGEX = /^01[016789][-\s]?\d{3,4}[-\s]?\d{4}$/
 
 const optionalTrimmed = (max: number) =>
   z
@@ -19,24 +19,24 @@ const optionalTrimmed = (max: number) =>
 const optionalEmail = z
   .string()
   .trim()
-  .email('Enter a valid email')
+  .email('이메일 형식이 올바르지 않습니다')
   .optional()
   .or(z.literal(''))
   .transform((v) => (v ? v : undefined))
 
 export const contactSchema = z.object({
-  name: z.string().trim().min(2, 'Name is required').max(120),
+  name: z.string().trim().min(2, '이름을 입력하세요').max(120),
   phone: z
     .string()
     .trim()
-    .regex(BD_PHONE_REGEX, 'Enter a valid 11-digit phone number (01XXXXXXXXX)'),
+    .regex(BD_PHONE_REGEX, '휴대폰 번호를 정확히 입력하세요 (예: 010-1234-5678)'),
   email: optionalEmail,
 })
 
 export const addressSchema = z.object({
-  line1: z.string().trim().min(3, 'Address is required').max(300),
+  line1: z.string().trim().min(3, '주소를 입력하세요').max(300),
   area: optionalTrimmed(150),
-  district: z.string().trim().min(2, 'Select a district'),
+  district: z.string().trim().min(2, '지역을 선택하세요'),
 })
 
 export const cartItemInputSchema = z.object({
@@ -48,13 +48,13 @@ export type CartItemInput = z.infer<typeof cartItemInputSchema>
 
 export const quoteDeliverySchema = z.object({
   orgSlug: z.string().min(1),
-  district: z.string().trim().min(1, 'Select a district'),
+  district: z.string().trim().min(1, '지역을 선택하세요'),
 })
 export type QuoteDeliveryInput = z.infer<typeof quoteDeliverySchema>
 
 export const applyDiscountSchema = z.object({
   orgSlug: z.string().min(1),
-  code: z.string().trim().min(1, 'Enter a discount code').max(64),
+  code: z.string().trim().min(1, '할인 코드를 입력하세요').max(64),
   items: z.array(cartItemInputSchema).min(1),
 })
 export type ApplyDiscountInput = z.infer<typeof applyDiscountSchema>
@@ -65,7 +65,7 @@ export const placeOrderSchema = z.object({
   orgSlug: z.string().min(1),
   contact: contactSchema,
   address: addressSchema,
-  items: z.array(cartItemInputSchema).min(1, 'Your cart is empty'),
+  items: z.array(cartItemInputSchema).min(1, '장바구니가 비어 있습니다'),
   discountCode: optionalTrimmed(64),
   paymentMethod: paymentMethodSchema,
   /** Only used when paymentMethod === 'cod' and an advance is required. */
@@ -80,7 +80,7 @@ export const reviewSchema = z.object({
   orgSlug: z.string().min(1),
   productId: z.string().uuid(),
   orderId: z.string().uuid().optional(),
-  customerName: z.string().trim().min(2, 'Name is required').max(120),
+  customerName: z.string().trim().min(2, '이름을 입력하세요').max(120),
   rating: z.number().int().min(1).max(5),
   title: optionalTrimmed(150),
   body: optionalTrimmed(2000),
@@ -91,9 +91,9 @@ export const inquirySchema = z.object({
   orgSlug: z.string().min(1),
   productId: z.string().uuid().optional(),
   listingId: z.string().uuid().optional(),
-  name: z.string().trim().min(2, 'Name is required').max(120),
+  name: z.string().trim().min(2, '이름을 입력하세요').max(120),
   phone: optionalTrimmed(20),
   email: optionalEmail,
-  message: z.string().trim().min(1, 'Message is required').max(2000),
+  message: z.string().trim().min(1, '문의 내용을 입력하세요').max(2000),
 })
 export type InquiryInput = z.infer<typeof inquirySchema>

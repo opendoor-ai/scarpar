@@ -10,7 +10,7 @@ interface CodBigProps {
   label?: string
 }
 
-export function CodBig({ amountPaisa, label = 'Cash to Collect' }: CodBigProps) {
+export function CodBig({ amountPaisa, label = '받을 금액' }: CodBigProps) {
   return (
     <div className="cod-big">
       <div className="cod-big-label">{label}</div>

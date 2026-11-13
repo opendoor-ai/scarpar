@@ -17,19 +17,19 @@ export default async function StorefrontSettingsPage() {
 
   return (
     <>
-      <PageHeader title="Storefront" description="Theme, contact details and checkout-facing settings." />
+      <PageHeader title="쇼핑몰 설정" description="디자인, 연락처, 주문 관련 설정" />
 
       <div className="flex flex-col gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Your storefront</CardTitle>
+            <CardTitle className="text-base">내 쇼핑몰 주소</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
             <div className="flex items-center gap-1.5">
               <code className="rounded bg-muted px-2 py-1 text-xs">{storefrontUrl}</code>
               <CopyButton text={storefrontUrl} />
             </div>
-            <p className="text-xs text-muted-foreground">Custom domains: coming soon.</p>
+            <p className="text-xs text-muted-foreground">개인 도메인 연결: 준비 중</p>
           </CardContent>
         </Card>
 

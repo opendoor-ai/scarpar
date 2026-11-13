@@ -55,14 +55,14 @@ export function ProductsPicker({ value, onChange, initialProducts = [] }: Produc
 
   return (
     <div className="flex flex-col gap-2 rounded-md border p-3">
-      <SearchInput value={query} onChange={setQuery} placeholder="Search products by name..." />
+      <SearchInput value={query} onChange={setQuery} placeholder="상품명으로 검색..." />
 
       {value.length > 0 ? (
         <div className="flex flex-wrap gap-1">
           {value.map((id) => (
             <Badge key={id} variant="secondary" className="gap-1">
               {labels.get(id) ?? id}
-              <button type="button" onClick={() => toggle(id)} className="opacity-70 hover:opacity-100" aria-label="Remove">
+              <button type="button" onClick={() => toggle(id)} className="opacity-70 hover:opacity-100" aria-label="삭제">
                 ×
               </button>
             </Badge>
@@ -72,9 +72,9 @@ export function ProductsPicker({ value, onChange, initialProducts = [] }: Produc
 
       <div className="flex max-h-48 flex-col gap-1 overflow-y-auto">
         {loading ? (
-          <p className="text-muted-foreground py-2 text-xs">Searching...</p>
+          <p className="text-muted-foreground py-2 text-xs">검색 중...</p>
         ) : results.length === 0 ? (
-          <p className="text-muted-foreground py-2 text-xs">No products found.</p>
+          <p className="text-muted-foreground py-2 text-xs">상품을 찾을 수 없습니다.</p>
         ) : (
           results.map((product) => (
             <label

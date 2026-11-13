@@ -44,7 +44,7 @@ function NotesTagsCard({ orderId, noteInternal, noteCustomer, tags }: NotesTagsC
         toast.error(result.error)
         return
       }
-      toast.success('Note saved')
+      toast.success('메모가 저장되었습니다')
       router.refresh()
     } finally {
       setNoteSaving(false)
@@ -73,7 +73,7 @@ function NotesTagsCard({ orderId, noteInternal, noteCustomer, tags }: NotesTagsC
         toast.error(result.error)
         return
       }
-      toast.success('Tags saved')
+      toast.success('태그가 저장되었습니다')
       router.refresh()
     } finally {
       setTagsSaving(false)
@@ -83,34 +83,34 @@ function NotesTagsCard({ orderId, noteInternal, noteCustomer, tags }: NotesTagsC
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Notes &amp; tags</CardTitle>
+        <CardTitle>메모 · 태그</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="note-internal">Internal note</Label>
+          <Label htmlFor="note-internal">내부 메모</Label>
           <Textarea
             id="note-internal"
             rows={3}
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Staff-only note…"
+            placeholder="직원만 보는 메모…"
           />
           <div>
             <Button size="sm" onClick={saveNote} disabled={noteSaving || note === (noteInternal ?? '')}>
-              {noteSaving ? 'Saving…' : 'Save note'}
+              {noteSaving ? '저장 중…' : '메모 저장'}
             </Button>
           </div>
         </div>
 
         {noteCustomer ? (
           <div className="flex flex-col gap-1">
-            <Label>Customer note</Label>
+            <Label>고객 요청사항</Label>
             <p className="text-muted-foreground text-[13px] italic">{noteCustomer}</p>
           </div>
         ) : null}
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="tag-input">Tags</Label>
+          <Label htmlFor="tag-input">태그</Label>
           <div className="flex flex-wrap gap-1.5">
             {tagList.map((tag) => (
               <Badge key={tag} variant="secondary" className="gap-1">
@@ -132,16 +132,16 @@ function NotesTagsCard({ orderId, noteInternal, noteCustomer, tags }: NotesTagsC
                   addTag()
                 }
               }}
-              placeholder="Add a tag, press Enter"
+              placeholder="태그 입력 후 Enter"
               className="h-8"
             />
             <Button type="button" variant="outline" size="sm" onClick={addTag}>
-              Add
+추가
             </Button>
           </div>
           <div>
             <Button size="sm" onClick={saveTags} disabled={tagsSaving}>
-              {tagsSaving ? 'Saving…' : 'Save tags'}
+              {tagsSaving ? '저장 중…' : '태그 저장'}
             </Button>
           </div>
         </div>

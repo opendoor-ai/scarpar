@@ -9,16 +9,16 @@ import { SearchInput } from '@/components/ui/search-input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const STATUS_TABS = [
-  { value: 'all', label: 'All' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'confirmed', label: 'Confirmed' },
-  { value: 'packed', label: 'Packed' },
-  { value: 'dispatched', label: 'Dispatched' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'cancelled', label: 'Cancelled' },
-  { value: 'returned', label: 'Returned' },
-  { value: 'failed', label: 'Failed' },
+  { value: 'all', label: '전체' },
+  { value: 'pending', label: '대기' },
+  { value: 'confirmed', label: '확인됨' },
+  { value: 'packed', label: '포장 완료' },
+  { value: 'dispatched', label: '출고' },
+  { value: 'delivered', label: '배송 완료' },
+  { value: 'completed', label: '완료' },
+  { value: 'cancelled', label: '취소' },
+  { value: 'returned', label: '반품' },
+  { value: 'failed', label: '실패' },
 ] as const
 
 interface OrdersFilterBarProps {
@@ -53,10 +53,10 @@ function OrdersFilterBar({ status, q, from, to }: OrdersFilterBarProps) {
       </Tabs>
       <div className="flex flex-wrap items-end gap-3">
         <div className="w-64">
-          <SearchInput value={q} onChange={(v) => setParam('q', v)} placeholder="Order no. or phone" />
+          <SearchInput value={q} onChange={(v) => setParam('q', v)} placeholder="주문번호 또는 전화번호" />
         </div>
         <div className="flex flex-col gap-1">
-          <Label htmlFor="orders-from">From</Label>
+          <Label htmlFor="orders-from">시작일</Label>
           <Input
             id="orders-from"
             type="date"
@@ -66,7 +66,7 @@ function OrdersFilterBar({ status, q, from, to }: OrdersFilterBarProps) {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <Label htmlFor="orders-to">To</Label>
+          <Label htmlFor="orders-to">종료일</Label>
           <Input id="orders-to" type="date" value={to} onChange={(e) => setParam('to', e.target.value)} className="w-36" />
         </div>
       </div>

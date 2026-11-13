@@ -17,13 +17,13 @@ import type { PageProps } from '@/lib/types'
 export const dynamic = 'force-dynamic'
 
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
-  cod: 'Cash on Delivery',
+  cod: '착불(현장 결제)',
   bkash: 'bKash',
   nagad: 'Nagad',
   uddoktapay: 'UddoktaPay',
   sslcommerz: 'SSLCommerz',
-  bank: 'Bank Transfer',
-  cash: 'Cash',
+  bank: '계좌이체',
+  cash: '현금',
 }
 
 /** Exclusive: rate% of the pre-tax line. Inclusive: the VAT portion already baked into it. */
@@ -65,7 +65,7 @@ export default async function InvoicePage({ params }: PageProps<{ orderId: strin
     taxMode !== 'none' && order.tax_amount > 0
       ? [
           {
-            label: `VAT (${vatRate}%)${taxMode === 'inclusive' ? ' incl.' : ''}`,
+            label: `부가세 (${vatRate}%)${taxMode === 'inclusive' ? ' 포함' : ''}`,
             amountPaisa: order.tax_amount,
           },
         ]
@@ -107,19 +107,19 @@ export default async function InvoicePage({ params }: PageProps<{ orderId: strin
             ) : null}
           </address>
         </div>
-        <div className="receipt-title">{isMushak ? 'Mushak-6.3 Tax Invoice' : 'Invoice'}</div>
+        <div className="receipt-title">{isMushak ? 'Mushak-6.3 Tax Invoice' : '거래명세서'}</div>
       </header>
 
       <div className="receipt-meta">
         <div>
-          <strong>Invoice No:</strong> {invoiceNo}
+          <strong>명세서 번호:</strong> {invoiceNo}
           <br />
-          <strong>Date:</strong> {format(new Date(order.placed_at), 'd MMM yyyy')}
+          <strong>날짜:</strong> {format(new Date(order.placed_at), 'yyyy.MM.dd')}
           <br />
-          <strong>Order No:</strong> {order.order_no}
+          <strong>주문번호:</strong> {order.order_no}
         </div>
         <address>
-          <strong>Bill To</strong>
+          <strong>받는 분</strong>
           <br />
           {order.customer_name}
           <br />
@@ -138,12 +138,12 @@ export default async function InvoicePage({ params }: PageProps<{ orderId: strin
       <table className="receipt-items">
         <thead>
           <tr>
-            <th>Item</th>
-            {isMushak ? <th>HS Code</th> : null}
-            <th className="num">Qty</th>
-            <th className="num">Unit</th>
+            <th>품목</th>
+            {isMushak ? <th>HS 코드</th> : null}
+            <th className="num">수량</th>
+            <th className="num">단가</th>
             {isMushak ? <th className="num">VAT</th> : null}
-            <th className="num">Amount</th>
+            <th className="num">금액</th>
           </tr>
         </thead>
         <tbody>
@@ -185,7 +185,7 @@ export default async function InvoicePage({ params }: PageProps<{ orderId: strin
 
       {order.payment_method === 'cod' && balanceDue > 0 ? (
         <div style={{ marginTop: 8, marginLeft: 'auto', width: '60mm' }}>
-          <CodBig amountPaisa={balanceDue} label="Cash on Delivery Due" />
+          <CodBig amountPaisa={balanceDue} label="받을 때 결제할 금액" />
         </div>
       ) : null}
 

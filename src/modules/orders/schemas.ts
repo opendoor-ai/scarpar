@@ -35,7 +35,7 @@ export const ReturnResolutionValues = ['refund', 'store_credit', 'exchange'] as 
 
 const emptyToUndefined = (v: string) => (v.trim() === '' ? undefined : v.trim())
 
-const PhoneSchema = z.string().trim().min(6, 'Enter a valid phone number').max(20)
+const PhoneSchema = z.string().trim().min(6, '전화번호를 정확히 입력하세요').max(20)
 
 // ---------------------------------------------------------------------------
 // New manual order
@@ -43,24 +43,24 @@ const PhoneSchema = z.string().trim().min(6, 'Enter a valid phone number').max(2
 
 export const OrderCustomerInputSchema = z.object({
   id: z.string().uuid().optional(),
-  name: z.string().trim().min(1, 'Customer name is required').max(200),
+  name: z.string().trim().min(1, '고객 이름을 입력하세요').max(200),
   phone: PhoneSchema,
   email: z
     .string()
     .trim()
     .optional()
     .transform((v) => (v ? emptyToUndefined(v) : undefined))
-    .refine((v) => !v || z.string().email().safeParse(v).success, 'Enter a valid email'),
+    .refine((v) => !v || z.string().email().safeParse(v).success, '이메일 형식이 올바르지 않습니다'),
 })
 
 export const OrderAddressInputSchema = z.object({
-  line1: z.string().trim().min(1, 'Address line is required').max(300),
+  line1: z.string().trim().min(1, '주소를 입력하세요').max(300),
   area: z
     .string()
     .trim()
     .optional()
     .transform((v) => (v ? emptyToUndefined(v) : undefined)),
-  district: z.string().trim().min(1, 'District is required'),
+  district: z.string().trim().min(1, '지역을 선택하세요'),
   postcode: z
     .string()
     .trim()
@@ -86,7 +86,7 @@ export const CreateManualOrderSchema = z.object({
   delivery_zone_id: z.string().uuid().optional(),
   // paisa — only used when no delivery_zone_id (module disabled or no zones configured)
   manual_delivery_charge: z.number().int().nonnegative().optional(),
-  items: z.array(OrderLineItemInputSchema).min(1, 'Add at least one item'),
+  items: z.array(OrderLineItemInputSchema).min(1, '상품을 1개 이상 추가하세요'),
   discount_code: z
     .string()
     .trim()
@@ -147,7 +147,7 @@ export const RecordPaymentSchema = z.object({
   orderId: z.string().uuid(),
   kind: z.enum(PaymentKindValues),
   method: z.enum(PaymentMethodValues),
-  amount: z.string().trim().min(1, 'Amount is required'), // taka string
+  amount: z.string().trim().min(1, '금액을 입력하세요'), // taka string
   provider_ref: z
     .string()
     .trim()
@@ -194,7 +194,7 @@ export const CreateReturnItemSchema = z.object({
 
 export const CreateReturnSchema = z.object({
   orderId: z.string().uuid(),
-  items: z.array(CreateReturnItemSchema).min(1, 'Select at least one item'),
+  items: z.array(CreateReturnItemSchema).min(1, '상품을 1개 이상 선택하세요'),
   reason: z
     .string()
     .trim()
@@ -212,7 +212,7 @@ export type UpdateReturnStatusInput = z.infer<typeof UpdateReturnStatusSchema>
 
 export const RefundReturnSchema = z.object({
   returnId: z.string().uuid(),
-  refund_amount: z.string().trim().min(1, 'Refund amount is required'), // taka string
+  refund_amount: z.string().trim().min(1, '환불 금액을 입력하세요'), // taka string
   method: z.enum(PaymentMethodValues),
   resolution: z.enum(ReturnResolutionValues).default('refund'),
   note: z

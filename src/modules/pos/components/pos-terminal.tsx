@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
-import { toPaisa } from '@/lib/money'
+import { formatMoney, toPaisa } from '@/lib/money'
 import { posCheckoutAction, type PosCheckoutInput } from '@/modules/pos/actions'
 import { ProductGrid } from '@/modules/pos/components/product-grid'
 import { CartPanel } from '@/modules/pos/components/cart-panel'
@@ -155,11 +155,11 @@ export function PosTerminal({ products, categories }: PosTerminalProps) {
 
   async function completeSale() {
     if (cart.length === 0) {
-      toast.error('Cart is empty')
+      toast.error('장바구니가 비어 있습니다')
       return
     }
     if (tenderMethod === 'cash' && amountReceived !== undefined && amountReceived < total) {
-      toast.error('Amount received is less than the total due')
+      toast.error('받은 금액이 결제할 금액보다 적습니다')
       return
     }
 
@@ -182,8 +182,8 @@ export function PosTerminal({ products, categories }: PosTerminalProps) {
     }
 
     const sale = result.data
-    toast.success(`Sale complete — ${sale?.orderNo}`, {
-      description: sale && sale.changeDue > 0 ? `Change due: ৳${(sale.changeDue / 100).toFixed(2)}` : undefined,
+    toast.success(`판매 완료 — ${sale?.orderNo}`, {
+      description: sale && sale.changeDue > 0 ? `거스름돈: ${formatMoney(sale.changeDue)}` : undefined,
     })
 
     if (sale) {

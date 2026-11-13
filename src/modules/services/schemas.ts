@@ -11,7 +11,7 @@ const moneyString = z
   .trim()
   .min(1, 'Amount is required')
   .refine((v) => Number.isFinite(Number(v.replace(/,/g, ''))) && Number(v.replace(/,/g, '')) >= 0, {
-    message: 'Enter a valid amount',
+    message: '금액을 정확히 입력하세요',
   })
 
 const optionalMoneyString = z
@@ -20,11 +20,11 @@ const optionalMoneyString = z
   .optional()
   .or(z.literal(''))
   .refine((v) => !v || (Number.isFinite(Number(v.replace(/,/g, ''))) && Number(v.replace(/,/g, '')) >= 0), {
-    message: 'Enter a valid amount',
+    message: '금액을 정확히 입력하세요',
   })
 
 export const newJobCustomerSchema = z.union([
-  z.object({ mode: z.literal('existing'), customer_id: z.string().uuid('Select a customer') }),
+  z.object({ mode: z.literal('existing'), customer_id: z.string().uuid('고객을 선택하세요') }),
   z.object({
     mode: z.literal('new'),
     customer_name: z.string().trim().min(1, 'Name is required'),

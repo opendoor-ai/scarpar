@@ -30,22 +30,22 @@ function LessonsSection({ courseId, lessons }: LessonsSectionProps) {
 
   async function handleDelete(lessonId: string) {
     const result = await deleteLesson(lessonId, courseId)
-    if (result.ok) toast.success('Lesson deleted')
+    if (result.ok) toast.success('수업이 삭제되었습니다')
     else toast.error(result.error)
   }
 
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between">
-        <CardTitle>Lessons</CardTitle>
+        <CardTitle>수업 목록</CardTitle>
         <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
           <Plus />
-          Add lesson
+          수업 추가
         </Button>
       </CardHeader>
       <CardContent>
         {lessons.length === 0 ? (
-          <EmptyState icon={PlayCircle} title="No lessons yet" description="Add the first lesson for this course." />
+          <EmptyState icon={PlayCircle} title="아직 수업이 없습니다" description="첫 수업을 추가하세요." />
         ) : (
           <ul className="flex flex-col gap-2">
             {lessons.map((lesson, index) => (
@@ -55,7 +55,7 @@ function LessonsSection({ courseId, lessons }: LessonsSectionProps) {
                   <span className="text-foreground truncate text-[13px] font-medium">{lesson.title}</span>
                   {lesson.is_free ? (
                     <Badge variant="outline" className="shrink-0">
-                      Free
+                      무료
                     </Badge>
                   ) : null}
                 </div>
@@ -67,7 +67,7 @@ function LessonsSection({ courseId, lessons }: LessonsSectionProps) {
                     onClick={() => handleMove(lesson.id, 'up')}
                   >
                     <ArrowUp />
-                    <span className="sr-only">Move up</span>
+                    <span className="sr-only">위로</span>
                   </Button>
                   <Button
                     variant="ghost"
@@ -76,22 +76,22 @@ function LessonsSection({ courseId, lessons }: LessonsSectionProps) {
                     onClick={() => handleMove(lesson.id, 'down')}
                   >
                     <ArrowDown />
-                    <span className="sr-only">Move down</span>
+                    <span className="sr-only">아래로</span>
                   </Button>
                   <Button variant="ghost" size="icon" onClick={() => setDialogLesson(lesson)}>
                     <Pencil />
-                    <span className="sr-only">Edit lesson</span>
+                    <span className="sr-only">수업 수정</span>
                   </Button>
                   <ConfirmDialog
                     trigger={
                       <Button variant="ghost" size="icon">
                         <Trash2 />
-                        <span className="sr-only">Delete lesson</span>
+                        <span className="sr-only">수업 삭제</span>
                       </Button>
                     }
-                    title="Delete lesson?"
+                    title="수업을 삭제할까요?"
                     description={`"${lesson.title}" will be permanently removed.`}
-                    confirmLabel="Delete"
+                    confirmLabel="삭제"
                     destructive
                     onConfirm={() => handleDelete(lesson.id)}
                   />

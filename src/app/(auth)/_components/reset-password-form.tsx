@@ -64,7 +64,7 @@ export function ResetPasswordForm() {
         setFormError(error.message)
         return
       }
-      toast.success('Password updated — log in with your new password.')
+      toast.success('비밀번호가 변경되었습니다. 새 비밀번호로 로그인하세요.')
       router.push('/login')
     })
   }
@@ -73,7 +73,7 @@ export function ResetPasswordForm() {
     return (
       <Card>
         <CardContent className="py-8">
-          <p className="text-center text-sm text-muted-foreground">Verifying reset link…</p>
+          <p className="text-center text-sm text-muted-foreground">재설정 링크 확인 중…</p>
         </CardContent>
       </Card>
     )
@@ -85,11 +85,11 @@ export function ResetPasswordForm() {
         <CardContent className="py-4">
           <EmptyState
             icon={KeyRound}
-            title="Link expired or invalid"
-            description="This password reset link is no longer valid. Request a new one to continue."
+            title="링크가 만료되었거나 올바르지 않습니다"
+            description="이 비밀번호 재설정 링크는 더 이상 쓸 수 없습니다. 새 링크를 요청하세요."
             action={
               <Button asChild variant="secondary" size="sm">
-                <Link href="/forgot-password">Request new link</Link>
+                <Link href="/forgot-password">새 링크 요청</Link>
               </Button>
             }
           />
@@ -101,8 +101,8 @@ export function ResetPasswordForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Set a new password</CardTitle>
-        <CardDescription>Choose a new password for your account.</CardDescription>
+        <CardTitle className="text-lg">새 비밀번호 설정</CardTitle>
+        <CardDescription>사용할 새 비밀번호를 입력하세요.</CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
         <Form {...form}>
@@ -119,7 +119,7 @@ export function ResetPasswordForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New password</FormLabel>
+                  <FormLabel>새 비밀번호</FormLabel>
                   <FormControl>
                     <Input type="password" autoComplete="new-password" {...field} />
                   </FormControl>
@@ -133,7 +133,7 @@ export function ResetPasswordForm() {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm password</FormLabel>
+                  <FormLabel>비밀번호 확인</FormLabel>
                   <FormControl>
                     <Input type="password" autoComplete="new-password" {...field} />
                   </FormControl>
@@ -143,7 +143,7 @@ export function ResetPasswordForm() {
             />
 
             <Button type="submit" className="mt-2 w-full" disabled={isPending}>
-              {isPending ? 'Updating…' : 'Update password'}
+              {isPending ? '변경 중…' : '비밀번호 변경'}
             </Button>
           </form>
         </Form>

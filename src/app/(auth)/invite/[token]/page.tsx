@@ -14,7 +14,7 @@ import { AcceptInviteButton } from '../../_components/accept-invite-button'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = { title: 'Join organization — Scarpar' }
+export const metadata: Metadata = { title: '조직 초대 — Scarpar' }
 
 function InvalidInviteCard({ title }: { title: string }) {
   return (
@@ -23,10 +23,10 @@ function InvalidInviteCard({ title }: { title: string }) {
         <EmptyState
           icon={AlertCircle}
           title={title}
-          description="Ask whoever invited you to send a new invitation link."
+          description="초대한 분께 새 초대 링크를 요청하세요."
           action={
             <Button asChild size="sm" variant="secondary">
-              <Link href="/login">Back to log in</Link>
+              <Link href="/login">로그인으로 돌아가기</Link>
             </Button>
           }
         />
@@ -57,7 +57,7 @@ export default async function InvitePage({ params }: PageProps<{ token: string }
   if (!invitation || !isValid) {
     return (
       <InvalidInviteCard
-        title={!invitation ? 'Invitation not found' : isExpired ? 'Invitation expired' : 'Invitation no longer valid'}
+        title={!invitation ? '초대장을 찾을 수 없습니다' : isExpired ? '초대장 유효기간이 지났습니다' : '더 이상 유효하지 않은 초대장입니다'}
       />
     )
   }
@@ -71,7 +71,7 @@ export default async function InvitePage({ params }: PageProps<{ token: string }
   const org = orgRow as Org | null
 
   if (!org) {
-    return <InvalidInviteCard title="Organization not found" />
+    return <InvalidInviteCard title="조직을 찾을 수 없습니다" />
   }
 
   const nextPath = `/invite/${token}`
@@ -80,17 +80,17 @@ export default async function InvitePage({ params }: PageProps<{ token: string }
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">You&apos;re invited to {org.name}</CardTitle>
+          <CardTitle className="text-lg">{org.name}에 초대되었습니다</CardTitle>
           <CardDescription>
-            Log in or create an account with {invitation.email} to accept this invitation.
+            초대를 수락하려면 {invitation.email} 계정으로 로그인하거나 회원가입하세요.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-2 pb-4">
           <Button asChild className="w-full">
-            <Link href={`/login?next=${encodeURIComponent(nextPath)}`}>Log in</Link>
+            <Link href={`/login?next=${encodeURIComponent(nextPath)}`}>로그인</Link>
           </Button>
           <Button asChild variant="secondary" className="w-full">
-            <Link href={`/signup?next=${encodeURIComponent(nextPath)}`}>Create an account</Link>
+            <Link href={`/signup?next=${encodeURIComponent(nextPath)}`}>회원가입</Link>
           </Button>
         </CardContent>
       </Card>

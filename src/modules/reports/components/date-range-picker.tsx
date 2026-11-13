@@ -30,10 +30,10 @@ function DateRangePicker({ from, to }: DateRangePickerProps) {
 
   const today = new Date()
   const chips: { label: string; from: string; to: string }[] = [
-    { label: '7d', from: toDateStr(subDays(today, 6)), to: toDateStr(today) },
-    { label: '30d', from: toDateStr(subDays(today, 29)), to: toDateStr(today) },
-    { label: '90d', from: toDateStr(subDays(today, 89)), to: toDateStr(today) },
-    { label: 'This month', from: toDateStr(startOfMonth(today)), to: toDateStr(today) },
+    { label: '7일', from: toDateStr(subDays(today, 6)), to: toDateStr(today) },
+    { label: '30일', from: toDateStr(subDays(today, 29)), to: toDateStr(today) },
+    { label: '90일', from: toDateStr(subDays(today, 89)), to: toDateStr(today) },
+    { label: '이번 달', from: toDateStr(startOfMonth(today)), to: toDateStr(today) },
   ]
 
   return (
@@ -44,7 +44,7 @@ function DateRangePicker({ from, to }: DateRangePickerProps) {
         max={to}
         onChange={(e) => pushRange(e.target.value, to)}
         className="w-auto"
-        aria-label="From date"
+        aria-label="시작일"
       />
       <span className="text-xs text-muted-foreground">to</span>
       <Input
@@ -53,7 +53,7 @@ function DateRangePicker({ from, to }: DateRangePickerProps) {
         min={from}
         onChange={(e) => pushRange(from, e.target.value)}
         className="w-auto"
-        aria-label="To date"
+        aria-label="종료일"
       />
       <div className="ml-1 flex items-center gap-1">
         {chips.map((chip) => {

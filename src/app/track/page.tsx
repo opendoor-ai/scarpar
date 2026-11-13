@@ -9,7 +9,7 @@ export default function TrackPage() {
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-semibold">{t("track_order")}</h1>
         <p className="text-muted-foreground max-w-sm text-sm">
-          Enter your delivery number or tracking code to see live status.
+          배송 번호나 송장 번호를 입력하면 배송 상태를 볼 수 있습니다.
         </p>
       </div>
       <TrackSearchForm />

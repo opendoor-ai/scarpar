@@ -60,7 +60,7 @@ function SettleCodDialog({ rider, deliveries }: { rider: Rider; deliveries: CodD
 
   async function handleSettle() {
     if (selected.length === 0) {
-      toast.error("Select at least one delivery")
+      toast.error("배송을 1개 이상 선택하세요")
       return
     }
     setLoading(true)
@@ -70,7 +70,7 @@ function SettleCodDialog({ rider, deliveries }: { rider: Rider; deliveries: CodD
         toast.error(result.error)
         return
       }
-      toast.success("COD settled")
+      toast.success("착불 정산이 완료되었습니다")
       setOpen(false)
       router.refresh()
     } finally {
@@ -81,12 +81,12 @@ function SettleCodDialog({ rider, deliveries }: { rider: Rider; deliveries: CodD
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button size="sm">Settle</Button>
+        <Button size="sm">정산</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Settle COD — {rider.name}</DialogTitle>
-          <DialogDescription>Confirm cash handed over to clear it from the rider&apos;s balance.</DialogDescription>
+          <DialogDescription>배송기사에게 현금을 받았는지 확인하고 정산하세요.</DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="max-h-72">
@@ -113,22 +113,22 @@ function SettleCodDialog({ rider, deliveries }: { rider: Rider; deliveries: CodD
         </ScrollArea>
 
         <div className="flex flex-col gap-1.5">
-          <Label>Note (optional)</Label>
+          <Label>메모 (선택)</Label>
           <Input
             value={note}
             onChange={(event) => setNote(event.target.value)}
-            placeholder="Handed over in cash at the office"
+            placeholder="예: 사무실에서 현금으로 받음"
           />
         </div>
 
         <div className="flex items-center justify-between rounded-md border p-3 text-sm">
-          <span className="text-muted-foreground">Total to settle</span>
+          <span className="text-muted-foreground">정산 합계</span>
           <span className="font-semibold tabular-nums">{formatMoney(amount)}</span>
         </div>
 
         <DialogFooter>
           <Button disabled={loading || selected.length === 0} onClick={handleSettle}>
-            {loading ? "Settling..." : `Settle ${formatMoney(amount)}`}
+            {loading ? "정산 중..." : `${formatMoney(amount)} 정산`}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -143,8 +143,8 @@ function CodRiderTable({ groups }: { groups: CodRiderGroup[] }) {
     return (
       <EmptyState
         icon={Wallet}
-        title="Nothing to settle"
-        description="No rider is currently holding collected COD cash."
+        title="정산할 금액이 없습니다"
+        description="현재 착불금을 가지고 있는 배송기사가 없습니다."
       />
     )
   }
@@ -154,9 +154,9 @@ function CodRiderTable({ groups }: { groups: CodRiderGroup[] }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Rider</TableHead>
-            <TableHead className="text-right">Deliveries</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
+            <TableHead>배송기사</TableHead>
+            <TableHead className="text-right">배송 건수</TableHead>
+            <TableHead className="text-right">금액</TableHead>
             <TableHead />
           </TableRow>
         </TableHeader>

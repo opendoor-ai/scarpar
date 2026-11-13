@@ -32,7 +32,7 @@ export async function CoursesGridBlockView({ block, ctx }: { block: CoursesGridB
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <h2 className="mb-5 text-lg font-semibold">Courses</h2>
+      <h2 className="mb-5 text-lg font-semibold">강의</h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {courses.map((c) => {
           const path = c.cover_media_id ? mediaPaths.get(c.cover_media_id) : undefined

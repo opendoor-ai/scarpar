@@ -22,7 +22,7 @@ export default async function ReviewsPage() {
 
   return (
     <div className="px-6 py-6">
-      <PageHeader title="Reviews" description="Moderate customer product reviews." />
+      <PageHeader title="리뷰관리" description="고객 상품 리뷰를 확인하고 게시합니다." />
       <ReviewsTable reviews={reviews} />
     </div>
   )

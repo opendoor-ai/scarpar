@@ -74,7 +74,7 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
       <CardHeader>
         <CardTitle className="text-lg">{heading}</CardTitle>
         <CardDescription>
-          {step === 1 ? 'Tell us a bit about your business.' : 'Pick what you sell so we can set things up.'}
+          {step === 1 ? '회사 기본 정보를 입력하세요.' : '사업 유형을 고르면 맞는 기능을 켜 드립니다.'}
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
@@ -93,10 +93,10 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Organization name</FormLabel>
+                    <FormLabel>회사(조직) 이름</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="e.g. Harbour Perfumes"
+                        placeholder="예: 전자동"
                         {...field}
                         onChange={(e) => {
                           field.onChange(e)
@@ -116,10 +116,10 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
                 name="slug"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>URL slug</FormLabel>
+                    <FormLabel>사이트 주소 (영문)</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="harbour-perfumes"
+                        placeholder="jadong"
                         {...field}
                         onChange={(e) => {
                           setSlugTouched(true)
@@ -137,9 +137,9 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Business phone</FormLabel>
+                    <FormLabel>대표 전화번호</FormLabel>
                     <FormControl>
-                      <Input placeholder="01XXXXXXXXX" autoComplete="tel" {...field} />
+                      <Input placeholder="010-1234-5678" autoComplete="tel" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -147,7 +147,7 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
               />
 
               <Button type="button" className="mt-2 w-full" onClick={() => void goToStep2()}>
-                Continue
+다음
               </Button>
             </div>
 
@@ -199,7 +199,7 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                     <FormLabel className="text-xs font-normal">
-                      Load demo data so I can explore with sample content
+                      둘러볼 수 있게 예시 데이터 넣기
                     </FormLabel>
                   </FormItem>
                 )}
@@ -207,10 +207,10 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
 
               <div className="flex gap-2">
                 <Button type="button" variant="secondary" className="flex-1" onClick={() => setStep(1)}>
-                  Back
+이전
                 </Button>
                 <Button type="submit" className="flex-1" disabled={isPending}>
-                  {isPending ? 'Creating…' : 'Create organization'}
+                  {isPending ? '만드는 중…' : '조직 만들기'}
                 </Button>
               </div>
             </div>

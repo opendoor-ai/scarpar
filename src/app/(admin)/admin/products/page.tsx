@@ -79,28 +79,28 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   return (
     <div>
       <PageHeader
-        title="Products"
-        description="Manage your catalog, pricing, and variants."
+        title="상품"
+        description="상품, 가격, 옵션을 관리합니다."
         actions={
           <Button asChild>
             <Link href="/admin/products/new">
               <Plus className="size-4" />
-              New product
+새 상품 등록
             </Link>
           </Button>
         }
       />
 
       {error ? (
-        <EmptyState icon={Package} title="Couldn't load products" description={error.message} />
+        <EmptyState icon={Package} title="상품을 불러오지 못했습니다" description={error.message} />
       ) : rows.length === 0 && status === 'all' ? (
         <EmptyState
           icon={Package}
-          title="No products yet"
-          description="Add your first product to start building your catalog."
+          title="아직 등록된 상품이 없습니다"
+          description="첫 상품을 등록해 보세요."
           action={
             <Button asChild>
-              <Link href="/admin/products/new">New product</Link>
+              <Link href="/admin/products/new">새 상품 등록</Link>
             </Button>
           }
         />

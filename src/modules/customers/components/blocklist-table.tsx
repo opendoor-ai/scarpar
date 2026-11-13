@@ -21,8 +21,8 @@ export interface BlocklistRow extends BlocklistEntry {
 }
 
 const KIND_LABEL: Record<BlocklistEntry['kind'], string> = {
-  phone: 'Phone',
-  address: 'Address',
+  phone: '전화번호',
+  address: '주소',
   ip: 'IP',
 }
 
@@ -35,7 +35,7 @@ export function BlocklistTable({ entries }: { entries: BlocklistRow[] }) {
       toast.error(result.error)
       return
     }
-    toast.success('Removed from blocklist')
+    toast.success('차단 목록에서 삭제했습니다')
     router.refresh()
   }
 
@@ -43,24 +43,24 @@ export function BlocklistTable({ entries }: { entries: BlocklistRow[] }) {
     () => [
       {
         accessorKey: 'kind',
-        header: 'Kind',
+        header: '구분',
         cell: ({ row }) => <Badge variant="outline">{KIND_LABEL[row.original.kind]}</Badge>,
       },
-      { accessorKey: 'value', header: 'Value' },
+      { accessorKey: 'value', header: '값' },
       {
         accessorKey: 'reason',
-        header: 'Reason',
+        header: '사유',
         cell: ({ row }) => row.original.reason ?? <span className="text-muted-foreground">—</span>,
       },
       {
         accessorKey: 'creatorName',
-        header: 'Added by',
-        cell: ({ row }) => row.original.creatorName ?? <span className="text-muted-foreground">System</span>,
+        header: '등록자',
+        cell: ({ row }) => row.original.creatorName ?? <span className="text-muted-foreground">시스템</span>,
       },
       {
         accessorKey: 'created_at',
-        header: 'Date',
-        cell: ({ row }) => format(new Date(row.original.created_at), 'd MMM yyyy'),
+        header: '날짜',
+        cell: ({ row }) => format(new Date(row.original.created_at), 'yyyy.MM.dd'),
       },
       {
         id: 'actions',
@@ -73,9 +73,9 @@ export function BlocklistTable({ entries }: { entries: BlocklistRow[] }) {
                   <Trash2 className="size-3.5" />
                 </Button>
               }
-              title="Remove this entry?"
-              description="Checkout will no longer auto-flag this value as high risk."
-              confirmLabel="Remove"
+              title="이 항목을 삭제할까요?"
+              description="이제 이 값으로 주문해도 위험 주문으로 표시되지 않습니다."
+              confirmLabel="삭제"
               destructive
               onConfirm={() => handleRemove(row.original.id)}
             />
@@ -93,8 +93,8 @@ export function BlocklistTable({ entries }: { entries: BlocklistRow[] }) {
       emptyState={
         <EmptyState
           icon={ShieldBan}
-          title="Blocklist is empty"
-          description="Blocked phone numbers, addresses, and IPs will appear here."
+          title="차단 목록이 비어 있습니다"
+          description="차단한 전화번호, 주소, IP가 여기에 표시됩니다."
         />
       }
     />

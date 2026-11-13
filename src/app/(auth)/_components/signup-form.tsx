@@ -51,8 +51,8 @@ export function SignupForm({ next }: SignupFormProps) {
         <CardContent className="py-4">
           <EmptyState
             icon={Mail}
-            title="Check your email"
-            description={`We sent a confirmation link to ${submittedEmail}. Open it to activate your account.`}
+            title="메일함을 확인하세요"
+            description={`${submittedEmail}(으)로 인증 링크를 보냈습니다. 링크를 열면 가입이 완료됩니다.`}
           />
         </CardContent>
       </Card>
@@ -62,8 +62,8 @@ export function SignupForm({ next }: SignupFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Create your account</CardTitle>
-        <CardDescription>Set up Scarpar for your business in a couple of minutes.</CardDescription>
+        <CardTitle className="text-lg">회원가입</CardTitle>
+        <CardDescription>몇 분이면 우리 회사 홈페이지를 시작할 수 있습니다.</CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
         <Form {...form}>
@@ -80,9 +80,9 @@ export function SignupForm({ next }: SignupFormProps) {
               name="full_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full name</FormLabel>
+                  <FormLabel>이름</FormLabel>
                   <FormControl>
-                    <Input placeholder="Your name" autoComplete="name" {...field} />
+                    <Input placeholder="홍길동" autoComplete="name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -94,7 +94,7 @@ export function SignupForm({ next }: SignupFormProps) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>이메일</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="you@business.com" autoComplete="email" {...field} />
                   </FormControl>
@@ -108,7 +108,7 @@ export function SignupForm({ next }: SignupFormProps) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>비밀번호 (8자 이상)</FormLabel>
                   <FormControl>
                     <Input type="password" autoComplete="new-password" {...field} />
                   </FormControl>
@@ -118,15 +118,15 @@ export function SignupForm({ next }: SignupFormProps) {
             />
 
             <Button type="submit" className="mt-2 w-full" disabled={isPending}>
-              {isPending ? 'Creating account…' : 'Create account'}
+              {isPending ? '가입 중…' : '가입하기'}
             </Button>
           </form>
         </Form>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          Already have an account?{' '}
+          이미 회원이신가요?{' '}
           <Link href={loginHref} className="font-medium text-primary hover:underline">
-            Log in
+로그인
           </Link>
         </p>
       </CardContent>

@@ -29,24 +29,9 @@ import { productFormSchema, type ProductActionInput, type ProductFormValues } fr
 import { ImageGallery, fromImageRow, toImageRow, type ImageRow } from './image-gallery'
 import { VariantEditor, fromVariantRow, newVariantRow, toVariantRow, type VariantRow } from './variant-editor'
 
-export interface CategoryOption {
-  id: string
-  name: string
-  parentName: string | null
-}
+import type { CategoryOption } from '../category-options'
 
-/** Shared by products/new and products/[id] pages — flattens org categories
- *  (one level of nesting) into "Parent / Child" select options. */
-export function toCategoryOptions(
-  rows: { id: string; name: string; parent_id: string | null }[],
-): CategoryOption[] {
-  const byId = new Map(rows.map((r) => [r.id, r]))
-  return rows.map((r) => ({
-    id: r.id,
-    name: r.name,
-    parentName: r.parent_id ? (byId.get(r.parent_id)?.name ?? null) : null,
-  }))
-}
+export type { CategoryOption }
 
 interface ProductFormProps {
   mode: 'create' | 'edit'
@@ -182,15 +167,15 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
       ])
 
       if (!variantsResult.ok) {
-        toast.error(`Product saved, but variants failed: ${variantsResult.error}`)
+        toast.error(`상품은 저장됐지만 옵션 저장에 실패했습니다: ${variantsResult.error}`)
         return
       }
       if (!imagesResult.ok) {
-        toast.error(`Product saved, but images failed: ${imagesResult.error}`)
+        toast.error(`상품은 저장됐지만 사진 저장에 실패했습니다: ${imagesResult.error}`)
         return
       }
 
-      toast.success(mode === 'create' ? 'Product created' : 'Product updated')
+      toast.success(mode === 'create' ? '상품이 등록되었습니다' : '상품이 수정되었습니다')
 
       if (mode === 'create') {
         router.push(`/admin/products/${productId}`)
@@ -207,7 +192,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
       toast.error(result.error)
       return
     }
-    toast.success('Product deleted')
+    toast.success('상품이 삭제되었습니다')
     router.push('/admin/products')
   }
 
@@ -218,7 +203,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
           <div className="flex flex-col gap-6 lg:col-span-2">
             <Card className="gap-4 p-4">
               <CardHeader className="p-0">
-                <CardTitle>Details</CardTitle>
+                <CardTitle>기본 정보</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-4 p-0">
                 <FormField
@@ -226,7 +211,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>상품명</FormLabel>
                       <FormControl>
                         <Input {...field} onChange={(e) => handleNameChange(e.target.value)} />
                       </FormControl>
@@ -239,7 +224,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="slug"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Slug</FormLabel>
+                      <FormLabel>주소(영문)</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -258,7 +243,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>상품 설명</FormLabel>
                       <FormControl>
                         <Textarea rows={4} {...field} />
                       </FormControl>
@@ -272,7 +257,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                     name="brand"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Brand</FormLabel>
+                        <FormLabel>제조사/브랜드</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -285,18 +270,18 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                     name="category_id"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Category</FormLabel>
+                        <FormLabel>카테고리</FormLabel>
                         <Select
                           value={field.value ?? NONE_CATEGORY}
                           onValueChange={(v) => field.onChange(v === NONE_CATEGORY ? null : v)}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
-                              <SelectValue placeholder="No category" />
+                              <SelectValue placeholder="카테고리 없음" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value={NONE_CATEGORY}>No category</SelectItem>
+                            <SelectItem value={NONE_CATEGORY}>카테고리 없음</SelectItem>
                             {categories.map((c) => (
                               <SelectItem key={c.id} value={c.id}>
                                 {c.parentName ? `${c.parentName} / ${c.name}` : c.name}
@@ -314,7 +299,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
 
             <Card className="gap-4 p-4">
               <CardHeader className="p-0">
-                <CardTitle>Images</CardTitle>
+                <CardTitle>사진</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <ImageGallery value={imageRows} onChange={setImageRows} variantOptions={persistedVariantOptions} />
@@ -323,9 +308,9 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
 
             <Card className="gap-4 p-4">
               <CardHeader className="flex-row items-center justify-between p-0">
-                <CardTitle>Variants</CardTitle>
+                <CardTitle>옵션</CardTitle>
                 <label className="flex items-center gap-2 text-xs font-medium">
-                  Has variants
+옵션 있음
                   <Switch
                     checked={hasVariants}
                     onCheckedChange={(checked) => {
@@ -344,7 +329,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
               ) : (
                 <CardContent className="p-0">
                   <p className="text-muted-foreground text-xs">
-                    Off — this product sells at the single price/stock set under Pricing &amp; Inventory.
+                    꺼짐 — 아래 가격·재고에 입력한 하나의 가격과 재고로 판매합니다.
                   </p>
                 </CardContent>
               )}
@@ -354,7 +339,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
           <div className="flex flex-col gap-6">
             <Card className="gap-4 p-4">
               <CardHeader className="p-0">
-                <CardTitle>Status</CardTitle>
+                <CardTitle>상태</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-4 p-0">
                 <FormField
@@ -362,7 +347,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Status</FormLabel>
+                      <FormLabel>노출 상태</FormLabel>
                       <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger className="w-full">
@@ -370,9 +355,9 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="draft">Draft</SelectItem>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="archived">Archived</SelectItem>
+                          <SelectItem value="draft">임시저장</SelectItem>
+                          <SelectItem value="active">판매중(공개)</SelectItem>
+                          <SelectItem value="archived">보관(비공개)</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -384,7 +369,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="is_featured"
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between gap-2">
-                      <FormLabel className="text-foreground text-xs">Featured</FormLabel>
+                      <FormLabel className="text-foreground text-xs">추천 상품</FormLabel>
                       <FormControl>
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
@@ -396,7 +381,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
 
             <Card className="gap-4 p-4">
               <CardHeader className="p-0">
-                <CardTitle>Pricing</CardTitle>
+                <CardTitle>가격</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-4 p-0">
                 <FormField
@@ -404,7 +389,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Price (৳)</FormLabel>
+                      <FormLabel>판매가 (원)</FormLabel>
                       <FormControl>
                         <Input inputMode="decimal" {...field} />
                       </FormControl>
@@ -417,7 +402,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="compare_at_price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Compare-at price (৳)</FormLabel>
+                      <FormLabel>정가 (할인 전, 원)</FormLabel>
                       <FormControl>
                         <Input inputMode="decimal" {...field} />
                       </FormControl>
@@ -430,7 +415,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="cost_price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cost price (৳)</FormLabel>
+                      <FormLabel>원가 (원)</FormLabel>
                       <FormControl>
                         <Input inputMode="decimal" {...field} />
                       </FormControl>
@@ -443,7 +428,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
 
             <Card className="gap-4 p-4">
               <CardHeader className="p-0">
-                <CardTitle>Inventory</CardTitle>
+                <CardTitle>재고</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-4 p-0">
                 <div className="grid grid-cols-2 gap-4">
@@ -465,7 +450,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                     name="barcode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Barcode</FormLabel>
+                        <FormLabel>바코드</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -479,7 +464,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="hs_code"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>HS code</FormLabel>
+                      <FormLabel>HS 코드</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -492,7 +477,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="track_stock"
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between gap-2">
-                      <FormLabel className="text-foreground text-xs">Track stock</FormLabel>
+                      <FormLabel className="text-foreground text-xs">재고 관리</FormLabel>
                       <FormControl>
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
@@ -505,7 +490,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                     name="stock_qty"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Stock qty</FormLabel>
+                        <FormLabel>재고 수량</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} value={String(field.value)} />
                         </FormControl>
@@ -518,7 +503,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                     name="low_stock_threshold"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Low stock at</FormLabel>
+                        <FormLabel>재고 부족 기준</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} value={String(field.value)} />
                         </FormControl>
@@ -532,7 +517,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="allow_backorder"
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between gap-2">
-                      <FormLabel className="text-foreground text-xs">Allow backorder</FormLabel>
+                      <FormLabel className="text-foreground text-xs">품절 시에도 주문 허용</FormLabel>
                       <FormControl>
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
@@ -544,7 +529,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="weight_grams"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Weight (grams)</FormLabel>
+                      <FormLabel>무게 (g)</FormLabel>
                       <FormControl>
                         <Input inputMode="numeric" {...field} />
                       </FormControl>
@@ -557,9 +542,9 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   name="tags"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tags</FormLabel>
+                      <FormLabel>태그</FormLabel>
                       <FormControl>
-                        <Input placeholder="comma, separated, tags" {...field} />
+                        <Input placeholder="쉼표로, 구분해서, 입력" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -576,12 +561,12 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
               <ConfirmDialog
                 trigger={
                   <Button type="button" variant="outline">
-                    Delete product
+상품 삭제
                   </Button>
                 }
-                title="Delete this product?"
-                description={`"${product.name}" will be permanently removed. Past orders keep their own snapshot and are unaffected.`}
-                confirmLabel="Delete"
+                title="이 상품을 삭제할까요?"
+                description={`"${product.name}" 상품이 완전히 삭제됩니다. 지난 주문 내역은 그대로 남습니다.`}
+                confirmLabel="삭제"
                 destructive
                 onConfirm={handleDelete}
               />
@@ -589,10 +574,10 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
           </div>
           <div className="flex items-center gap-2">
             <Button type="button" variant="outline" onClick={() => router.push('/admin/products')}>
-              Cancel
+취소
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? 'Saving...' : mode === 'create' ? 'Create product' : 'Save changes'}
+              {isPending ? '저장 중...' : mode === 'create' ? '상품 등록' : '변경사항 저장'}
             </Button>
           </div>
         </div>

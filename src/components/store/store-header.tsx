@@ -48,7 +48,7 @@ export function StoreHeader({
         <div className="flex items-center gap-1">
           <Link
             href={storePath(org.slug, '/products')}
-            aria-label="Search products"
+            aria-label="제품 검색"
             className="inline-flex size-8 items-center justify-center rounded-md transition-colors hover:bg-accent"
           >
             <Search className="size-4" />

@@ -29,34 +29,34 @@ function ExpensesTable({ expenses }: ExpensesTableProps) {
       toast.error(result.error)
       return
     }
-    toast.success('Expense deleted')
+    toast.success('지출이 삭제되었습니다')
     router.refresh()
   }
 
   const columns: ColumnDef<ExpenseWithReceipt, unknown>[] = [
     {
       accessorKey: 'spent_at',
-      header: 'Date',
-      cell: ({ row }) => format(parseISO(row.original.spent_at), 'd MMM yyyy'),
+      header: '날짜',
+      cell: ({ row }) => format(parseISO(row.original.spent_at), 'yyyy.MM.dd'),
     },
     {
       accessorKey: 'category',
-      header: 'Category',
+      header: '분류',
       cell: ({ row }) => <Badge variant="secondary">{row.original.category}</Badge>,
     },
     {
       accessorKey: 'amount',
-      header: () => <div className="text-right">Amount</div>,
+      header: () => <div className="text-right">금액</div>,
       cell: ({ row }) => <div className="text-right tabular-nums">{formatMoney(row.original.amount)}</div>,
     },
     {
       accessorKey: 'note',
-      header: 'Note',
+      header: '메모',
       cell: ({ row }) => <span className="text-muted-foreground">{row.original.note || '—'}</span>,
     },
     {
       id: 'receipt',
-      header: 'Receipt',
+      header: '영수증',
       cell: ({ row }) => {
         const path = row.original.receiptPath
         if (!path) return <span className="text-muted-foreground">—</span>
@@ -64,14 +64,14 @@ function ExpensesTable({ expenses }: ExpensesTableProps) {
         return (
           <a href={src} target="_blank" rel="noreferrer" className="block w-fit">
             {/* Plain img: receipt host isn't guaranteed to match next/image's remotePatterns. */}
-            <img src={src} alt="Receipt" className="size-8 rounded-md border object-cover" />
+            <img src={src} alt="영수증" className="size-8 rounded-md border object-cover" />
           </a>
         )
       },
     },
     {
       id: 'actions',
-      header: () => <div className="text-right">Actions</div>,
+      header: () => <div className="text-right">관리</div>,
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
           <ExpenseFormDialog
@@ -79,7 +79,7 @@ function ExpensesTable({ expenses }: ExpensesTableProps) {
             trigger={
               <Button type="button" variant="ghost" size="icon" className="size-7">
                 <Pencil className="size-3.5" />
-                <span className="sr-only">Edit</span>
+                <span className="sr-only">수정</span>
               </Button>
             }
           />
@@ -87,12 +87,12 @@ function ExpensesTable({ expenses }: ExpensesTableProps) {
             trigger={
               <Button type="button" variant="ghost" size="icon" className="size-7">
                 <Trash2 className="size-3.5" />
-                <span className="sr-only">Delete</span>
+                <span className="sr-only">삭제</span>
               </Button>
             }
-            title="Delete this expense?"
-            description="This can't be undone."
-            confirmLabel="Delete"
+            title="이 지출을 삭제할까요?"
+            description="되돌릴 수 없습니다."
+            confirmLabel="삭제"
             destructive
             onConfirm={() => handleDelete(row.original.id)}
           />
@@ -102,7 +102,7 @@ function ExpensesTable({ expenses }: ExpensesTableProps) {
   ]
 
   return (
-    <DataTable columns={columns} data={expenses} emptyState={<span className="text-muted-foreground">No expenses yet.</span>} />
+    <DataTable columns={columns} data={expenses} emptyState={<span className="text-muted-foreground">아직 지출이 없습니다.</span>} />
   )
 }
 

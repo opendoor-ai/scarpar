@@ -24,7 +24,7 @@ function TrackSearchForm() {
       <Input
         value={code}
         onChange={(event) => setCode(event.target.value)}
-        placeholder="DLV-00001 or tracking code"
+        placeholder="DLV-00001 또는 송장 번호"
         aria-label={t("track_order")}
         autoFocus
       />

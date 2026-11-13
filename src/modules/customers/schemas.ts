@@ -16,7 +16,7 @@ const addressSubSchema = z.object({
 export const customerFormSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(120),
   phone: z.string().trim().regex(phoneRegex, 'Enter a valid phone number'),
-  email: z.string().trim().email('Enter a valid email').optional().or(z.literal('')),
+  email: z.string().trim().email('이메일 형식이 올바르지 않습니다').optional().or(z.literal('')),
   address: addressSubSchema.optional(),
 })
 export type CustomerFormInput = z.infer<typeof customerFormSchema>

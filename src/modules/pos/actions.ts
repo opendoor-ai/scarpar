@@ -61,7 +61,7 @@ export async function posCheckoutAction(input: PosCheckoutInput): Promise<Action
   try {
     const parsed = posCheckoutSchema.safeParse(input)
     if (!parsed.success) {
-      return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid checkout data' }
+      return { ok: false, error: parsed.error.issues[0]?.message ?? '결제 정보가 올바르지 않습니다' }
     }
     const data = parsed.data
     const supabase = getAdminClient()
@@ -74,7 +74,7 @@ export async function posCheckoutAction(input: PosCheckoutInput): Promise<Action
       .in('id', productIds)
 
     if (productsError || !products) {
-      return { ok: false, error: 'Failed to load products for pricing' }
+      return { ok: false, error: '상품 가격을 불러오지 못했습니다' }
     }
     const productById = new Map(products.map((p) => [p.id as string, p]))
 
@@ -94,7 +94,7 @@ export async function posCheckoutAction(input: PosCheckoutInput): Promise<Action
         .in('id', variantIds)
 
       if (variantsError || !variants) {
-        return { ok: false, error: 'Failed to load variants for pricing' }
+        return { ok: false, error: '옵션 가격을 불러오지 못했습니다' }
       }
       for (const variant of variants) {
         variantById.set(variant.id as string, variant)
@@ -114,7 +114,7 @@ export async function posCheckoutAction(input: PosCheckoutInput): Promise<Action
     for (const line of data.items) {
       const product = productById.get(line.productId)
       if (!product || product.status !== 'active') {
-        return { ok: false, error: 'One of the items in this sale is no longer available' }
+        return { ok: false, error: '판매할 수 없는 상품이 포함되어 있습니다' }
       }
 
       let unitPrice = product.price as number
@@ -124,7 +124,7 @@ export async function posCheckoutAction(input: PosCheckoutInput): Promise<Action
       if (line.variantId) {
         const variant = variantById.get(line.variantId)
         if (!variant || variant.product_id !== product.id) {
-          return { ok: false, error: `Selected variant is no longer available for ${product.name}` }
+          return { ok: false, error: `${product.name}의 선택한 옵션은 더 이상 판매하지 않습니다` }
         }
         unitPrice = variant.price
         variantName = variant.name
@@ -147,7 +147,7 @@ export async function posCheckoutAction(input: PosCheckoutInput): Promise<Action
     const total = Math.max(subtotal - discountAmount, 0)
 
     if (data.paymentMethod === 'cash' && data.amountReceived !== undefined && data.amountReceived < total) {
-      return { ok: false, error: 'Amount received is less than the total due' }
+      return { ok: false, error: '받은 금액이 결제할 금액보다 적습니다' }
     }
 
     const customerName = data.customerName?.trim() || 'Walk-in'
@@ -164,7 +164,7 @@ export async function posCheckoutAction(input: PosCheckoutInput): Promise<Action
       discount_amount: discountAmount,
       advance_paid: total,
       payment_method: data.paymentMethod,
-      note_internal: 'POS sale',
+      note_internal: '매장 판매',
       actor_id: ctx.user.id,
       decrement_stock: true,
     })
@@ -178,7 +178,7 @@ export async function posCheckoutAction(input: PosCheckoutInput): Promise<Action
       status: 'verified',
       verified_by: ctx.user.id,
       verified_at: new Date().toISOString(),
-      note: 'POS sale — verified at point of sale',
+      note: '매장 판매 — 현장 결제 확인',
     })
     if (paymentError) {
       console.error('[pos] payment insert failed', paymentError)
@@ -189,8 +189,8 @@ export async function posCheckoutAction(input: PosCheckoutInput): Promise<Action
       paymentMethod: data.paymentMethod,
     })
     void notify(ctx.org.id, 'payment_received', {
-      title: `POS sale ${result.orderNo}`,
-      body: `${customerName} — ${orderItems.length} item${orderItems.length === 1 ? '' : 's'}`,
+      title: `매장 판매 ${result.orderNo}`,
+      body: `${customerName} — 상품 ${orderItems.length}개`,
       link: `/admin/receipts`,
     })
 
@@ -205,6 +205,6 @@ export async function posCheckoutAction(input: PosCheckoutInput): Promise<Action
     return { ok: true, data: { orderId: result.orderId, orderNo: result.orderNo, total, changeDue } }
   } catch (err) {
     console.error('[pos] checkout failed', err)
-    return { ok: false, error: err instanceof Error ? err.message : 'Checkout failed' }
+    return { ok: false, error: err instanceof Error ? err.message : '결제에 실패했습니다' }
   }
 }

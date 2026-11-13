@@ -46,9 +46,9 @@ export async function ExpensesMonthWidget() {
   return (
     <Card className="gap-3 p-4">
       <CardHeader className="flex-row items-center justify-between gap-2 p-0">
-        <CardTitle className="text-[13px]">Expenses This Month</CardTitle>
+        <CardTitle className="text-[13px]">이번 달 지출</CardTitle>
         <Link href="/admin/expenses" className="text-xs text-primary hover:underline">
-          View all
+          전체 보기
         </Link>
       </CardHeader>
       <CardContent className="flex flex-col gap-3 p-0">
@@ -56,7 +56,7 @@ export async function ExpensesMonthWidget() {
           {formatCompact(total, { symbol: true })}
         </span>
         {topCategories.length === 0 ? (
-          <EmptyState icon={Wallet} title="No expenses logged yet" className="py-4" />
+          <EmptyState icon={Wallet} title="아직 기록된 지출이 없습니다" className="py-4" />
         ) : (
           <ul className="flex flex-col gap-1.5">
             {topCategories.map(([category, amount]) => (

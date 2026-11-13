@@ -6,7 +6,7 @@ import { ForgotPasswordForm } from '../_components/forgot-password-form'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = { title: 'Reset password — Scarpar' }
+export const metadata: Metadata = { title: '비밀번호 찾기 — Scarpar' }
 
 export default async function ForgotPasswordPage({ searchParams }: PageProps) {
   const params = await searchParams

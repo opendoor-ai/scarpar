@@ -40,22 +40,22 @@ export async function OrdersRecentWidget() {
   return (
     <Card className="gap-3 p-4">
       <CardHeader className="flex-row items-center justify-between gap-2 p-0">
-        <CardTitle className="text-[13px]">Recent Orders</CardTitle>
+        <CardTitle className="text-[13px]">최근 주문</CardTitle>
         <Link href="/admin/orders" className="text-xs text-primary hover:underline">
-          View all
+          전체 보기
         </Link>
       </CardHeader>
       <CardContent className="p-0">
         {orders.length === 0 ? (
-          <EmptyState icon={ShoppingCart} title="No orders yet" className="py-8" />
+          <EmptyState icon={ShoppingCart} title="아직 주문이 없습니다" className="py-8" />
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Order</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Total</TableHead>
+                <TableHead>주문번호</TableHead>
+                <TableHead>고객</TableHead>
+                <TableHead>상태</TableHead>
+                <TableHead className="text-right">합계</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -12,15 +12,15 @@ export default async function SettingsPage() {
   requireRole(ctx, 'admin')
 
   const sections = [
-    { id: 'section-organization', label: 'Organization' },
+    { id: 'section-organization', label: '회사 정보' },
     ...SETTING_GROUPS.map((group) => ({ id: `section-${group}`, label: GROUP_LABELS[group] })),
   ]
 
   return (
     <div>
       <PageHeader
-        title="Settings"
-        description="Organization profile, enabled modules, and platform behavior."
+        title="설정"
+        description="회사 정보, 사용할 기능, 세부 설정"
       />
 
       <div className="flex items-start gap-8">

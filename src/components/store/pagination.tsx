@@ -34,7 +34,7 @@ export function Pagination({
   )
 
   return (
-    <nav className="flex items-center justify-center gap-1 pt-4" aria-label="Pagination">
+    <nav className="flex items-center justify-center gap-1 pt-4" aria-label="페이지 이동">
       <Link
         href={href(Math.max(1, page - 1))}
         aria-disabled={page <= 1}

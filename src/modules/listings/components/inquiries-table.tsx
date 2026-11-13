@@ -21,7 +21,7 @@ interface InquiriesTableProps {
 function InquiriesTable({ inquiries }: InquiriesTableProps) {
   async function handleStatusChange(inquiryId: string, status: InquiryStatus) {
     const result = await updateInquiryStatus(inquiryId, status)
-    if (result.ok) toast.success('Inquiry updated')
+    if (result.ok) toast.success('문의 상태가 변경되었습니다')
     else toast.error(result.error)
   }
 
@@ -29,18 +29,18 @@ function InquiriesTable({ inquiries }: InquiriesTableProps) {
     () => [
       {
         id: 'listing',
-        header: 'Listing',
+        header: '매물',
         cell: ({ row }) => (
           <span className="text-foreground font-medium">{row.original.listing?.title ?? '—'}</span>
         ),
       },
       {
         accessorKey: 'name',
-        header: 'Name',
+        header: '이름',
       },
       {
         id: 'phone',
-        header: 'Phone',
+        header: '전화번호',
         cell: ({ row }) =>
           row.original.phone ? (
             <div className="flex items-center gap-1">
@@ -53,7 +53,7 @@ function InquiriesTable({ inquiries }: InquiriesTableProps) {
       },
       {
         id: 'message',
-        header: 'Message',
+        header: '문의 내용',
         cell: ({ row }) => {
           const message = row.original.message
           if (!message) return <span className="text-muted-foreground">—</span>
@@ -71,7 +71,7 @@ function InquiriesTable({ inquiries }: InquiriesTableProps) {
       },
       {
         id: 'status',
-        header: 'Status',
+        header: '상태',
         cell: ({ row }) => (
           <Select
             value={row.original.status}
@@ -81,17 +81,17 @@ function InquiriesTable({ inquiries }: InquiriesTableProps) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="new">New</SelectItem>
-              <SelectItem value="contacted">Contacted</SelectItem>
-              <SelectItem value="closed">Closed</SelectItem>
+              <SelectItem value="new">새 문의</SelectItem>
+              <SelectItem value="contacted">연락함</SelectItem>
+              <SelectItem value="closed">종료</SelectItem>
             </SelectContent>
           </Select>
         ),
       },
       {
         id: 'created_at',
-        header: 'Date',
-        cell: ({ row }) => format(new Date(row.original.created_at), 'd MMM yyyy'),
+        header: '날짜',
+        cell: ({ row }) => format(new Date(row.original.created_at), 'yyyy.MM.dd'),
       },
     ],
     [],

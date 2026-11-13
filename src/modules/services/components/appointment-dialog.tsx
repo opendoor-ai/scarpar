@@ -32,7 +32,7 @@ function AppointmentDialog({ jobId }: AppointmentDialogProps) {
   async function onSubmit(values: AppointmentFormValues) {
     const result = await createAppointment(jobId, { ...values, customer_id: customer?.id ?? null })
     if (result.ok) {
-      toast.success('Appointment added')
+      toast.success('예약이 추가되었습니다')
       setOpen(false)
       form.reset()
       setCustomer(null)
@@ -55,12 +55,12 @@ function AppointmentDialog({ jobId }: AppointmentDialogProps) {
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
           <Plus />
-          Add appointment
+          예약 추가
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add appointment</DialogTitle>
+          <DialogTitle>예약 추가</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -69,7 +69,7 @@ function AppointmentDialog({ jobId }: AppointmentDialogProps) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>제목</FormLabel>
                   <FormControl>
                     <Input autoFocus {...field} />
                   </FormControl>
@@ -83,7 +83,7 @@ function AppointmentDialog({ jobId }: AppointmentDialogProps) {
                 name="starts_at"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Starts at</FormLabel>
+                    <FormLabel>시작 시간</FormLabel>
                     <FormControl>
                       <Input type="datetime-local" {...field} />
                     </FormControl>
@@ -96,7 +96,7 @@ function AppointmentDialog({ jobId }: AppointmentDialogProps) {
                 name="ends_at"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Ends at (optional)</FormLabel>
+                    <FormLabel>종료 시간 (선택)</FormLabel>
                     <FormControl>
                       <Input type="datetime-local" {...field} />
                     </FormControl>
@@ -106,7 +106,7 @@ function AppointmentDialog({ jobId }: AppointmentDialogProps) {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <FormLabel>Customer (optional)</FormLabel>
+              <FormLabel>고객 (선택)</FormLabel>
               <CustomerCombobox value={customer} onChange={setCustomer} />
             </div>
             <FormField
@@ -114,7 +114,7 @@ function AppointmentDialog({ jobId }: AppointmentDialogProps) {
               name="note"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Note</FormLabel>
+                  <FormLabel>메모</FormLabel>
                   <FormControl>
                     <Textarea rows={2} {...field} />
                   </FormControl>
@@ -124,7 +124,7 @@ function AppointmentDialog({ jobId }: AppointmentDialogProps) {
             />
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Saving...' : 'Add appointment'}
+                {form.formState.isSubmitting ? '저장 중...' : '예약 추가'}
               </Button>
             </DialogFooter>
           </form>

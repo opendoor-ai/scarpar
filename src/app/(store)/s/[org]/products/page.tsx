@@ -87,8 +87,8 @@ export default async function ProductsPage({
         <div className="py-12">
           <EmptyState
             icon={PackageSearch}
-            title="No products found"
-            description="Try a different search or category."
+            title="제품을 찾을 수 없습니다"
+            description="다른 검색어나 카테고리를 선택해 보세요."
           />
         </div>
       ) : (

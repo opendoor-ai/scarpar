@@ -18,7 +18,7 @@ function MediaGrid({ items, loading, selectedId, onSelect }: MediaGridProps) {
   if (loading) {
     return (
       <div className="flex min-h-[200px] items-center justify-center text-sm text-muted-foreground">
-        Loading...
+        불러오는 중...
       </div>
     )
   }
@@ -26,7 +26,7 @@ function MediaGrid({ items, loading, selectedId, onSelect }: MediaGridProps) {
   if (items.length === 0) {
     return (
       <div className="flex min-h-[200px] flex-col items-center justify-center gap-1 text-center text-sm text-muted-foreground">
-        <p>No media yet.</p>
+        <p>아직 등록된 미디어가 없습니다.</p>
       </div>
     )
   }

@@ -23,19 +23,19 @@ import { refundReturnAction } from '@/modules/orders/actions'
 import { RefundReturnSchema, type RefundReturnInput } from '@/modules/orders/schemas'
 
 const METHOD_OPTIONS = [
-  { value: 'cod', label: 'Cash' },
+  { value: 'cod', label: '현금' },
   { value: 'bkash', label: 'bKash' },
   { value: 'nagad', label: 'Nagad' },
   { value: 'uddoktapay', label: 'UddoktaPay' },
   { value: 'sslcommerz', label: 'SSLCommerz' },
-  { value: 'bank', label: 'Bank' },
-  { value: 'cash', label: 'Cash' },
+  { value: 'bank', label: '계좌이체' },
+  { value: 'cash', label: '현금' },
 ]
 
 const RESOLUTION_OPTIONS = [
-  { value: 'refund', label: 'Refund' },
-  { value: 'store_credit', label: 'Store credit' },
-  { value: 'exchange', label: 'Exchange' },
+  { value: 'refund', label: '환불' },
+  { value: 'store_credit', label: '적립금' },
+  { value: 'exchange', label: '교환' },
 ]
 
 interface RefundDialogProps {
@@ -60,7 +60,7 @@ function RefundDialog({ returnId }: RefundDialogProps) {
       toast.error(result.error)
       return
     }
-    toast.success('Refund processed')
+    toast.success('환불이 처리되었습니다')
     setOpen(false)
     router.refresh()
   }
@@ -68,11 +68,11 @@ function RefundDialog({ returnId }: RefundDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">Refund</Button>
+        <Button size="sm">환불</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Process refund</DialogTitle>
+          <DialogTitle>환불 처리</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -81,7 +81,7 @@ function RefundDialog({ returnId }: RefundDialogProps) {
               name="refund_amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Refund amount (taka)</FormLabel>
+                  <FormLabel>환불 금액 (원)</FormLabel>
                   <FormControl>
                     <Input inputMode="decimal" placeholder="0.00" {...field} />
                   </FormControl>
@@ -95,7 +95,7 @@ function RefundDialog({ returnId }: RefundDialogProps) {
                 name="method"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Method</FormLabel>
+                    <FormLabel>환불 방법</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -119,7 +119,7 @@ function RefundDialog({ returnId }: RefundDialogProps) {
                 name="resolution"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Resolution</FormLabel>
+                    <FormLabel>처리 방식</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -144,7 +144,7 @@ function RefundDialog({ returnId }: RefundDialogProps) {
               name="note"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Note</FormLabel>
+                  <FormLabel>메모</FormLabel>
                   <FormControl>
                     <Textarea rows={2} {...field} />
                   </FormControl>
@@ -154,7 +154,7 @@ function RefundDialog({ returnId }: RefundDialogProps) {
             />
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Processing…' : 'Process refund'}
+                {form.formState.isSubmitting ? '처리 중…' : '환불 처리'}
               </Button>
             </DialogFooter>
           </form>

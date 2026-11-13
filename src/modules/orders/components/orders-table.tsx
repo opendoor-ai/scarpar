@@ -32,9 +32,9 @@ export interface OrderRow {
 }
 
 const CHANNEL_LABEL: Record<string, string> = {
-  storefront: 'Storefront',
-  pos: 'POS',
-  manual: 'Manual',
+  storefront: '쇼핑몰',
+  pos: '매장(POS)',
+  manual: '직접 등록',
 }
 
 interface OrdersTableProps {
@@ -78,9 +78,9 @@ function OrdersTable({ data }: OrdersTableProps) {
       )
       const failed = results.filter((r) => !r.ok).length
       if (failed > 0) {
-        toast.error(`${failed} of ${ids.length} order(s) could not be confirmed`)
+        toast.error(`${ids.length}건 중 ${failed}건을 확인 처리하지 못했습니다`)
       } else {
-        toast.success(`${ids.length} order(s) confirmed`)
+        toast.success(`${ids.length}건 확인 처리되었습니다`)
       }
       setSelected(new Set())
       router.refresh()
@@ -97,7 +97,7 @@ function OrdersTable({ data }: OrdersTableProps) {
           <Checkbox
             checked={data.length > 0 && selected.size === data.length}
             onCheckedChange={(v) => toggleAll(Boolean(v))}
-            aria-label="Select all"
+            aria-label="전체 선택"
           />
         ),
         cell: ({ row }) => (
@@ -105,24 +105,24 @@ function OrdersTable({ data }: OrdersTableProps) {
             checked={selected.has(row.original.id)}
             onCheckedChange={(v) => toggleOne(row.original.id, Boolean(v))}
             onClick={(e) => e.stopPropagation()}
-            aria-label="Select row"
+            aria-label="선택"
           />
         ),
         enableSorting: false,
       },
       {
         accessorKey: 'order_no',
-        header: 'Order',
+        header: '주문번호',
         cell: ({ row }) => <span className="font-medium">{row.original.order_no}</span>,
       },
       {
         accessorKey: 'placed_at',
-        header: 'Placed',
-        cell: ({ row }) => format(new Date(row.original.placed_at), 'd MMM, h:mm a'),
+        header: '주문일',
+        cell: ({ row }) => format(new Date(row.original.placed_at), 'MM.dd HH:mm'),
       },
       {
         id: 'customer',
-        header: 'Customer',
+        header: '고객',
         cell: ({ row }) => (
           <div className="flex flex-col">
             <span>{row.original.customer_name}</span>
@@ -132,27 +132,27 @@ function OrdersTable({ data }: OrdersTableProps) {
       },
       {
         accessorKey: 'channel',
-        header: 'Channel',
+        header: '경로',
         cell: ({ row }) => <Badge variant="outline">{CHANNEL_LABEL[row.original.channel] ?? row.original.channel}</Badge>,
       },
       {
         accessorKey: 'items_count',
-        header: 'Items',
+        header: '수량',
         cell: ({ row }) => <span className="tabular-nums">{row.original.items_count}</span>,
       },
       {
         accessorKey: 'total',
-        header: 'Total',
+        header: '합계',
         cell: ({ row }) => <span className="tabular-nums">{formatMoney(row.original.total)}</span>,
       },
       {
         accessorKey: 'payment_status',
-        header: 'Payment',
+        header: '결제',
         cell: ({ row }) => <StatusBadge kind="payment" value={row.original.payment_status} />,
       },
       {
         accessorKey: 'status',
-        header: 'Status',
+        header: '상태',
         cell: ({ row }) => (
           <div className="flex items-center gap-1.5">
             {row.original.risk_level === 'high' || row.original.risk_level === 'medium' ? (
@@ -161,7 +161,7 @@ function OrdersTable({ data }: OrdersTableProps) {
                   'size-2 fill-current',
                   row.original.risk_level === 'high' ? 'text-destructive' : 'text-amber-600 dark:text-amber-500',
                 )}
-                aria-label={`${row.original.risk_level} risk`}
+                aria-label={`위험도 ${row.original.risk_level}`}
               />
             ) : null}
             <StatusBadge kind="order" value={row.original.status} />
@@ -179,12 +179,12 @@ function OrdersTable({ data }: OrdersTableProps) {
       pageSize={50}
       onRowClick={(row) => router.push(`/admin/orders/${row.id}`)}
       emptyState={
-        <EmptyState icon={ShoppingCart} title="No orders found" description="Try a different filter or date range." />
+        <EmptyState icon={ShoppingCart} title="주문이 없습니다" description="다른 조건이나 기간으로 검색해 보세요." />
       }
       toolbar={
         selected.size > 0 ? (
           <Button size="sm" onClick={bulkConfirm} disabled={bulkBusy}>
-            {bulkBusy ? 'Confirming…' : `Confirm ${selected.size} selected`}
+            {bulkBusy ? '처리 중…' : `선택한 ${selected.size}건 확인 처리`}
           </Button>
         ) : undefined
       }

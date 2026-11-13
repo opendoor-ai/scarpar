@@ -46,7 +46,7 @@ export default async function ListingDetailPage({ params }: PageProps<{ id: stri
     <div className="px-6 py-6">
       <PageHeader
         title={listing.title}
-        description={`Created ${new Date(listing.created_at).toLocaleDateString()}`}
+        description={`등록일 ${new Date(listing.created_at).toLocaleDateString('ko-KR')}`}
         backHref="/admin/listings"
         actions={<StatusBadge kind="listing" value={listing.status} />}
       />

@@ -32,7 +32,7 @@ import {
 } from './schemas'
 
 function firstIssue(error: ZodError): string {
-  return error.issues[0]?.message ?? 'Invalid input'
+  return error.issues[0]?.message ?? '입력값이 올바르지 않습니다'
 }
 
 function errorMessage(err: unknown, fallback: string): string {
@@ -41,7 +41,7 @@ function errorMessage(err: unknown, fallback: string): string {
 
 /** Postgres unique_violation → a friendly message instead of the raw constraint name. */
 function friendlyDbError(error: { code?: string; message: string }, entity: string): string {
-  if (error.code === '23505') return `A ${entity} with this slug already exists.`
+  if (error.code === '23505') return `같은 주소(영문)를 쓰는 ${entity === 'product' ? '상품' : entity === 'category' ? '카테고리' : '항목'}이(가) 이미 있습니다.`
   return error.message
 }
 
@@ -86,14 +86,14 @@ export async function createProduct(input: ProductActionInput): Promise<ActionRe
       .select('id')
       .single()
 
-    if (error || !row) return { ok: false, error: friendlyDbError(error ?? { message: 'Failed to create product' }, 'product') }
+    if (error || !row) return { ok: false, error: friendlyDbError(error ?? { message: '상품을 등록하지 못했습니다' }, 'product') }
 
     audit(ctx, 'create', 'product', row.id as string, undefined, data)
     revalidatePath('/admin/products')
 
     return { ok: true, data: { id: row.id as string } }
   } catch (err) {
-    return { ok: false, error: errorMessage(err, 'Failed to create product') }
+    return { ok: false, error: errorMessage(err, '상품을 등록하지 못했습니다') }
   }
 }
 
@@ -117,7 +117,7 @@ export async function updateProduct(
       .eq('id', id)
       .eq('org_id', ctx.org.id)
       .single()
-    if (!before) return { ok: false, error: 'Product not found' }
+    if (!before) return { ok: false, error: '상품을 찾을 수 없습니다' }
 
     const { data: row, error } = await supabase
       .from('products')
@@ -147,7 +147,7 @@ export async function updateProduct(
       .select('id')
       .single()
 
-    if (error || !row) return { ok: false, error: friendlyDbError(error ?? { message: 'Failed to update product' }, 'product') }
+    if (error || !row) return { ok: false, error: friendlyDbError(error ?? { message: '상품을 수정하지 못했습니다' }, 'product') }
 
     audit(ctx, 'update', 'product', id, before, data)
     await maybeNotifyLowStock(ctx.org.id, before as Product, {
@@ -161,7 +161,7 @@ export async function updateProduct(
 
     return { ok: true, data: { id } }
   } catch (err) {
-    return { ok: false, error: errorMessage(err, 'Failed to update product') }
+    return { ok: false, error: errorMessage(err, '상품을 수정하지 못했습니다') }
   }
 }
 
@@ -178,7 +178,7 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
       .eq('id', id)
       .eq('org_id', ctx.org.id)
       .single()
-    if (!before) return { ok: false, error: 'Product not found' }
+    if (!before) return { ok: false, error: '상품을 찾을 수 없습니다' }
 
     // order_items.product_id is ON DELETE SET NULL (snapshots survive);
     // product_variants/product_images/inventory_movements are ON DELETE
@@ -216,7 +216,7 @@ export async function saveVariants(input: SaveVariantsInput): Promise<ActionResu
       .eq('id', product_id)
       .eq('org_id', ctx.org.id)
       .single()
-    if (!product) return { ok: false, error: 'Product not found' }
+    if (!product) return { ok: false, error: '상품을 찾을 수 없습니다' }
 
     const { data: existing, error: existingError } = await supabase
       .from('product_variants')
@@ -302,7 +302,7 @@ export async function saveImages(input: SaveImagesInput): Promise<ActionResult> 
       .eq('id', product_id)
       .eq('org_id', ctx.org.id)
       .single()
-    if (!product) return { ok: false, error: 'Product not found' }
+    if (!product) return { ok: false, error: '상품을 찾을 수 없습니다' }
 
     const { data: existing, error: existingError } = await supabase
       .from('product_images')
@@ -377,7 +377,7 @@ export async function adjustStock(input: AdjustStockInput): Promise<ActionResult
       .eq('id', product_id)
       .eq('org_id', ctx.org.id)
       .single()
-    if (!product) return { ok: false, error: 'Product not found' }
+    if (!product) return { ok: false, error: '상품을 찾을 수 없습니다' }
 
     let beforeQty: number
     let afterQty: number
@@ -389,12 +389,12 @@ export async function adjustStock(input: AdjustStockInput): Promise<ActionResult
         .eq('id', variant_id)
         .eq('product_id', product_id)
         .single()
-      if (!variant) return { ok: false, error: 'Variant not found' }
+      if (!variant) return { ok: false, error: '옵션을 찾을 수 없습니다' }
 
       beforeQty = variant.stock_qty as number
       afterQty = beforeQty + qty_delta
       if (afterQty < 0 && !product.allow_backorder) {
-        return { ok: false, error: 'Resulting stock cannot be negative' }
+        return { ok: false, error: '재고가 0보다 적어질 수 없습니다' }
       }
 
       const { error: updError } = await supabase
@@ -406,7 +406,7 @@ export async function adjustStock(input: AdjustStockInput): Promise<ActionResult
       beforeQty = product.stock_qty as number
       afterQty = beforeQty + qty_delta
       if (afterQty < 0 && !product.allow_backorder) {
-        return { ok: false, error: 'Resulting stock cannot be negative' }
+        return { ok: false, error: '재고가 0보다 적어질 수 없습니다' }
       }
 
       const { error: updError } = await supabase
@@ -434,8 +434,8 @@ export async function adjustStock(input: AdjustStockInput): Promise<ActionResult
     const threshold = product.low_stock_threshold as number
     if (beforeQty >= threshold && afterQty < threshold) {
       await notify(ctx.org.id, 'low_stock', {
-        title: `Low stock: ${product.name as string}`,
-        body: `${afterQty} left (threshold ${threshold})`,
+        title: `재고 부족: ${product.name as string}`,
+        body: `${afterQty}개 남음 (기준 ${threshold}개)`,
         link: `/admin/products/${product_id}`,
       })
     }
@@ -459,8 +459,8 @@ async function maybeNotifyLowStock(
 ): Promise<void> {
   if (before.stock_qty >= after.low_stock_threshold && after.stock_qty < after.low_stock_threshold) {
     await notify(orgId, 'low_stock', {
-      title: `Low stock: ${after.name}`,
-      body: `${after.stock_qty} left (threshold ${after.low_stock_threshold})`,
+      title: `재고 부족: ${after.name}`,
+      body: `${after.stock_qty}개 남음 (기준 ${after.low_stock_threshold}개)`,
       link: `/admin/products/${productId}`,
     })
   }
@@ -486,14 +486,14 @@ export async function createCategory(input: CategoryInput): Promise<ActionResult
       .select('id')
       .single()
 
-    if (error || !row) return { ok: false, error: friendlyDbError(error ?? { message: 'Failed to create category' }, 'category') }
+    if (error || !row) return { ok: false, error: friendlyDbError(error ?? { message: '카테고리를 추가하지 못했습니다' }, 'category') }
 
     audit(ctx, 'create', 'category', row.id as string, undefined, data)
     revalidatePath('/admin/categories')
 
     return { ok: true, data: { id: row.id as string } }
   } catch (err) {
-    return { ok: false, error: errorMessage(err, 'Failed to create category') }
+    return { ok: false, error: errorMessage(err, '카테고리를 추가하지 못했습니다') }
   }
 }
 
@@ -506,7 +506,7 @@ export async function updateCategory(id: string, input: CategoryInput): Promise<
   const data = parsed.data
 
   if (data.parent_id === id) {
-    return { ok: false, error: 'A category cannot be its own parent' }
+    return { ok: false, error: '자기 자신을 상위 카테고리로 지정할 수 없습니다' }
   }
 
   try {
@@ -518,7 +518,7 @@ export async function updateCategory(id: string, input: CategoryInput): Promise<
       .eq('id', id)
       .eq('org_id', ctx.org.id)
       .single()
-    if (!before) return { ok: false, error: 'Category not found' }
+    if (!before) return { ok: false, error: '카테고리를 찾을 수 없습니다' }
 
     const { error } = await supabase
       .from('categories')
@@ -551,7 +551,7 @@ export async function deleteCategory(id: string): Promise<ActionResult> {
       .eq('id', id)
       .eq('org_id', ctx.org.id)
       .single()
-    if (!before) return { ok: false, error: 'Category not found' }
+    if (!before) return { ok: false, error: '카테고리를 찾을 수 없습니다' }
 
     // categories.parent_id and products.category_id are both ON DELETE SET
     // NULL (supabase/migrations/0002_commerce.sql) — child categories and

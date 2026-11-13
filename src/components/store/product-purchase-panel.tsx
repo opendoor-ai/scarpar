@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { t, type Lang } from '@/lib/i18n'
-import { formatMoney } from '@/lib/money'
+import { formatMoney, formatPrice } from '@/lib/money'
 import { cn } from '@/lib/utils'
 import type { ProductVariant } from '@/types/db'
 
@@ -26,7 +26,7 @@ export function ProductPurchasePanel({
   product,
   variants,
   image,
-  lang = 'en',
+  lang = 'ko',
 }: {
   product: PurchaseProduct
   variants: ProductVariant[]
@@ -44,7 +44,9 @@ export function ProductPurchasePanel({
   const stock = selected ? selected.stock_qty : product.stock_qty
   const outOfStock = product.track_stock && stock <= 0 && !product.allow_backorder
   const maxQty = product.track_stock && !product.allow_backorder ? Math.max(stock, 1) : 999
-  const hasDiscount = compareAt != null && compareAt > price
+  const hasDiscount = price > 0 && compareAt != null && compareAt > price
+  // 가격 0원 = 가격협의 상품: 장바구니 대신 전화·문자 문의로 연결
+  const priceOnRequest = price <= 0
 
   function handleAdd() {
     if (outOfStock) return
@@ -57,13 +59,13 @@ export function ProductPurchasePanel({
       image,
       qty,
     })
-    toast.success(lang === 'bn' ? 'কার্টে যোগ করা হয়েছে' : 'Added to cart')
+    toast.success(lang === 'bn' ? 'কার্টে যোগ করা হয়েছে' : lang === 'en' ? 'Added to cart' : '장바구니에 담았습니다')
   }
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-baseline gap-3">
-        <span className="text-xl font-semibold tabular-nums">{formatMoney(price)}</span>
+        <span className="text-xl font-semibold tabular-nums">{formatPrice(price)}</span>
         {hasDiscount ? (
           <span className="text-sm text-muted-foreground line-through tabular-nums">
             {formatMoney(compareAt as number)}
@@ -73,7 +75,7 @@ export function ProductPurchasePanel({
 
       {variants.length > 0 ? (
         <div className="flex flex-col gap-2">
-          <span className="text-xs font-medium text-muted-foreground">Options</span>
+          <span className="text-xs font-medium text-muted-foreground">옵션</span>
           <div className="flex flex-wrap gap-2">
             {variants.map((v) => {
               const variantOut = product.track_stock && v.stock_qty <= 0 && !product.allow_backorder
@@ -100,14 +102,18 @@ export function ProductPurchasePanel({
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-2">
-        <span className="text-xs font-medium text-muted-foreground">{t('quantity', lang)}</span>
-        <QtyStepper value={qty} onChange={setQty} max={maxQty} />
-      </div>
+      {priceOnRequest ? null : (
+        <>
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-medium text-muted-foreground">{t('quantity', lang)}</span>
+            <QtyStepper value={qty} onChange={setQty} max={maxQty} />
+          </div>
 
-      <Button type="button" size="lg" className="w-full sm:w-auto" disabled={outOfStock} onClick={handleAdd}>
-        {outOfStock ? t('out_of_stock', lang) : t('add_to_cart', lang)}
-      </Button>
+          <Button type="button" size="lg" className="w-full sm:w-auto" disabled={outOfStock} onClick={handleAdd}>
+            {outOfStock ? t('out_of_stock', lang) : t('add_to_cart', lang)}
+          </Button>
+        </>
+      )}
     </div>
   )
 }

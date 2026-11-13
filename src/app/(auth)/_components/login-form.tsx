@@ -43,8 +43,8 @@ export function LoginForm({ next }: LoginFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Log in</CardTitle>
-        <CardDescription>Welcome back — enter your details to continue.</CardDescription>
+        <CardTitle className="text-lg">로그인</CardTitle>
+        <CardDescription>이메일과 비밀번호를 입력하세요.</CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
         <Form {...form}>
@@ -61,7 +61,7 @@ export function LoginForm({ next }: LoginFormProps) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>이메일</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="you@business.com" autoComplete="email" {...field} />
                   </FormControl>
@@ -76,9 +76,9 @@ export function LoginForm({ next }: LoginFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between">
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>비밀번호</FormLabel>
                     <Link href={forgotHref} className="text-xs text-primary hover:underline">
-                      Forgot password?
+                      비밀번호를 잊으셨나요?
                     </Link>
                   </div>
                   <FormControl>
@@ -90,15 +90,15 @@ export function LoginForm({ next }: LoginFormProps) {
             />
 
             <Button type="submit" className="mt-2 w-full" disabled={isPending}>
-              {isPending ? 'Logging in…' : 'Log in'}
+              {isPending ? '로그인 중…' : '로그인'}
             </Button>
           </form>
         </Form>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          Don&apos;t have an account?{' '}
+          아직 회원이 아니신가요?{' '}
           <Link href={signupHref} className="font-medium text-primary hover:underline">
-            Sign up
+회원가입
           </Link>
         </p>
       </CardContent>

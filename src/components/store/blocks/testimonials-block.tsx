@@ -39,7 +39,7 @@ export async function TestimonialsBlockView({
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <h2 className="mb-5 text-lg font-semibold">What customers say</h2>
+      <h2 className="mb-5 text-lg font-semibold">고객 후기</h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item, i) => (
           <div key={i} className="flex flex-col gap-2 rounded-lg border border-border p-4">

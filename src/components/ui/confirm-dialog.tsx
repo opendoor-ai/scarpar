@@ -31,7 +31,7 @@ function ConfirmDialog({
   onOpenChange,
   title,
   description,
-  confirmLabel = "Confirm",
+  confirmLabel = "확인",
   destructive,
   onConfirm,
 }: ConfirmDialogProps) {
@@ -70,7 +70,7 @@ function ConfirmDialog({
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline" disabled={loading}>
-              Cancel
+              취소
             </Button>
           </DialogClose>
           <Button
@@ -78,7 +78,7 @@ function ConfirmDialog({
             disabled={loading}
             onClick={handleConfirm}
           >
-            {loading ? "Please wait..." : confirmLabel}
+            {loading ? "잠시만 기다려 주세요..." : confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

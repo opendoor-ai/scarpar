@@ -32,10 +32,10 @@ export interface ProductListRow {
 }
 
 const STATUS_TABS: { value: 'all' | ProductStatus; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'active', label: 'Active' },
-  { value: 'draft', label: 'Draft' },
-  { value: 'archived', label: 'Archived' },
+  { value: 'all', label: '전체' },
+  { value: 'active', label: '판매중' },
+  { value: 'draft', label: '임시저장' },
+  { value: 'archived', label: '보관' },
 ]
 
 function ProductStatusTabs({ current }: { current: 'all' | ProductStatus }) {
@@ -61,12 +61,12 @@ function ProductStatusTabs({ current }: { current: 'all' | ProductStatus }) {
 
 function StockCell({ row }: { row: ProductListRow }) {
   if (!row.track_stock) return <span className="text-muted-foreground">—</span>
-  if (row.stock_qty <= 0) return <Badge variant="destructive">Out</Badge>
+  if (row.stock_qty <= 0) return <Badge variant="destructive">품절</Badge>
   if (row.stock_qty <= row.low_stock_threshold) {
     return (
       <span className="flex items-center justify-end gap-1.5 tabular-nums">
         {row.stock_qty}
-        <Badge variant="warning">Low</Badge>
+        <Badge variant="warning">부족</Badge>
       </span>
     )
   }
@@ -90,7 +90,7 @@ const columns: ColumnDef<ProductListRow>[] = [
   },
   {
     accessorKey: 'name',
-    header: 'Name',
+    header: '상품명',
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <span className="font-medium">{row.original.name}</span>
@@ -102,24 +102,24 @@ const columns: ColumnDef<ProductListRow>[] = [
   },
   {
     accessorKey: 'categoryName',
-    header: 'Category',
+    header: '카테고리',
     cell: ({ row }) => row.original.categoryName ?? <span className="text-muted-foreground">—</span>,
   },
   {
     accessorKey: 'price',
-    header: () => <div className="text-right">Price</div>,
+    header: () => <div className="text-right">가격</div>,
     cell: ({ row }) => {
       const { variantCount, minVariantPrice, price } = row.original
       return (
         <div className="text-right tabular-nums">
-          {variantCount > 0 && minVariantPrice != null ? `from ${formatMoney(minVariantPrice)}` : formatMoney(price)}
+          {variantCount > 0 && minVariantPrice != null ? `${formatMoney(minVariantPrice)}~` : formatMoney(price)}
         </div>
       )
     },
   },
   {
     accessorKey: 'stock_qty',
-    header: () => <div className="text-right">Stock</div>,
+    header: () => <div className="text-right">재고</div>,
     cell: ({ row }) => (
       <div className="text-right">
         <StockCell row={row.original} />
@@ -128,13 +128,13 @@ const columns: ColumnDef<ProductListRow>[] = [
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: '상태',
     cell: ({ row }) => <StatusBadge kind="product" value={row.original.status} />,
   },
   {
     accessorKey: 'updated_at',
-    header: 'Updated',
-    cell: ({ row }) => new Date(row.original.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+    header: '수정일',
+    cell: ({ row }) => new Date(row.original.updated_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }),
   },
 ]
 

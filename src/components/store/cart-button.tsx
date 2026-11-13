@@ -12,7 +12,7 @@ export function CartButton({ orgSlug }: { orgSlug: string }) {
   return (
     <Link
       href={storePath(orgSlug, '/cart')}
-      aria-label="View cart"
+      aria-label="장바구니 보기"
       className="relative inline-flex size-8 items-center justify-center rounded-md transition-colors hover:bg-accent"
     >
       <ShoppingBag className="size-4" />

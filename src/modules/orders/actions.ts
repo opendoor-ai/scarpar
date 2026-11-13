@@ -362,7 +362,7 @@ export async function createManualOrderAction(
     })
 
     await notify(ctx.org.id, 'order_placed', {
-      title: `New order ${result.orderNo}`,
+      title: `새 주문 ${result.orderNo}`,
       body: `${formatMoney(result.total)} — ${parsed.customer.name}`,
       link: `/admin/orders/${result.orderId}`,
     })
@@ -410,12 +410,12 @@ async function transitionOrderStatus(
     .eq('id', orderId)
     .single()
 
-  if (error || !data) return { ok: false, error: 'Order not found' }
+  if (error || !data) return { ok: false, error: '주문을 찾을 수 없습니다' }
   const order = data as Order
 
   const allowed = ORDER_STATUS_FLOW[order.status] ?? []
   if (!allowed.includes(nextStatus)) {
-    return { ok: false, error: `Cannot move order from ${order.status} to ${nextStatus}` }
+    return { ok: false, error: `주문 상태를 ${order.status}에서 ${nextStatus}(으)로 바꿀 수 없습니다` }
   }
 
   const nowIso = new Date().toISOString()
@@ -430,7 +430,7 @@ async function transitionOrderStatus(
     org_id: ctx.org.id,
     order_id: orderId,
     type: 'status',
-    message: `Status changed: ${order.status} -> ${nextStatus}`,
+    message: `상태 변경: ${order.status} -> ${nextStatus}`,
     data: { from: order.status, to: nextStatus },
     actor_id: ctx.user.id,
   })
@@ -445,12 +445,12 @@ async function transitionOrderStatus(
 
   if (nextStatus === 'dispatched') {
     await notify(ctx.org.id, 'order_dispatched', {
-      title: `Order ${order.order_no} dispatched`,
+      title: `주문 ${order.order_no} 출고됨`,
       link: `/admin/orders/${orderId}`,
     })
   } else if (nextStatus === 'delivered') {
     await notify(ctx.org.id, 'order_delivered', {
-      title: `Order ${order.order_no} delivered`,
+      title: `주문 ${order.order_no} 배송 완료`,
       link: `/admin/orders/${orderId}`,
     })
   }
@@ -503,10 +503,10 @@ export async function recordPaymentAction(input: RecordPaymentInput): Promise<Ac
       .eq('org_id', ctx.org.id)
       .eq('id', parsed.orderId)
       .maybeSingle()
-    if (!order) return { ok: false, error: 'Order not found' }
+    if (!order) return { ok: false, error: '주문을 찾을 수 없습니다' }
 
     const amountPaisa = toPaisa(parsed.amount)
-    if (amountPaisa <= 0) return { ok: false, error: 'Amount must be greater than zero' }
+    if (amountPaisa <= 0) return { ok: false, error: '금액은 0보다 커야 합니다' }
 
     const { data: payment, error } = await admin
       .from('payments')
@@ -524,13 +524,13 @@ export async function recordPaymentAction(input: RecordPaymentInput): Promise<Ac
       .select('id')
       .single()
 
-    if (error || !payment) return { ok: false, error: error?.message ?? 'Failed to record payment' }
+    if (error || !payment) return { ok: false, error: error?.message ?? '결제를 기록하지 못했습니다' }
 
     await admin.from('order_events').insert({
       org_id: ctx.org.id,
       order_id: parsed.orderId,
       type: 'payment',
-      message: `Payment recorded: ${parsed.kind} ${formatMoney(amountPaisa)} via ${parsed.method} (pending verification)`,
+      message: `결제 기록: ${parsed.kind} ${formatMoney(amountPaisa)} · ${parsed.method} (확인 대기)`,
       data: { paymentId: payment.id, kind: parsed.kind, method: parsed.method, amount: amountPaisa },
       actor_id: ctx.user.id,
     })
@@ -546,7 +546,7 @@ export async function recordPaymentAction(input: RecordPaymentInput): Promise<Ac
     return { ok: true, data: { paymentId: payment.id as string } }
   } catch (err) {
     rethrowIfRedirect(err)
-    return { ok: false, error: errMessage(err, 'Failed to record payment') }
+    return { ok: false, error: errMessage(err, '결제를 기록하지 못했습니다') }
   }
 }
 
@@ -571,9 +571,9 @@ export async function verifyPaymentAction(paymentId: string): Promise<ActionResu
       .eq('id', paymentId)
       .single()
 
-    if (paymentError || !paymentData) return { ok: false, error: 'Payment not found' }
+    if (paymentError || !paymentData) return { ok: false, error: '결제 내역을 찾을 수 없습니다' }
     const payment = paymentData as Payment
-    if (payment.status !== 'pending') return { ok: false, error: `Payment already ${payment.status}` }
+    if (payment.status !== 'pending') return { ok: false, error: `이미 처리된 결제입니다 (${payment.status})` }
 
     const { data: orderData, error: orderError } = await admin
       .from('orders')
@@ -582,7 +582,7 @@ export async function verifyPaymentAction(paymentId: string): Promise<ActionResu
       .eq('id', payment.order_id)
       .single()
 
-    if (orderError || !orderData) return { ok: false, error: 'Order not found' }
+    if (orderError || !orderData) return { ok: false, error: '주문을 찾을 수 없습니다' }
     const order = orderData as Order
 
     const nowIso = new Date().toISOString()
@@ -623,7 +623,7 @@ export async function verifyPaymentAction(paymentId: string): Promise<ActionResu
       org_id: ctx.org.id,
       order_id: order.id,
       type: 'payment',
-      message: `Payment verified: ${payment.kind} ${formatMoney(payment.amount)} via ${payment.method}`,
+      message: `결제 확인: ${payment.kind} ${formatMoney(payment.amount)} via ${payment.method}`,
       data: { paymentId, amount: payment.amount, kind: payment.kind },
       actor_id: ctx.user.id,
     })
@@ -631,7 +631,7 @@ export async function verifyPaymentAction(paymentId: string): Promise<ActionResu
     audit(ctx, 'payment.verify', 'payment', paymentId, { status: 'pending' }, { status: 'verified' })
 
     await notify(ctx.org.id, 'payment_received', {
-      title: `Payment verified for ${order.order_no}`,
+      title: `${order.order_no} 결제 확인됨`,
       body: `${formatMoney(payment.amount)} via ${payment.method}`,
       link: `/admin/orders/${order.id}`,
     })
@@ -658,9 +658,9 @@ export async function rejectPaymentAction(input: RejectPaymentInput): Promise<Ac
       .eq('id', parsed.paymentId)
       .maybeSingle()
 
-    if (!paymentData) return { ok: false, error: 'Payment not found' }
+    if (!paymentData) return { ok: false, error: '결제 내역을 찾을 수 없습니다' }
     const payment = paymentData as Payment
-    if (payment.status !== 'pending') return { ok: false, error: `Payment already ${payment.status}` }
+    if (payment.status !== 'pending') return { ok: false, error: `이미 처리된 결제입니다 (${payment.status})` }
 
     const { error } = await admin
       .from('payments')
@@ -676,7 +676,7 @@ export async function rejectPaymentAction(input: RejectPaymentInput): Promise<Ac
       org_id: ctx.org.id,
       order_id: payment.order_id,
       type: 'payment',
-      message: `Payment rejected: ${payment.kind} ${formatMoney(payment.amount)}${parsed.note ? ` — ${parsed.note}` : ''}`,
+      message: `결제 거절: ${payment.kind} ${formatMoney(payment.amount)}${parsed.note ? ` — ${parsed.note}` : ''}`,
       data: { paymentId: parsed.paymentId },
       actor_id: ctx.user.id,
     })
@@ -707,7 +707,7 @@ export async function updateRiskAction(input: UpdateRiskInput): Promise<ActionRe
       .eq('org_id', ctx.org.id)
       .eq('id', parsed.orderId)
       .maybeSingle()
-    if (!order) return { ok: false, error: 'Order not found' }
+    if (!order) return { ok: false, error: '주문을 찾을 수 없습니다' }
 
     const { error } = await admin
       .from('orders')
@@ -720,7 +720,7 @@ export async function updateRiskAction(input: UpdateRiskInput): Promise<ActionRe
       org_id: ctx.org.id,
       order_id: parsed.orderId,
       type: 'note',
-      message: `Risk level set to ${parsed.risk_level}`,
+      message: `위험도 변경: ${parsed.risk_level}`,
       data: { risk_level: parsed.risk_level, risk_note: parsed.risk_note ?? null },
       actor_id: ctx.user.id,
     })
@@ -751,7 +751,7 @@ export async function checkBlocklistAction(
       .eq('id', orderId)
       .maybeSingle()
 
-    if (!order) return { ok: false, error: 'Order not found' }
+    if (!order) return { ok: false, error: '주문을 찾을 수 없습니다' }
 
     const { data: blocklistRows } = await admin.from('blocklist').select('kind, value').eq('org_id', ctx.org.id)
 
@@ -861,14 +861,14 @@ export async function createReturnAction(
       .eq('org_id', ctx.org.id)
       .eq('id', parsed.orderId)
       .maybeSingle()
-    if (!order) return { ok: false, error: 'Order not found' }
+    if (!order) return { ok: false, error: '주문을 찾을 수 없습니다' }
 
     const { data: returnNo, error: rpcError } = await admin.rpc('next_doc_number', {
       p_org: ctx.org.id,
       p_doc_type: 'return',
       p_prefix: 'RET-',
     })
-    if (rpcError || !returnNo) return { ok: false, error: rpcError?.message ?? 'Failed to allocate return number' }
+    if (rpcError || !returnNo) return { ok: false, error: rpcError?.message ?? '반품 번호를 만들지 못했습니다' }
 
     const { data: ret, error: retError } = await admin
       .from('returns')
@@ -882,7 +882,7 @@ export async function createReturnAction(
       .select('id, return_no')
       .single()
 
-    if (retError || !ret) return { ok: false, error: retError?.message ?? 'Failed to create return' }
+    if (retError || !ret) return { ok: false, error: retError?.message ?? '반품을 만들지 못했습니다' }
 
     const itemRows = parsed.items.map((item) => ({
       org_id: ctx.org.id,
@@ -899,7 +899,7 @@ export async function createReturnAction(
       org_id: ctx.org.id,
       order_id: parsed.orderId,
       type: 'note',
-      message: `Return ${ret.return_no} requested`,
+      message: `반품 ${ret.return_no} 요청됨`,
       data: { returnId: ret.id },
       actor_id: ctx.user.id,
     })
@@ -910,7 +910,7 @@ export async function createReturnAction(
     })
 
     await notify(ctx.org.id, 'return_requested', {
-      title: `Return ${ret.return_no} requested`,
+      title: `반품 ${ret.return_no} 요청됨`,
       link: `/admin/returns/${ret.id}`,
     })
 
@@ -919,7 +919,7 @@ export async function createReturnAction(
     return { ok: true, data: { returnId: ret.id as string, returnNo: ret.return_no as string } }
   } catch (err) {
     rethrowIfRedirect(err)
-    return { ok: false, error: errMessage(err, 'Failed to create return') }
+    return { ok: false, error: errMessage(err, '반품을 만들지 못했습니다') }
   }
 }
 
@@ -991,7 +991,7 @@ export async function updateReturnStatusAction(
     const parsed = UpdateReturnStatusSchema.parse(input)
 
     if (parsed.nextStatus === 'refunded') {
-      return { ok: false, error: 'Use the refund action to move a return to refunded.' }
+      return { ok: false, error: '환불 완료는 환불 버튼으로 처리하세요.' }
     }
 
     const admin = getAdminClient()
@@ -1001,12 +1001,12 @@ export async function updateReturnStatusAction(
       .eq('org_id', ctx.org.id)
       .eq('id', parsed.returnId)
       .single()
-    if (!data) return { ok: false, error: 'Return not found' }
+    if (!data) return { ok: false, error: '반품을 찾을 수 없습니다' }
     const ret = data as { id: string; order_id: string; status: ReturnStatus; return_no: string }
 
     const allowed = RETURN_STATUS_FLOW[ret.status] ?? []
     if (!allowed.includes(parsed.nextStatus)) {
-      return { ok: false, error: `Cannot move return from ${ret.status} to ${parsed.nextStatus}` }
+      return { ok: false, error: `반품 상태를 ${ret.status}에서 ${parsed.nextStatus}(으)로 바꿀 수 없습니다` }
     }
 
     const { error } = await admin.from('returns').update({ status: parsed.nextStatus }).eq('id', parsed.returnId)
@@ -1016,7 +1016,7 @@ export async function updateReturnStatusAction(
       org_id: ctx.org.id,
       order_id: ret.order_id,
       type: 'note',
-      message: `Return ${ret.return_no}: ${ret.status} -> ${parsed.nextStatus}`,
+      message: `반품 ${ret.return_no}: ${ret.status} -> ${parsed.nextStatus}`,
       data: { returnId: parsed.returnId, from: ret.status, to: parsed.nextStatus },
       actor_id: ctx.user.id,
     })
@@ -1053,11 +1053,11 @@ export async function refundReturnAction(input: RefundReturnInput): Promise<Acti
       .eq('org_id', ctx.org.id)
       .eq('id', parsed.returnId)
       .single()
-    if (!retData) return { ok: false, error: 'Return not found' }
+    if (!retData) return { ok: false, error: '반품을 찾을 수 없습니다' }
     const ret = retData as { id: string; order_id: string; status: ReturnStatus; return_no: string; note: string | null }
 
     if (ret.status !== 'received') {
-      return { ok: false, error: `Return must be received before refunding (currently ${ret.status})` }
+      return { ok: false, error: `반품 상품을 받은 뒤에 환불할 수 있습니다 (현재: ${ret.status})` }
     }
 
     const { data: orderData } = await admin
@@ -1066,11 +1066,11 @@ export async function refundReturnAction(input: RefundReturnInput): Promise<Acti
       .eq('org_id', ctx.org.id)
       .eq('id', ret.order_id)
       .single()
-    if (!orderData) return { ok: false, error: 'Order not found' }
+    if (!orderData) return { ok: false, error: '주문을 찾을 수 없습니다' }
     const order = orderData as Order
 
     const refundAmountPaisa = toPaisa(parsed.refund_amount)
-    if (refundAmountPaisa <= 0) return { ok: false, error: 'Refund amount must be greater than zero' }
+    if (refundAmountPaisa <= 0) return { ok: false, error: '환불 금액은 0보다 커야 합니다' }
 
     const nowIso = new Date().toISOString()
 
@@ -1126,7 +1126,7 @@ export async function refundReturnAction(input: RefundReturnInput): Promise<Acti
       org_id: ctx.org.id,
       order_id: order.id,
       type: 'payment',
-      message: `Refund issued: ${formatMoney(refundAmountPaisa)} via ${parsed.method} (return ${ret.return_no})`,
+      message: `환불 처리: ${formatMoney(refundAmountPaisa)} via ${parsed.method} (return ${ret.return_no})`,
       data: { returnId: parsed.returnId, amount: refundAmountPaisa, method: parsed.method },
       actor_id: ctx.user.id,
     })

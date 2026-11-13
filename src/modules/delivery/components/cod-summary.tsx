@@ -13,9 +13,9 @@ interface CodSummaryProps {
 function CodSummary({ uncollectedInField, withRiders, settledThisMonth }: CodSummaryProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <StatCard label="Uncollected COD (in field)" value={formatMoney(uncollectedInField)} icon={Wallet} />
-      <StatCard label="Cash with riders" value={formatMoney(withRiders)} icon={PiggyBank} />
-      <StatCard label="Settled this month" value={formatMoney(settledThisMonth)} icon={Landmark} />
+      <StatCard label="미수금 착불 (배송 중)" value={formatMoney(uncollectedInField)} icon={Wallet} />
+      <StatCard label="배송기사 보유 현금" value={formatMoney(withRiders)} icon={PiggyBank} />
+      <StatCard label="이번 달 정산액" value={formatMoney(settledThisMonth)} icon={Landmark} />
     </div>
   )
 }

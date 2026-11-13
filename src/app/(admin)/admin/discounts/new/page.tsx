@@ -23,7 +23,7 @@ export default async function NewDiscountPage() {
 
   return (
     <div className="px-6 py-6">
-      <PageHeader title="New discount" backHref="/admin/discounts" />
+      <PageHeader title="새 할인" backHref="/admin/discounts" />
       <DiscountForm categories={categories} />
     </div>
   )

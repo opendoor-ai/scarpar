@@ -70,11 +70,11 @@ function ZoneDialog({ zone, trigger }: ZoneDialogProps) {
 
   async function handleSave() {
     if (!name.trim()) {
-      toast.error("Name is required")
+      toast.error("이름을 입력하세요")
       return
     }
     if (districts.length === 0) {
-      toast.error("Select at least one district")
+      toast.error("지역을 1개 이상 선택하세요")
       return
     }
 
@@ -94,7 +94,7 @@ function ZoneDialog({ zone, trigger }: ZoneDialogProps) {
         toast.error(result.error)
         return
       }
-      toast.success(zone ? "Zone updated" : "Zone created")
+      toast.success(zone ? "배송 지역이 수정되었습니다" : "배송 지역이 추가되었습니다")
       setOpen(false)
       router.refresh()
     } finally {
@@ -107,38 +107,38 @@ function ZoneDialog({ zone, trigger }: ZoneDialogProps) {
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{zone ? "Edit zone" : "New zone"}</DialogTitle>
-          <DialogDescription>Districts, charge, and COD rules for this delivery zone.</DialogDescription>
+          <DialogTitle>{zone ? "배송 지역 수정" : "새 배송 지역"}</DialogTitle>
+          <DialogDescription>이 배송 지역의 지역 목록, 배송비, 착불 규칙</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label>Name</Label>
+              <Label>이름</Label>
               <Input value={name} onChange={(event) => setName(event.target.value)} />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label>Charge (৳)</Label>
+              <Label>배송비 (원)</Label>
               <Input type="number" step="0.01" value={charge} onChange={(event) => setCharge(event.target.value)} />
             </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label>ETA text</Label>
+            <Label>예상 도착 안내</Label>
             <Input value={etaText} onChange={(event) => setEtaText(event.target.value)} placeholder="e.g. 24 hours" />
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <div className="flex items-center justify-between rounded-md border p-2.5">
-              <Label className="text-xs">COD available</Label>
+              <Label className="text-xs">착불 가능</Label>
               <Switch checked={codAvailable} onCheckedChange={setCodAvailable} />
             </div>
             <div className="flex items-center justify-between rounded-md border p-2.5">
-              <Label className="text-xs">Advance required</Label>
+              <Label className="text-xs">선결제 필요</Label>
               <Switch checked={advanceRequired} onCheckedChange={setAdvanceRequired} />
             </div>
             <div className="flex items-center justify-between rounded-md border p-2.5">
-              <Label className="text-xs">Active</Label>
+              <Label className="text-xs">활성</Label>
               <Switch checked={isActive} onCheckedChange={setIsActive} />
             </div>
           </div>
@@ -146,7 +146,7 @@ function ZoneDialog({ zone, trigger }: ZoneDialogProps) {
           <div className="flex items-center justify-between">
             <Label>Districts ({districts.length} selected)</Label>
             <Button type="button" variant="outline" size="sm" onClick={selectOutsideDhaka}>
-              Select all outside Dhaka
+              다카 외 지역 전체 선택
             </Button>
           </div>
 
@@ -174,7 +174,7 @@ function ZoneDialog({ zone, trigger }: ZoneDialogProps) {
 
         <DialogFooter>
           <Button disabled={loading} onClick={handleSave}>
-            {loading ? "Saving..." : "Save zone"}
+            {loading ? "저장 중..." : "배송 지역 저장"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -191,7 +191,7 @@ function ZoneRowActions({ zone }: { zone: DeliveryZone }) {
       toast.error(result.error)
       return
     }
-    toast.success("Zone deleted")
+    toast.success("배송 지역이 삭제되었습니다")
     router.refresh()
   }
 
@@ -202,20 +202,20 @@ function ZoneRowActions({ zone }: { zone: DeliveryZone }) {
         trigger={
           <Button variant="ghost" size="icon">
             <Pencil className="size-4" />
-            <span className="sr-only">Edit</span>
+            <span className="sr-only">수정</span>
           </Button>
         }
       />
       <ConfirmDialog
-        title="Delete this zone?"
+        title="이 배송 지역을 삭제할까요?"
         description={`"${zone.name}" will be removed. Existing deliveries keep their history.`}
-        confirmLabel="Delete"
+        confirmLabel="삭제"
         destructive
         onConfirm={handleDelete}
         trigger={
           <Button variant="ghost" size="icon">
             <Trash2 className="size-4" />
-            <span className="sr-only">Delete</span>
+            <span className="sr-only">삭제</span>
           </Button>
         }
       />
@@ -224,10 +224,10 @@ function ZoneRowActions({ zone }: { zone: DeliveryZone }) {
 }
 
 const columns: ColumnDef<DeliveryZone>[] = [
-  { accessorKey: "name", header: "Name" },
+  { accessorKey: "name", header: "이름" },
   {
     id: "districts",
-    header: "Districts",
+    header: "지역",
     cell: ({ row }) => {
       const districts = row.original.districts
       const preview = districts.slice(0, 3)
@@ -247,7 +247,7 @@ const columns: ColumnDef<DeliveryZone>[] = [
   },
   {
     accessorKey: "charge",
-    header: () => <div className="text-right">Charge</div>,
+    header: () => <div className="text-right">배송비</div>,
     cell: ({ row }) => <div className="text-right tabular-nums">{formatMoney(row.original.charge)}</div>,
   },
   {
@@ -255,30 +255,30 @@ const columns: ColumnDef<DeliveryZone>[] = [
     header: "COD",
     cell: ({ row }) =>
       row.original.cod_available ? (
-        <Badge variant="success">Yes</Badge>
+        <Badge variant="success">가능</Badge>
       ) : (
         <Badge variant="secondary">No</Badge>
       ),
   },
   {
     id: "advance_required",
-    header: "Advance",
+    header: "선결제",
     cell: ({ row }) =>
       row.original.advance_required ? (
-        <Badge variant="warning">Required</Badge>
+        <Badge variant="warning">필요</Badge>
       ) : (
         <span className="text-muted-foreground text-xs">—</span>
       ),
   },
-  { accessorKey: "eta_text", header: "ETA", cell: ({ row }) => row.original.eta_text ?? "—" },
+  { accessorKey: "eta_text", header: "예상 도착", cell: ({ row }) => row.original.eta_text ?? "—" },
   {
     id: "is_active",
-    header: "Status",
+    header: "상태",
     cell: ({ row }) =>
       row.original.is_active ? (
-        <Badge variant="success">Active</Badge>
+        <Badge variant="success">활성</Badge>
       ) : (
-        <Badge variant="secondary">Inactive</Badge>
+        <Badge variant="secondary">비활성</Badge>
       ),
   },
   {

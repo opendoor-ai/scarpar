@@ -2,12 +2,12 @@ import type { ModuleDef } from '@/modules/types'
 
 export const config: ModuleDef = {
   key: 'catalog',
-  name: 'Catalog',
-  description: 'Products, categories, and inventory management.',
+  name: '상품관리',
+  description: '상품, 카테고리, 재고 관리',
   nav: [
-    { label: 'Products', href: '/admin/products', icon: 'Package' },
-    { label: 'Categories', href: '/admin/categories', icon: 'Package' },
-    { label: 'Inventory', href: '/admin/inventory', icon: 'Package' },
+    { label: '상품', href: '/admin/products', icon: 'Package' },
+    { label: '카테고리', href: '/admin/categories', icon: 'Package' },
+    { label: '재고관리', href: '/admin/inventory', icon: 'Package' },
   ],
   dashboardWidgets: ['low-stock', 'top-products'],
 }

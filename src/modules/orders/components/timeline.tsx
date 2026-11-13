@@ -21,7 +21,7 @@ interface TimelineProps {
 
 function Timeline({ events }: TimelineProps) {
   if (events.length === 0) {
-    return <EmptyState icon={Settings2} title="No activity yet" />
+    return <EmptyState icon={Settings2} title="아직 기록이 없습니다" />
   }
 
   return (
@@ -40,7 +40,7 @@ function Timeline({ events }: TimelineProps) {
             <div className="flex flex-col gap-0.5 pb-0.5">
               <p className="text-foreground text-[13px]">{event.message ?? event.type}</p>
               <p className="text-muted-foreground text-xs">
-                {format(new Date(event.created_at), 'd MMM yyyy, h:mm a')}
+                {format(new Date(event.created_at), 'yyyy.MM.dd HH:mm')}
               </p>
             </div>
           </li>

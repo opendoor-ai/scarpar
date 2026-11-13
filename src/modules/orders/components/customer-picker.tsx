@@ -71,7 +71,7 @@ function CustomerPicker({ value, onChange }: CustomerPickerProps) {
           </div>
         </div>
         <Button type="button" variant="ghost" size="sm" onClick={switchToSearch}>
-          Change
+변경
         </Button>
       </div>
     )
@@ -85,15 +85,15 @@ function CustomerPicker({ value, onChange }: CustomerPickerProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query && setOpen(true)}
-          placeholder="Search customer by name or phone"
+          placeholder="이름 또는 전화번호로 고객 검색"
           className="pl-8"
         />
         {open && query ? (
           <div className="bg-popover text-popover-foreground absolute z-10 mt-1 w-full rounded-md border shadow-xs">
             {searching ? (
-              <div className="text-muted-foreground p-3 text-[13px]">Searching…</div>
+              <div className="text-muted-foreground p-3 text-[13px]">검색 중…</div>
             ) : results.length === 0 ? (
-              <div className="text-muted-foreground p-3 text-[13px]">No matching customers</div>
+              <div className="text-muted-foreground p-3 text-[13px]">일치하는 고객이 없습니다</div>
             ) : (
               <ul className="max-h-64 overflow-y-auto p-1">
                 {results.map((customer) => (
@@ -106,7 +106,7 @@ function CustomerPicker({ value, onChange }: CustomerPickerProps) {
                       <span className="font-medium">{customer.name}</span>
                       <span className="text-muted-foreground text-xs tabular-nums">
                         {customer.phone} · {customer.orders_count} order{customer.orders_count === 1 ? '' : 's'}
-                        {customer.is_blocked ? ' · blocked' : ''}
+                        {customer.is_blocked ? ' · 차단됨' : ''}
                       </span>
                     </button>
                   </li>
@@ -123,22 +123,22 @@ function CustomerPicker({ value, onChange }: CustomerPickerProps) {
         className="text-primary inline-flex w-fit items-center gap-1.5 text-[13px] font-medium hover:underline"
       >
         <UserPlus className="size-4" />
-        New customer
+새 고객
       </button>
 
       {value.mode === 'new' ? (
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="customer-name">Name</Label>
+            <Label htmlFor="customer-name">이름</Label>
             <Input
               id="customer-name"
               value={value.name}
               onChange={(e) => onChange({ ...value, name: e.target.value })}
-              placeholder="Customer name"
+              placeholder="고객 이름"
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="customer-phone">Phone</Label>
+            <Label htmlFor="customer-phone">전화번호</Label>
             <Input
               id="customer-phone"
               value={value.phone}
@@ -147,7 +147,7 @@ function CustomerPicker({ value, onChange }: CustomerPickerProps) {
             />
           </div>
           <div className="col-span-2 flex flex-col gap-1.5">
-            <Label htmlFor="customer-email">Email (optional)</Label>
+            <Label htmlFor="customer-email">이메일 (선택)</Label>
             <Input
               id="customer-email"
               type="email"

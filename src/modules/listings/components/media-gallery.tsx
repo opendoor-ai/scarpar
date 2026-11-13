@@ -35,7 +35,7 @@ function MediaGallery({ value, onChange }: MediaGalleryProps) {
             <button
               type="button"
               onClick={() => removeAt(index)}
-              aria-label="Remove photo"
+              aria-label="사진 삭제"
               className="bg-background/80 text-foreground flex size-5 items-center justify-center rounded-md border"
             >
               <X className="size-3" />
@@ -46,7 +46,7 @@ function MediaGallery({ value, onChange }: MediaGalleryProps) {
               type="button"
               onClick={() => move(index, 'left')}
               disabled={index === 0}
-              aria-label="Move left"
+              aria-label="왼쪽으로"
               className="bg-background/80 text-foreground flex size-5 items-center justify-center rounded-md border disabled:opacity-40"
             >
               <ArrowLeft className="size-3" />
@@ -55,7 +55,7 @@ function MediaGallery({ value, onChange }: MediaGalleryProps) {
               type="button"
               onClick={() => move(index, 'right')}
               disabled={index === value.length - 1}
-              aria-label="Move right"
+              aria-label="오른쪽으로"
               className="bg-background/80 text-foreground flex size-5 items-center justify-center rounded-md border disabled:opacity-40"
             >
               <ArrowRight className="size-3" />
@@ -63,7 +63,7 @@ function MediaGallery({ value, onChange }: MediaGalleryProps) {
           </div>
         </div>
       ))}
-      <MediaPicker value={null} onChange={(media) => media && onChange([...value, media])} label="Add photo" />
+      <MediaPicker value={null} onChange={(media) => media && onChange([...value, media])} label="사진 추가" />
     </div>
   )
 }

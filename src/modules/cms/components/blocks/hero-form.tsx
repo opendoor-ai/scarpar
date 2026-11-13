@@ -13,28 +13,28 @@ interface HeroFormProps {
 function HeroForm({ block, onChange }: HeroFormProps) {
   return (
     <div className="flex flex-col gap-4">
-      <Field label="Heading">
+      <Field label="제목">
         <Input value={block.heading} onChange={(e) => onChange({ ...block, heading: e.target.value })} />
       </Field>
-      <Field label="Subheading">
+      <Field label="부제목">
         <Input
           value={block.subheading ?? ''}
           onChange={(e) => onChange({ ...block, subheading: e.target.value })}
         />
       </Field>
-      <Field label="Image">
+      <Field label="이미지">
         <MediaPicker
           value={block.image ? { id: '', path: block.image } : null}
           onChange={(m) => onChange({ ...block, image: m?.path })}
         />
       </Field>
-      <Field label="Button label">
+      <Field label="버튼 문구">
         <Input
           value={block.ctaLabel ?? ''}
           onChange={(e) => onChange({ ...block, ctaLabel: e.target.value })}
         />
       </Field>
-      <Field label="Button link">
+      <Field label="버튼 링크">
         <Input
           value={block.ctaHref ?? ''}
           placeholder="/products"

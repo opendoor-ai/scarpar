@@ -32,17 +32,17 @@ export function CustomersTable({ customers }: CustomersTableProps) {
     () => [
       {
         accessorKey: 'name',
-        header: 'Name',
+        header: '이름',
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <span className="font-medium">{row.original.name}</span>
-            {row.original.is_blocked ? <Badge variant="destructive">Blocked</Badge> : null}
+            {row.original.is_blocked ? <Badge variant="destructive">차단됨</Badge> : null}
           </div>
         ),
       },
       {
         accessorKey: 'phone',
-        header: 'Phone',
+        header: '전화번호',
         cell: ({ row }) => (
           <div className="flex items-center gap-1">
             <span className="tabular-nums">{row.original.phone}</span>
@@ -54,23 +54,23 @@ export function CustomersTable({ customers }: CustomersTableProps) {
       },
       {
         accessorKey: 'orders_count',
-        header: 'Orders',
+        header: '주문 수',
         cell: ({ row }) => <span className="tabular-nums">{row.original.orders_count}</span>,
       },
       {
         accessorKey: 'total_spent',
-        header: 'Total spent',
+        header: '총 구매액',
         cell: ({ row }) => <span className="tabular-nums">{formatMoney(row.original.total_spent)}</span>,
       },
       {
         accessorKey: 'last_order_at',
-        header: 'Last order',
+        header: '최근 주문',
         cell: ({ row }) =>
-          row.original.last_order_at ? format(new Date(row.original.last_order_at), 'd MMM yyyy') : '—',
+          row.original.last_order_at ? format(new Date(row.original.last_order_at), 'yyyy.MM.dd') : '—',
       },
       {
         id: 'tags',
-        header: 'Tags',
+        header: '태그',
         cell: ({ row }) => {
           const tags = row.original.tags ?? []
           if (tags.length === 0) return null
@@ -97,7 +97,7 @@ export function CustomersTable({ customers }: CustomersTableProps) {
       <SearchInput
         value={search}
         onChange={setSearch}
-        placeholder="Search by name or phone..."
+        placeholder="이름 또는 전화번호로 검색..."
         className="max-w-sm"
       />
       <DataTable
@@ -107,8 +107,8 @@ export function CustomersTable({ customers }: CustomersTableProps) {
         emptyState={
           <EmptyState
             icon={Users}
-            title="No customers yet"
-            description="Customers will appear here once created."
+            title="아직 고객이 없습니다"
+            description="고객을 추가하면 여기에 표시됩니다."
           />
         }
       />

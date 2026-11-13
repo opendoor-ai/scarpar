@@ -45,7 +45,7 @@ function DeliveryStatusActions({ deliveryId, status, hasOtp, codAmount, riders }
 
   const nextStatuses = DELIVERY_STATUS_FLOW[status]
   if (!nextStatuses || nextStatuses.length === 0) {
-    return <p className="text-muted-foreground text-sm">This delivery is in a final state.</p>
+    return <p className="text-muted-foreground text-sm">이미 처리가 끝난 배송입니다.</p>
   }
 
   async function runDirect(next: DeliveryStatus, action: () => Promise<{ ok: boolean; error?: string }>) {
@@ -56,7 +56,7 @@ function DeliveryStatusActions({ deliveryId, status, hasOtp, codAmount, riders }
         toast.error(result.error)
         return
       }
-      toast.success("Delivery updated")
+      toast.success("배송 상태가 변경되었습니다")
       router.refresh()
     } finally {
       setPending(null)
@@ -74,7 +74,7 @@ function DeliveryStatusActions({ deliveryId, status, hasOtp, codAmount, riders }
           disabled={pending !== null}
           onClick={() => runDirect("picked_up", () => markPickedUpAction({ delivery_id: deliveryId }))}
         >
-          {pending === "picked_up" ? "Updating..." : "Mark Picked Up"}
+          {pending === "picked_up" ? "처리 중..." : "집하 완료"}
         </Button>
       ) : null}
 
@@ -84,7 +84,7 @@ function DeliveryStatusActions({ deliveryId, status, hasOtp, codAmount, riders }
           disabled={pending !== null}
           onClick={() => runDirect("in_transit", () => markInTransitAction({ delivery_id: deliveryId }))}
         >
-          {pending === "in_transit" ? "Updating..." : "Mark In Transit"}
+          {pending === "in_transit" ? "처리 중..." : "배송 중으로 변경"}
         </Button>
       ) : null}
 
@@ -123,7 +123,7 @@ function AssignRiderDialog({
 
   async function handleAssign() {
     if (!riderId) {
-      toast.error("Select a rider")
+      toast.error("배송기사를 선택하세요")
       return
     }
     setLoading(true)
@@ -133,7 +133,7 @@ function AssignRiderDialog({
         toast.error(result.error)
         return
       }
-      toast.success("Rider assigned")
+      toast.success("배송기사가 배정되었습니다")
       setOpen(false)
       onDone()
     } finally {
@@ -144,16 +144,16 @@ function AssignRiderDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Assign Rider</Button>
+        <Button>배송기사 배정</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Assign rider</DialogTitle>
-          <DialogDescription>Choose which rider will pick up this delivery.</DialogDescription>
+          <DialogTitle>배송기사 배정</DialogTitle>
+          <DialogDescription>이 배송을 맡을 배송기사를 고르세요.</DialogDescription>
         </DialogHeader>
         <Select value={riderId} onValueChange={setRiderId}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select rider" />
+            <SelectValue placeholder="배송기사 선택" />
           </SelectTrigger>
           <SelectContent>
             {riders.map((rider) => (
@@ -165,7 +165,7 @@ function AssignRiderDialog({
         </Select>
         <DialogFooter>
           <Button disabled={loading} onClick={handleAssign}>
-            {loading ? "Assigning..." : "Assign"}
+            {loading ? "배정 중..." : "배정"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -201,7 +201,7 @@ function DeliverDialog({
         toast.error(result.error)
         return
       }
-      toast.success("Delivery marked delivered")
+      toast.success("배송 완료로 처리했습니다")
       setOpen(false)
       onDone()
     } finally {
@@ -212,33 +212,33 @@ function DeliverDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Mark Delivered</Button>
+        <Button>배송 완료</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Mark delivered</DialogTitle>
-          <DialogDescription>Confirm this delivery reached the recipient.</DialogDescription>
+          <DialogTitle>배송 완료 처리</DialogTitle>
+          <DialogDescription>받는 분에게 전달되었는지 확인하세요.</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           {hasOtp ? (
             <div className="flex flex-col gap-1.5">
-              <Label>OTP from recipient</Label>
+              <Label>받는 분 인증 번호</Label>
               <Input
                 value={otp}
                 onChange={(event) => setOtp(event.target.value)}
                 maxLength={4}
-                placeholder="4-digit code"
+                placeholder="4자리 번호"
               />
             </div>
           ) : null}
           <div className="flex items-center justify-between rounded-md border p-3">
-            <Label>COD collected</Label>
+            <Label>착불금 받음</Label>
             <Switch checked={codCollected} onCheckedChange={setCodCollected} />
           </div>
         </div>
         <DialogFooter>
           <Button disabled={loading} onClick={handleDeliver}>
-            {loading ? "Saving..." : "Confirm delivered"}
+            {loading ? "저장 중..." : "배송 완료 확인"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -253,7 +253,7 @@ function FailDialog({ deliveryId, onDone }: { deliveryId: string; onDone: () => 
 
   async function handleFail() {
     if (!reason.trim()) {
-      toast.error("Reason is required")
+      toast.error("사유를 입력하세요")
       return
     }
     setLoading(true)
@@ -263,7 +263,7 @@ function FailDialog({ deliveryId, onDone }: { deliveryId: string; onDone: () => 
         toast.error(result.error)
         return
       }
-      toast.success("Delivery marked failed")
+      toast.success("배송 실패로 처리했습니다")
       setOpen(false)
       onDone()
     } finally {
@@ -274,21 +274,21 @@ function FailDialog({ deliveryId, onDone }: { deliveryId: string; onDone: () => 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="destructive">Mark Failed</Button>
+        <Button variant="destructive">배송 실패</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Mark delivery failed</DialogTitle>
-          <DialogDescription>The order stays dispatched — you can retry or return it later.</DialogDescription>
+          <DialogTitle>배송 실패 처리</DialogTitle>
+          <DialogDescription>주문은 출고 상태로 남으며, 나중에 다시 배송하거나 반송할 수 있습니다.</DialogDescription>
         </DialogHeader>
         <Textarea
           value={reason}
           onChange={(event) => setReason(event.target.value)}
-          placeholder="Reason (customer unreachable, refused, wrong address...)"
+          placeholder="사유 (연락 안 됨, 수령 거부, 주소 오류...)"
         />
         <DialogFooter>
           <Button variant="destructive" disabled={loading} onClick={handleFail}>
-            {loading ? "Saving..." : "Confirm failed"}
+            {loading ? "저장 중..." : "배송 실패 확인"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -309,7 +309,7 @@ function ReturnDialog({ deliveryId, onDone }: { deliveryId: string; onDone: () =
         toast.error(result.error)
         return
       }
-      toast.success("Delivery marked returned")
+      toast.success("반송 처리했습니다")
       setOpen(false)
       onDone()
     } finally {
@@ -320,17 +320,17 @@ function ReturnDialog({ deliveryId, onDone }: { deliveryId: string; onDone: () =
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Mark Returned</Button>
+        <Button variant="outline">반송 처리</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Mark delivery returned</DialogTitle>
-          <DialogDescription>This also marks the order as returned.</DialogDescription>
+          <DialogTitle>반송 처리</DialogTitle>
+          <DialogDescription>주문도 반품 상태로 바뀝니다.</DialogDescription>
         </DialogHeader>
-        <Textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="Note (optional)" />
+        <Textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="메모 (선택)" />
         <DialogFooter>
           <Button disabled={loading} onClick={handleReturn}>
-            {loading ? "Saving..." : "Confirm returned"}
+            {loading ? "저장 중..." : "반송 확인"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -65,13 +65,13 @@ function NewJobDialog() {
           : null
 
     if (!customer) {
-      setCustomerError('Select or enter a customer')
+      setCustomerError('고객을 선택하거나 입력하세요')
       return
     }
 
     const result = await createJob({ ...values, customer })
     if (result.ok && result.data) {
-      toast.success('Job created')
+      toast.success('작업이 만들어졌습니다')
       setOpen(false)
       resetAll()
       router.push(`/admin/services/${result.data.id}`)
@@ -91,18 +91,18 @@ function NewJobDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus />
-          New job
+          새 작업
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>New job</DialogTitle>
+          <DialogTitle>새 작업</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <FormLabel>Customer</FormLabel>
+              <FormLabel>고객</FormLabel>
               <div className="flex gap-1.5">
                 <Button
                   type="button"
@@ -110,7 +110,7 @@ function NewJobDialog() {
                   variant={mode === 'existing' ? 'default' : 'outline'}
                   onClick={() => setMode('existing')}
                 >
-                  Search existing
+                  기존 고객 검색
                 </Button>
                 <Button
                   type="button"
@@ -118,15 +118,15 @@ function NewJobDialog() {
                   variant={mode === 'new' ? 'default' : 'outline'}
                   onClick={() => setMode('new')}
                 >
-                  New customer
+                  새 고객
                 </Button>
               </div>
               {mode === 'existing' ? (
                 <CustomerCombobox value={selectedCustomer} onChange={setSelectedCustomer} />
               ) : (
                 <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="Name" value={newName} onChange={(event) => setNewName(event.target.value)} />
-                  <Input placeholder="Phone" value={newPhone} onChange={(event) => setNewPhone(event.target.value)} />
+                  <Input placeholder="이름" value={newName} onChange={(event) => setNewName(event.target.value)} />
+                  <Input placeholder="전화번호" value={newPhone} onChange={(event) => setNewPhone(event.target.value)} />
                 </div>
               )}
               {customerError ? <p className="text-destructive text-xs">{customerError}</p> : null}
@@ -137,7 +137,7 @@ function NewJobDialog() {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Job title</FormLabel>
+                  <FormLabel>작업명</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -151,7 +151,7 @@ function NewJobDialog() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>설명</FormLabel>
                   <FormControl>
                     <Textarea rows={3} {...field} />
                   </FormControl>
@@ -166,7 +166,7 @@ function NewJobDialog() {
                 name="quote_amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quote (৳)</FormLabel>
+                    <FormLabel>견적 (원)</FormLabel>
                     <FormControl>
                       <Input inputMode="decimal" {...field} />
                     </FormControl>
@@ -179,7 +179,7 @@ function NewJobDialog() {
                 name="scheduled_at"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Scheduled at</FormLabel>
+                    <FormLabel>예정 일시</FormLabel>
                     <FormControl>
                       <Input type="datetime-local" {...field} />
                     </FormControl>
@@ -195,7 +195,7 @@ function NewJobDialog() {
                 name="address_line1"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address line 1</FormLabel>
+                    <FormLabel>주소</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -208,11 +208,11 @@ function NewJobDialog() {
                 name="address_district"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>District</FormLabel>
+                    <FormLabel>지역</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select district" />
+                          <SelectValue placeholder="지역 선택" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -231,7 +231,7 @@ function NewJobDialog() {
 
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Creating...' : 'Create job'}
+                {form.formState.isSubmitting ? '만드는 중...' : '작업 만들기'}
               </Button>
             </DialogFooter>
           </form>

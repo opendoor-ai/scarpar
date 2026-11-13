@@ -26,9 +26,9 @@ export interface ReviewRow extends Review {
 }
 
 const TABS: { value: ReviewStatus; label: string }[] = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'published', label: 'Published' },
-  { value: 'rejected', label: 'Rejected' },
+  { value: 'pending', label: '승인 대기' },
+  { value: 'published', label: '게시됨' },
+  { value: 'rejected', label: '거절됨' },
 ]
 
 export function ReviewsTable({ reviews }: { reviews: ReviewRow[] }) {
@@ -94,7 +94,7 @@ function ReviewsPanel({
     const result = await publishReview(id)
     if (!result.ok) toast.error(result.error)
     else {
-      toast.success('Review published')
+      toast.success('리뷰가 게시되었습니다')
       onChanged()
     }
   }
@@ -103,7 +103,7 @@ function ReviewsPanel({
     const result = await rejectReview(id)
     if (!result.ok) toast.error(result.error)
     else {
-      toast.success('Review rejected')
+      toast.success('리뷰가 거절되었습니다')
       onChanged()
     }
   }
@@ -112,7 +112,7 @@ function ReviewsPanel({
     const result = await deleteReview(id)
     if (!result.ok) toast.error(result.error)
     else {
-      toast.success('Review deleted')
+      toast.success('리뷰가 삭제되었습니다')
       onChanged()
     }
   }
@@ -125,7 +125,7 @@ function ReviewsPanel({
         toast.error(result.error)
         return
       }
-      toast.success(`Published ${result.data?.count ?? ids.length} review(s)`)
+      toast.success(`리뷰 ${result.data?.count ?? ids.length}건을 게시했습니다`)
       setSelected(new Set())
       onChanged()
     })
@@ -141,14 +141,14 @@ function ReviewsPanel({
           <Checkbox
             checked={reviews.length > 0 && selected.size === reviews.length}
             onCheckedChange={toggleAll}
-            aria-label="Select all"
+            aria-label="전체 선택"
           />
         ),
         cell: ({ row }) => (
           <Checkbox
             checked={selected.has(row.original.id)}
             onCheckedChange={() => toggleOne(row.original.id)}
-            aria-label="Select row"
+            aria-label="선택"
           />
         ),
       })
@@ -158,21 +158,21 @@ function ReviewsPanel({
       {
         id: 'product',
         accessorFn: (row) => row.product?.name ?? '',
-        header: 'Product',
+        header: '상품',
         cell: ({ row }) => row.original.product?.name ?? '—',
       },
       {
         accessorKey: 'customer_name',
-        header: 'Customer',
+        header: '고객',
       },
       {
         accessorKey: 'rating',
-        header: 'Rating',
+        header: '별점',
         cell: ({ row }) => <RatingStars rating={row.original.rating} />,
       },
       {
         id: 'content',
-        header: 'Review',
+        header: '리뷰',
         cell: ({ row }) => {
           const { title, body } = row.original
           const text = [title, body].filter(Boolean).join(' — ')
@@ -194,13 +194,13 @@ function ReviewsPanel({
       },
       {
         accessorKey: 'is_verified',
-        header: 'Verified',
-        cell: ({ row }) => (row.original.is_verified ? <Badge variant="secondary">Verified</Badge> : null),
+        header: '구매 인증',
+        cell: ({ row }) => (row.original.is_verified ? <Badge variant="secondary">구매 인증</Badge> : null),
       },
       {
         accessorKey: 'created_at',
-        header: 'Date',
-        cell: ({ row }) => format(new Date(row.original.created_at), 'd MMM yyyy'),
+        header: '날짜',
+        cell: ({ row }) => format(new Date(row.original.created_at), 'yyyy.MM.dd'),
       },
       {
         id: 'actions',
@@ -216,7 +216,7 @@ function ReviewsPanel({
                       <Check className="size-3.5" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Publish</TooltipContent>
+                  <TooltipContent>게시</TooltipContent>
                 </Tooltip>
               ) : null}
               {review.status !== 'rejected' ? (
@@ -226,7 +226,7 @@ function ReviewsPanel({
                       <X className="size-3.5" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Reject</TooltipContent>
+                  <TooltipContent>거절</TooltipContent>
                 </Tooltip>
               ) : null}
               <ConfirmDialog
@@ -235,9 +235,9 @@ function ReviewsPanel({
                     <Trash2 className="size-3.5" />
                   </Button>
                 }
-                title="Delete this review?"
-                description="This permanently removes the review. This can't be undone."
-                confirmLabel="Delete"
+                title="이 리뷰를 삭제할까요?"
+                description="리뷰가 완전히 삭제되며 되돌릴 수 없습니다."
+                confirmLabel="삭제"
                 destructive
                 onConfirm={() => handleDelete(review.id)}
               />
@@ -262,7 +262,7 @@ function ReviewsPanel({
           </Button>
         ) : undefined
       }
-      emptyState={<EmptyState icon={Star} title={`No ${status} reviews`} description="Reviews will show up here." />}
+      emptyState={<EmptyState icon={Star} title="해당하는 리뷰가 없습니다" description="리뷰가 여기에 표시됩니다." />}
     />
   )
 }

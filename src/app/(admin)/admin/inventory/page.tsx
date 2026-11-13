@@ -89,7 +89,7 @@ export default async function InventoryPage() {
   const movements: MovementRow[] = rawMovements.map((m) => ({
     id: m.id,
     createdAt: m.created_at,
-    productName: m.product?.name ?? 'Deleted product',
+    productName: m.product?.name ?? '삭제된 상품',
     variantName: m.variant?.name ?? null,
     type: m.type,
     qtyDelta: m.qty_delta,
@@ -113,19 +113,19 @@ export default async function InventoryPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Inventory"
-        description="Stock movements and manual adjustments."
+        title="재고관리"
+        description="재고 입출고 내역과 수동 조정"
         actions={<AdjustStockDialog products={products} />}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="SKUs tracked" value={totalTrackedResult.count ?? 0} icon={Warehouse} />
-        <StatCard label="Out of stock" value={outOfStockResult.count ?? 0} icon={PackageX} />
-        <StatCard label="Low stock" value={lowStockCount} icon={TrendingDown} />
+        <StatCard label="재고 관리 상품" value={totalTrackedResult.count ?? 0} icon={Warehouse} />
+        <StatCard label="품절" value={outOfStockResult.count ?? 0} icon={PackageX} />
+        <StatCard label="재고 부족" value={lowStockCount} icon={TrendingDown} />
       </div>
 
       {movements.length === 0 ? (
-        <EmptyState icon={History} title="No stock movements yet" description="Adjustments and sales will show up here." />
+        <EmptyState icon={History} title="아직 재고 변동이 없습니다" description="재고 조정과 판매 내역이 여기에 표시됩니다." />
       ) : (
         <InventoryMovementsTable movements={movements} />
       )}

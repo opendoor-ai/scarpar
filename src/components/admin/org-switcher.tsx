@@ -63,7 +63,7 @@ export function OrgSwitcher({ orgs, activeOrgId, activeOrgName, collapsed = fals
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-60">
         <DropdownMenuLabel className="text-2xs font-medium tracking-wide text-muted-foreground uppercase">
-          Organizations
+          조직(공급사)
         </DropdownMenuLabel>
         {orgs.map((org) => (
           <DropdownMenuItem key={org.id} onSelect={() => handleSelect(org.id)} className="gap-2">
@@ -76,7 +76,7 @@ export function OrgSwitcher({ orgs, activeOrgId, activeOrgName, collapsed = fals
         <DropdownMenuItem asChild>
           <Link href="/onboarding" className="gap-2">
             <Plus className="size-4" />
-            Create organization
+            새 조직 만들기
           </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>

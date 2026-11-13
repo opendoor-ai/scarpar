@@ -18,7 +18,7 @@ function SearchInput({
   onChange,
   debounceMs = 300,
   className,
-  placeholder = "Search...",
+  placeholder = "검색...",
   ...props
 }: SearchInputProps) {
   const [internalValue, setInternalValue] = React.useState(value)

@@ -45,7 +45,7 @@ export default async function CmsPageEditorPage({ params }: PageProps<{ id: stri
     profileNames = Object.fromEntries(
       ((profiles ?? []) as { user_id: string; full_name: string | null }[]).map((p) => [
         p.user_id,
-        p.full_name ?? 'Unknown',
+        p.full_name ?? '알 수 없음',
       ]),
     )
   }
@@ -54,7 +54,7 @@ export default async function CmsPageEditorPage({ params }: PageProps<{ id: stri
     (r) => ({
       id: r.id,
       created_at: r.created_at,
-      savedByName: r.saved_by ? profileNames[r.saved_by] ?? 'Unknown' : 'System',
+      savedByName: r.saved_by ? profileNames[r.saved_by] ?? '알 수 없음' : '시스템',
     }),
   )
 

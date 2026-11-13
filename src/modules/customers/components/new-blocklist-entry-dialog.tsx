@@ -40,7 +40,7 @@ export function NewBlocklistEntryDialog() {
       toast.error(result.error)
       return
     }
-    toast.success('Added to blocklist')
+    toast.success('차단 목록에 추가했습니다')
     setOpen(false)
     form.reset(DEFAULT_VALUES)
     router.refresh()
@@ -56,12 +56,12 @@ export function NewBlocklistEntryDialog() {
     >
       <DialogTrigger asChild>
         <Button>
-          <Plus /> Add entry
+          <Plus /> 항목 추가
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add blocklist entry</DialogTitle>
+          <DialogTitle>차단 항목 추가</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -70,7 +70,7 @@ export function NewBlocklistEntryDialog() {
               name="kind"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kind</FormLabel>
+                  <FormLabel>구분</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger className="w-full">
@@ -78,8 +78,8 @@ export function NewBlocklistEntryDialog() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="phone">Phone</SelectItem>
-                      <SelectItem value="address">Address</SelectItem>
+                      <SelectItem value="phone">전화번호</SelectItem>
+                      <SelectItem value="address">주소</SelectItem>
                       <SelectItem value="ip">IP</SelectItem>
                     </SelectContent>
                   </Select>
@@ -92,7 +92,7 @@ export function NewBlocklistEntryDialog() {
               name="value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Value</FormLabel>
+                  <FormLabel>값</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -105,7 +105,7 @@ export function NewBlocklistEntryDialog() {
               name="reason"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Reason (optional)</FormLabel>
+                  <FormLabel>사유 (선택)</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -115,7 +115,7 @@ export function NewBlocklistEntryDialog() {
             />
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Adding...' : 'Add entry'}
+                {form.formState.isSubmitting ? '추가 중...' : '항목 추가'}
               </Button>
             </DialogFooter>
           </form>

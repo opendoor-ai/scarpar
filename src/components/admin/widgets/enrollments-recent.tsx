@@ -39,14 +39,14 @@ export async function EnrollmentsRecentWidget() {
   return (
     <Card className="gap-3 p-4">
       <CardHeader className="flex-row items-center justify-between gap-2 p-0">
-        <CardTitle className="text-[13px]">Recent Enrollments</CardTitle>
+        <CardTitle className="text-[13px]">최근 수강 신청</CardTitle>
         <Link href="/admin/courses" className="text-xs text-primary hover:underline">
-          View all
+          전체 보기
         </Link>
       </CardHeader>
       <CardContent className="p-0">
         {enrollments.length === 0 ? (
-          <EmptyState icon={GraduationCap} title="No enrollments yet" className="py-8" />
+          <EmptyState icon={GraduationCap} title="아직 수강 신청이 없습니다" className="py-8" />
         ) : (
           <ul className="flex flex-col gap-1">
             {enrollments.map((enrollment) => (
@@ -56,13 +56,13 @@ export async function EnrollmentsRecentWidget() {
                   className="flex items-center justify-between gap-2 rounded-md px-1.5 py-1 text-[13px] transition-colors hover:bg-accent"
                 >
                   <span className="min-w-0 flex-1 truncate text-foreground">
-                    {enrollment.courses?.title ?? 'Course'}{' '}
+                    {enrollment.courses?.title ?? '강의'}{' '}
                     <span className="text-muted-foreground">
-                      · {enrollment.customers?.name ?? 'Customer'}
+                      · {enrollment.customers?.name ?? '고객'}
                     </span>
                   </span>
                   <span className="shrink-0 text-2xs text-muted-foreground">
-                    {format(new Date(enrollment.enrolled_at), 'd MMM')}
+                    {format(new Date(enrollment.enrolled_at), 'MM.dd')}
                   </span>
                   <StatusBadge kind="enrollment" value={enrollment.status} />
                 </Link>

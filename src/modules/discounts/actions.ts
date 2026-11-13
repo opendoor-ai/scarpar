@@ -44,7 +44,7 @@ export async function createDiscount(input: DiscountFormInput): Promise<ActionRe
   requireRole(ctx, 'manager')
 
   const parsed = discountFormSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
 
   const row = buildDiscountRow(ctx.org.id, parsed.data)
   const supabase = await getServerClient()
@@ -54,8 +54,8 @@ export async function createDiscount(input: DiscountFormInput): Promise<ActionRe
     return {
       ok: false,
       error: isUniqueViolation(error)
-        ? 'This discount code is already in use.'
-        : (error?.message ?? 'Could not create discount.'),
+        ? '이미 사용 중인 할인 코드입니다.'
+        : (error?.message ?? '할인을 만들지 못했습니다.'),
     }
   }
 
@@ -69,7 +69,7 @@ export async function updateDiscount(id: string, input: DiscountFormInput): Prom
   requireRole(ctx, 'manager')
 
   const parsed = discountFormSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
   const { data: before } = await supabase
@@ -85,7 +85,7 @@ export async function updateDiscount(id: string, input: DiscountFormInput): Prom
   if (error) {
     return {
       ok: false,
-      error: isUniqueViolation(error) ? 'This discount code is already in use.' : error.message,
+      error: isUniqueViolation(error) ? '이미 사용 중인 할인 코드입니다.' : error.message,
     }
   }
 

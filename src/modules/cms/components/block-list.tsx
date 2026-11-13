@@ -20,7 +20,7 @@ function BlockList({ blocks, selectedKey, onSelect, onMove, onDuplicate, onDelet
   if (blocks.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-        No blocks yet. Add one below.
+아직 블록이 없습니다. 아래에서 추가하세요.
       </div>
     )
   }

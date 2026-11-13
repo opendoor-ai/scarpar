@@ -41,7 +41,7 @@ export async function validateDiscountCode(
   categoryIds: string[],
 ): Promise<DiscountValidationResult> {
   const normalizedCode = code.trim().toUpperCase()
-  if (!normalizedCode) return { ok: false, reason: 'Enter a discount code.' }
+  if (!normalizedCode) return { ok: false, reason: '할인 코드를 입력하세요.' }
 
   const supabase = getAdminClient()
   const { data, error } = await supabase
@@ -51,36 +51,36 @@ export async function validateDiscountCode(
     .eq('code', normalizedCode)
     .single()
 
-  if (error || !data) return { ok: false, reason: 'This discount code is not valid.' }
+  if (error || !data) return { ok: false, reason: '사용할 수 없는 할인 코드입니다.' }
   const discount = data as Discount
 
-  if (!discount.is_active) return { ok: false, reason: 'This discount code is no longer active.' }
+  if (!discount.is_active) return { ok: false, reason: '더 이상 사용할 수 없는 할인 코드입니다.' }
 
   const now = Date.now()
   if (discount.starts_at && now < new Date(discount.starts_at).getTime()) {
-    return { ok: false, reason: 'This discount code is not active yet.' }
+    return { ok: false, reason: '아직 사용 기간이 아닌 할인 코드입니다.' }
   }
   if (discount.expires_at && now > new Date(discount.expires_at).getTime()) {
-    return { ok: false, reason: 'This discount code has expired.' }
+    return { ok: false, reason: '기간이 끝난 할인 코드입니다.' }
   }
 
   if (discount.max_uses !== null && discount.used_count >= discount.max_uses) {
-    return { ok: false, reason: 'This discount code has reached its usage limit.' }
+    return { ok: false, reason: '사용 횟수가 모두 소진된 할인 코드입니다.' }
   }
 
   if (discount.min_order > 0 && subtotalPaisa < discount.min_order) {
-    return { ok: false, reason: `This code requires a minimum order of ${formatMoney(discount.min_order)}.` }
+    return { ok: false, reason: `${formatMoney(discount.min_order)} 이상 주문 시 쓸 수 있는 코드입니다.` }
   }
 
   if (discount.scope === 'products') {
     const allowed = new Set(discount.product_ids ?? [])
     if (!productIds.some((id) => allowed.has(id))) {
-      return { ok: false, reason: "This code doesn't apply to any item in your cart." }
+      return { ok: false, reason: "장바구니 상품에 적용되지 않는 코드입니다." }
     }
   } else if (discount.scope === 'categories') {
     const allowed = new Set(discount.category_ids ?? [])
     if (!categoryIds.some((id) => allowed.has(id))) {
-      return { ok: false, reason: "This code doesn't apply to any item in your cart." }
+      return { ok: false, reason: "장바구니 상품에 적용되지 않는 코드입니다." }
     }
   }
 
@@ -90,14 +90,14 @@ export async function validateDiscountCode(
   if (discount.type === 'percent') {
     const percent = discount.value ?? 0
     amount = Math.round((subtotalPaisa * percent) / 100)
-    label = `${percent}% off`
+    label = `${percent}% 할인`
   } else if (discount.type === 'fixed') {
     const fixed = discount.value ?? 0
     amount = Math.min(fixed, subtotalPaisa)
-    label = `${formatMoney(fixed)} off`
+    label = `${formatMoney(fixed)} 할인`
   } else {
     amount = 0
-    label = 'Free shipping'
+    label = '무료배송'
   }
 
   return { ok: true, discountId: discount.id, amount, label }

@@ -7,8 +7,8 @@ export const VERTICAL_PRESETS: Record<
   { name: string; description: string; modules: ModuleKey[]; icon: string }
 > = {
   ecommerce: {
-    name: 'E-commerce',
-    description: 'Sell physical products online and in-store.',
+    name: '쇼핑몰·기계 광고',
+    description: '상품을 온라인에 전시하고 판매·문의를 받습니다.',
     modules: [
       'catalog',
       'orders',
@@ -26,8 +26,8 @@ export const VERTICAL_PRESETS: Record<
     icon: 'Store',
   },
   courses: {
-    name: 'Courses',
-    description: 'Sell and deliver online courses with enrollments.',
+    name: '온라인 강의',
+    description: '온라인 강의를 판매하고 수강생을 관리합니다.',
     modules: [
       'courses',
       'orders',
@@ -42,14 +42,14 @@ export const VERTICAL_PRESETS: Record<
     icon: 'GraduationCap',
   },
   services: {
-    name: 'Services',
-    description: 'Manage service jobs, quotes, and appointments.',
+    name: '서비스업',
+    description: '작업, 견적, 예약을 관리합니다.',
     modules: ['services', 'orders', 'customers', 'receipts', 'reports', 'expenses', 'cms'],
     icon: 'Wrench',
   },
   realestate: {
-    name: 'Real Estate',
-    description: 'List properties for sale or rent and manage buyer inquiries.',
+    name: '부동산',
+    description: '매물을 등록하고 구매 문의를 관리합니다.',
     modules: ['listings', 'customers', 'cms', 'storefront', 'reports', 'expenses'],
     icon: 'Building2',
   },

@@ -26,7 +26,7 @@ export default async function CmsMenusPage() {
 
   return (
     <>
-      <PageHeader title="Menus" description="Header and footer navigation for your storefront." />
+      <PageHeader title="메뉴" description="홈페이지 상단·하단 메뉴를 관리합니다." />
       <MenuEditor header={header} footer={footer} linkSuggestions={linkSuggestions} />
     </>
   )

@@ -46,14 +46,14 @@ export async function JobsTodayWidget() {
   return (
     <Card className="gap-3 p-4">
       <CardHeader className="flex-row items-center justify-between gap-2 p-0">
-        <CardTitle className="text-[13px]">Jobs Today</CardTitle>
+        <CardTitle className="text-[13px]">오늘 작업</CardTitle>
         <Link href="/admin/services" className="text-xs text-primary hover:underline">
-          View all
+          전체 보기
         </Link>
       </CardHeader>
       <CardContent className="p-0">
         {jobs.length === 0 ? (
-          <EmptyState icon={Wrench} title="No jobs scheduled today" className="py-8" />
+          <EmptyState icon={Wrench} title="오늘 예정된 작업이 없습니다" className="py-8" />
         ) : (
           <ul className="flex flex-col gap-1">
             {jobs.map((job) => (
@@ -65,7 +65,7 @@ export async function JobsTodayWidget() {
                   <span className="min-w-0 flex-1 truncate text-foreground">{job.title}</span>
                   {job.scheduled_at && (
                     <span className="shrink-0 text-2xs text-muted-foreground">
-                      {format(new Date(job.scheduled_at), 'h:mm a')}
+                      {format(new Date(job.scheduled_at), 'HH:mm')}
                     </span>
                   )}
                   <StatusBadge kind="job" value={job.status} />

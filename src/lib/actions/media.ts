@@ -31,10 +31,10 @@ export async function uploadMediaAction(formData: FormData): Promise<ActionResul
 
   const file = formData.get('file')
   if (!(file instanceof File) || file.size === 0) {
-    return { ok: false, error: 'No file provided.' }
+    return { ok: false, error: '파일을 선택하세요.' }
   }
   if (file.size > MAX_UPLOAD_BYTES) {
-    return { ok: false, error: 'File is larger than 20MB.' }
+    return { ok: false, error: '20MB보다 큰 파일은 올릴 수 없습니다.' }
   }
 
   const folder = String(formData.get('folder') ?? '')
@@ -150,7 +150,7 @@ export async function deleteMediaAction(id: string): Promise<ActionResult<void>>
     .single()
 
   if (fetchError || !row) {
-    return { ok: false, error: 'Media not found.' }
+    return { ok: false, error: '파일을 찾을 수 없습니다.' }
   }
 
   const { error: removeError } = await supabase.storage.from(MEDIA_BUCKET).remove([row.path as string])

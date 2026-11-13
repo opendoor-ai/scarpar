@@ -33,7 +33,7 @@ function PaymentsCard({ orderId, payments }: PaymentsCardProps) {
         toast.error(result.error)
         return
       }
-      toast.success('Payment verified')
+      toast.success('결제가 확인되었습니다')
       router.refresh()
     } finally {
       setBusyId(null)
@@ -48,7 +48,7 @@ function PaymentsCard({ orderId, payments }: PaymentsCardProps) {
         toast.error(result.error)
         return
       }
-      toast.success('Payment rejected')
+      toast.success('결제가 거절되었습니다')
       router.refresh()
     } finally {
       setBusyId(null)
@@ -58,26 +58,26 @@ function PaymentsCard({ orderId, payments }: PaymentsCardProps) {
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0">
-        <CardTitle>Payments</CardTitle>
+        <CardTitle>결제 내역</CardTitle>
         <RecordPaymentDialog orderId={orderId} />
       </CardHeader>
       <CardContent>
         {payments.length === 0 ? (
           <EmptyState
             icon={Wallet}
-            title="No payments recorded"
-            description="Record an advance, full, or balance payment for this order."
+            title="결제 기록이 없습니다"
+            description="선결제, 전액, 잔금 결제를 기록하세요."
           />
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Kind</TableHead>
-                <TableHead>Method</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Reference</TableHead>
-                <TableHead>Verified</TableHead>
+                <TableHead>구분</TableHead>
+                <TableHead>방법</TableHead>
+                <TableHead className="text-right">금액</TableHead>
+                <TableHead>상태</TableHead>
+                <TableHead>거래번호</TableHead>
+                <TableHead>확인</TableHead>
                 <TableHead />
               </TableRow>
             </TableHeader>
@@ -94,13 +94,13 @@ function PaymentsCard({ orderId, payments }: PaymentsCardProps) {
                     {payment.provider_ref || payment.sender_number || '—'}
                   </TableCell>
                   <TableCell className="text-muted-foreground text-xs">
-                    {payment.verified_at ? format(new Date(payment.verified_at), 'd MMM, h:mm a') : '—'}
+                    {payment.verified_at ? format(new Date(payment.verified_at), 'MM.dd HH:mm') : '—'}
                   </TableCell>
                   <TableCell>
                     {payment.status === 'pending' ? (
                       <div className="flex justify-end gap-1.5">
                         <Button size="sm" disabled={busyId === payment.id} onClick={() => handleVerify(payment.id)}>
-                          Verify
+확인
                         </Button>
                         <Button
                           size="sm"
@@ -108,7 +108,7 @@ function PaymentsCard({ orderId, payments }: PaymentsCardProps) {
                           disabled={busyId === payment.id}
                           onClick={() => handleReject(payment.id)}
                         >
-                          Reject
+거절
                         </Button>
                       </div>
                     ) : null}

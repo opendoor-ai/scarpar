@@ -49,11 +49,11 @@ export function ForgotPasswordForm({ next }: ForgotPasswordFormProps) {
         <CardContent className="py-4">
           <EmptyState
             icon={Mail}
-            title="Check your email"
-            description="If an account exists for that address, we've sent a link to reset your password."
+            title="메일함을 확인하세요"
+            description="가입된 이메일이라면 비밀번호 재설정 링크를 보냈습니다."
             action={
               <Button asChild variant="secondary" size="sm">
-                <Link href={loginHref}>Back to log in</Link>
+                <Link href={loginHref}>로그인으로 돌아가기</Link>
               </Button>
             }
           />
@@ -65,8 +65,8 @@ export function ForgotPasswordForm({ next }: ForgotPasswordFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Reset your password</CardTitle>
-        <CardDescription>Enter your email and we&apos;ll send you a reset link.</CardDescription>
+        <CardTitle className="text-lg">비밀번호 찾기</CardTitle>
+        <CardDescription>가입한 이메일을 입력하면 재설정 링크를 보내드립니다.</CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
         <Form {...form}>
@@ -83,7 +83,7 @@ export function ForgotPasswordForm({ next }: ForgotPasswordFormProps) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>이메일</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="you@business.com" autoComplete="email" {...field} />
                   </FormControl>
@@ -93,15 +93,15 @@ export function ForgotPasswordForm({ next }: ForgotPasswordFormProps) {
             />
 
             <Button type="submit" className="mt-2 w-full" disabled={isPending}>
-              {isPending ? 'Sending…' : 'Send reset link'}
+              {isPending ? '보내는 중…' : '재설정 링크 보내기'}
             </Button>
           </form>
         </Form>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          Remembered your password?{' '}
+          비밀번호가 기억나셨나요?{' '}
           <Link href={loginHref} className="font-medium text-primary hover:underline">
-            Log in
+로그인
           </Link>
         </p>
       </CardContent>

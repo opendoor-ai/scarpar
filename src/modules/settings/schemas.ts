@@ -24,7 +24,7 @@ export const orgProfileSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(200, 'Too long'),
   phone: z.string().trim().max(32, 'Too long').optional().nullable(),
   email: z
-    .union([z.string().trim().email('Enter a valid email'), z.literal('')])
+    .union([z.string().trim().email('이메일 형식이 올바르지 않습니다'), z.literal('')])
     .optional()
     .nullable(),
   address: z.string().trim().max(500, 'Too long').optional().nullable(),

@@ -79,8 +79,8 @@ export default async function ExpensesPage({
   return (
     <div>
       <PageHeader
-        title="Expenses"
-        description="Track business expenses by category."
+        title="지출관리"
+        description="분류별로 지출을 기록합니다."
         actions={
           <>
             <MonthPicker month={month} />
@@ -88,7 +88,7 @@ export default async function ExpensesPage({
               trigger={
                 <Button type="button">
                   <Plus className="size-4" />
-                  New expense
+                  새 지출
                 </Button>
               }
             />
@@ -97,9 +97,9 @@ export default async function ExpensesPage({
       />
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="This month" value={formatMoney(total)} />
-        <StatCard label="Top category" value={topCategory ? topCategory[0] : '—'} />
-        <StatCard label="Entries" value={expenses.length} />
+        <StatCard label="이번 달" value={formatMoney(total)} />
+        <StatCard label="가장 큰 분류" value={topCategory ? topCategory[0] : '—'} />
+        <StatCard label="건수" value={expenses.length} />
       </div>
 
       <ExpensesTable expenses={expensesWithReceipt} />

@@ -78,7 +78,7 @@ function ImageGallery({ value, onChange, variantOptions }: ImageGalleryProps) {
   return (
     <div className="flex flex-col gap-3">
       {value.length === 0 ? (
-        <EmptyState icon={ImageOff} title="No images yet" description="Add product photos below." />
+        <EmptyState icon={ImageOff} title="아직 사진이 없습니다" description="아래에서 상품 사진을 추가하세요." />
       ) : (
         <div className="flex flex-col gap-2">
           {value.map((row, index) => (
@@ -93,10 +93,10 @@ function ImageGallery({ value, onChange, variantOptions }: ImageGalleryProps) {
                     onValueChange={(v) => updateRow(row.key, { variantId: v === ALL_VARIANTS ? null : v })}
                   >
                     <SelectTrigger size="sm" className="w-56">
-                      <SelectValue placeholder="All variants" />
+                      <SelectValue placeholder="모든 옵션" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={ALL_VARIANTS}>All variants</SelectItem>
+                      <SelectItem value={ALL_VARIANTS}>모든 옵션</SelectItem>
                       {variantOptions.map((v) => (
                         <SelectItem key={v.id} value={v.id}>
                           {v.name}
@@ -105,7 +105,7 @@ function ImageGallery({ value, onChange, variantOptions }: ImageGalleryProps) {
                     </SelectContent>
                   </Select>
                 ) : (
-                  <span className="text-muted-foreground text-xs">Shown for all variants</span>
+                  <span className="text-muted-foreground text-xs">모든 옵션에 표시</span>
                 )}
               </div>
               <div className="flex items-center gap-1">
@@ -129,7 +129,7 @@ function ImageGallery({ value, onChange, variantOptions }: ImageGalleryProps) {
           ))}
         </div>
       )}
-      <MediaPicker value={null} onChange={addImage} label="Add image" />
+      <MediaPicker value={null} onChange={addImage} label="사진 추가" />
     </div>
   )
 }

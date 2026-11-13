@@ -69,15 +69,15 @@ export default async function ReturnDetailPage({ params }: PageProps<{ id: strin
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Items</CardTitle>
+              <CardTitle>반품 상품</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Item</TableHead>
-                    <TableHead className="text-right">Qty</TableHead>
-                    <TableHead>Condition</TableHead>
+                    <TableHead>상품</TableHead>
+                    <TableHead className="text-right">수량</TableHead>
+                    <TableHead>상태</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -107,26 +107,26 @@ export default async function ReturnDetailPage({ params }: PageProps<{ id: strin
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Details</CardTitle>
+              <CardTitle>상세 정보</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-2 text-[13px]">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Reason</span>
+                <span className="text-muted-foreground">사유</span>
                 <span>{ret.reason ?? '—'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Resolution</span>
+                <span className="text-muted-foreground">처리 방식</span>
                 <span className="capitalize">{ret.resolution?.replace('_', ' ') ?? '—'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Refund amount</span>
+                <span className="text-muted-foreground">환불 금액</span>
                 <span className="tabular-nums">
                   {ret.refund_amount != null ? formatMoney(ret.refund_amount) : '—'}
                 </span>
               </div>
               {ret.note ? (
                 <div className="flex flex-col gap-1 pt-2">
-                  <span className="text-muted-foreground">Note</span>
+                  <span className="text-muted-foreground">메모</span>
                   <span>{ret.note}</span>
                 </div>
               ) : null}

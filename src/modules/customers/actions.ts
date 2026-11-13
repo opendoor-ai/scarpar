@@ -31,7 +31,7 @@ export async function createCustomer(input: CustomerFormInput): Promise<ActionRe
   requireRole(ctx, 'staff')
 
   const parsed = customerFormSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   const { address, ...customer } = parsed.data
 
   const supabase = await getServerClient()
@@ -50,8 +50,8 @@ export async function createCustomer(input: CustomerFormInput): Promise<ActionRe
     return {
       ok: false,
       error: isUniqueViolation(error)
-        ? 'A customer with this phone number already exists.'
-        : (error?.message ?? 'Could not create customer.'),
+        ? '같은 전화번호의 고객이 이미 있습니다.'
+        : (error?.message ?? '고객을 추가하지 못했습니다.'),
     }
   }
 
@@ -84,7 +84,7 @@ export async function updateCustomer(customerId: string, input: CustomerEditInpu
   requireRole(ctx, 'staff')
 
   const parsed = customerEditSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
   const { data: before } = await supabase
@@ -107,7 +107,7 @@ export async function updateCustomer(customerId: string, input: CustomerEditInpu
   if (error) {
     return {
       ok: false,
-      error: isUniqueViolation(error) ? 'A customer with this phone number already exists.' : error.message,
+      error: isUniqueViolation(error) ? '같은 전화번호의 고객이 이미 있습니다.' : error.message,
     }
   }
 
@@ -134,7 +134,7 @@ export async function toggleCustomerBlock(customerId: string, block: boolean): P
     .eq('org_id', ctx.org.id)
     .single()
 
-  if (fetchError || !customer) return { ok: false, error: 'Customer not found.' }
+  if (fetchError || !customer) return { ok: false, error: '고객을 찾을 수 없습니다.' }
 
   const { error: updateError } = await supabase
     .from('customers')
@@ -150,7 +150,7 @@ export async function toggleCustomerBlock(customerId: string, block: boolean): P
         org_id: ctx.org.id,
         kind: 'phone',
         value: customer.phone,
-        reason: 'Blocked from customer profile',
+        reason: '고객 상세 화면에서 차단',
         created_by: ctx.user.id,
       },
       { onConflict: 'org_id,kind,value' },
@@ -232,7 +232,7 @@ export async function addCustomerAddress(
   requireRole(ctx, 'staff')
 
   const parsed = addressFormSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
 
@@ -261,7 +261,7 @@ export async function addCustomerAddress(
     .select('id')
     .single()
 
-  if (error || !data) return { ok: false, error: error?.message ?? 'Could not add address.' }
+  if (error || !data) return { ok: false, error: error?.message ?? '주소를 추가하지 못했습니다.' }
 
   audit(ctx, 'customer.address.add', 'customer_address', data.id, null, parsed.data)
   revalidatePath(`/admin/customers/${customerId}`)
@@ -277,7 +277,7 @@ export async function updateCustomerAddress(
   requireRole(ctx, 'staff')
 
   const parsed = addressFormSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
   const { data: before } = await supabase
@@ -352,7 +352,7 @@ export async function addBlocklistEntry(input: BlocklistEntryInput): Promise<Act
   requireRole(ctx, 'manager')
 
   const parsed = blocklistEntrySchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
   const { data, error } = await supabase
@@ -370,7 +370,7 @@ export async function addBlocklistEntry(input: BlocklistEntryInput): Promise<Act
     .select('id')
     .single()
 
-  if (error || !data) return { ok: false, error: error?.message ?? 'Could not add entry.' }
+  if (error || !data) return { ok: false, error: error?.message ?? '항목을 추가하지 못했습니다.' }
 
   audit(ctx, 'blocklist.add', 'blocklist', data.id, null, parsed.data)
   revalidatePath('/admin/blocklist')

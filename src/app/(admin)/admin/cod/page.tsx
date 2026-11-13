@@ -81,7 +81,7 @@ export default async function CodPage() {
 
   return (
     <div className="flex flex-col gap-6 px-6 py-6">
-      <PageHeader title="COD Reconciliation" />
+      <PageHeader title="착불 정산" />
 
       <CodSummary
         uncollectedInField={uncollectedInField}
@@ -90,12 +90,12 @@ export default async function CodPage() {
       />
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold">Ready to settle</h2>
+        <h2 className="text-base font-semibold">정산 대기</h2>
         <CodRiderTable groups={groups} />
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold">Settlement history</h2>
+        <h2 className="text-base font-semibold">정산 내역</h2>
         <CodSettlementsTable settlements={settlementRows} />
       </div>
     </div>

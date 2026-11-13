@@ -17,7 +17,7 @@ export interface TimelineEvent {
 /** Chronological events list — used by both the admin delivery detail page and /track/[code]. */
 function DeliveryTimeline({ events }: { events: TimelineEvent[] }) {
   if (events.length === 0) {
-    return <p className="text-muted-foreground text-sm">No activity yet.</p>
+    return <p className="text-muted-foreground text-sm">아직 기록이 없습니다.</p>
   }
 
   return (

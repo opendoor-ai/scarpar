@@ -34,12 +34,12 @@ function ReturnsTable({ data }: ReturnsTableProps) {
     () => [
       {
         accessorKey: 'return_no',
-        header: 'Return',
+        header: '반품번호',
         cell: ({ row }) => <span className="font-medium">{row.original.return_no}</span>,
       },
       {
         id: 'order',
-        header: 'Order',
+        header: '주문번호',
         cell: ({ row }) => (
           <Link
             href={`/admin/orders/${row.original.order_id}`}
@@ -52,19 +52,19 @@ function ReturnsTable({ data }: ReturnsTableProps) {
       },
       {
         accessorKey: 'status',
-        header: 'Status',
+        header: '상태',
         cell: ({ row }) => <StatusBadge kind="return" value={row.original.status} />,
       },
       {
         accessorKey: 'resolution',
-        header: 'Resolution',
+        header: '처리 방식',
         cell: ({ row }) => (
           <span className="text-muted-foreground capitalize">{row.original.resolution?.replace('_', ' ') ?? '—'}</span>
         ),
       },
       {
         accessorKey: 'refund_amount',
-        header: 'Refund',
+        header: '환불액',
         cell: ({ row }) => (
           <span className="tabular-nums">
             {row.original.refund_amount != null ? formatMoney(row.original.refund_amount) : '—'}
@@ -73,8 +73,8 @@ function ReturnsTable({ data }: ReturnsTableProps) {
       },
       {
         accessorKey: 'created_at',
-        header: 'Created',
-        cell: ({ row }) => format(new Date(row.original.created_at), 'd MMM yyyy, h:mm a'),
+        header: '등록일',
+        cell: ({ row }) => format(new Date(row.original.created_at), 'yyyy.MM.dd HH:mm'),
       },
     ],
     [],
@@ -86,7 +86,7 @@ function ReturnsTable({ data }: ReturnsTableProps) {
       data={data}
       pageSize={50}
       onRowClick={(row) => router.push(`/admin/returns/${row.id}`)}
-      emptyState={<EmptyState icon={Undo2} title="No returns yet" description="Returns created from an order will show up here." />}
+      emptyState={<EmptyState icon={Undo2} title="아직 반품이 없습니다" description="주문에서 등록한 반품이 여기에 표시됩니다." />}
     />
   )
 }

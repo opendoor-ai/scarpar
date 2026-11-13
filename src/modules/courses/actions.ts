@@ -57,7 +57,7 @@ export async function createCourse(input: CourseFormValues): Promise<ActionResul
 
   const parsed = courseFormSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
 
   const supabase = await getServerClient()
@@ -78,7 +78,7 @@ export async function createCourse(input: CourseFormValues): Promise<ActionResul
     .single()
 
   if (error || !data) {
-    return { ok: false, error: error?.message ?? 'Failed to create course' }
+    return { ok: false, error: error?.message ?? '강의를 만들지 못했습니다' }
   }
 
   audit(ctx, 'course.create', 'course', data.id, undefined, { title: parsed.data.title, slug })
@@ -93,7 +93,7 @@ export async function updateCourse(courseId: string, input: CourseFormValues): P
 
   const parsed = courseFormSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
 
   const supabase = await getServerClient()
@@ -104,7 +104,7 @@ export async function updateCourse(courseId: string, input: CourseFormValues): P
     .eq('id', courseId)
     .maybeSingle()
 
-  if (!before) return { ok: false, error: 'Course not found' }
+  if (!before) return { ok: false, error: '강의를 찾을 수 없습니다' }
 
   const { error } = await supabase
     .from('courses')
@@ -141,7 +141,7 @@ export async function createLesson(
 
   const parsed = lessonFormSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
 
   const supabase = await getServerClient()
@@ -165,7 +165,7 @@ export async function createLesson(
     .select('id')
     .single()
 
-  if (error || !data) return { ok: false, error: error?.message ?? 'Failed to add lesson' }
+  if (error || !data) return { ok: false, error: error?.message ?? '수업을 추가하지 못했습니다' }
 
   audit(ctx, 'lesson.create', 'lesson', data.id, undefined, { course_id: courseId, ...parsed.data })
   revalidatePath(`/admin/courses/${courseId}`)
@@ -183,7 +183,7 @@ export async function updateLesson(
 
   const parsed = lessonFormSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
 
   const supabase = await getServerClient()
@@ -237,14 +237,14 @@ export async function moveLesson(
     .eq('course_id', courseId)
     .order('position', { ascending: true })
 
-  if (error || !lessons) return { ok: false, error: error?.message ?? 'Failed to reorder' }
+  if (error || !lessons) return { ok: false, error: error?.message ?? '순서를 바꾸지 못했습니다' }
 
   const rows = lessons as { id: string; position: number }[]
   const index = rows.findIndex((lesson) => lesson.id === lessonId)
   const swapIndex = direction === 'up' ? index - 1 : index + 1
 
   if (index === -1 || swapIndex < 0 || swapIndex >= rows.length) {
-    return { ok: false, error: 'Cannot move lesson further' }
+    return { ok: false, error: '더 이상 이동할 수 없습니다' }
   }
 
   const current = rows[index]
@@ -255,7 +255,7 @@ export async function moveLesson(
     supabase.from('lessons').update({ position: current.position }).eq('org_id', ctx.org.id).eq('id', target.id),
   ])
 
-  if (error1 || error2) return { ok: false, error: error1?.message ?? error2?.message ?? 'Failed to reorder' }
+  if (error1 || error2) return { ok: false, error: error1?.message ?? error2?.message ?? '순서를 바꾸지 못했습니다' }
 
   audit(ctx, 'lesson.reorder', 'lesson', lessonId, undefined, { direction })
   revalidatePath(`/admin/courses/${courseId}`)
@@ -294,7 +294,7 @@ export async function enrollCustomer(courseId: string, customerId: string): Prom
 
   const parsed = enrollCustomerSchema.safeParse({ customer_id: customerId })
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Select a customer' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '고객을 선택하세요' }
   }
 
   const supabase = await getServerClient()
@@ -308,7 +308,7 @@ export async function enrollCustomer(courseId: string, customerId: string): Prom
     .eq('status', 'active')
     .maybeSingle()
 
-  if (existing) return { ok: false, error: 'This customer is already enrolled' }
+  if (existing) return { ok: false, error: '이미 수강 중인 고객입니다' }
 
   const { data, error } = await supabase
     .from('enrollments')
@@ -321,7 +321,7 @@ export async function enrollCustomer(courseId: string, customerId: string): Prom
     .select('id')
     .single()
 
-  if (error || !data) return { ok: false, error: error?.message ?? 'Failed to enroll customer' }
+  if (error || !data) return { ok: false, error: error?.message ?? '수강 등록에 실패했습니다' }
 
   audit(ctx, 'enrollment.create', 'enrollment', data.id, undefined, {
     course_id: courseId,

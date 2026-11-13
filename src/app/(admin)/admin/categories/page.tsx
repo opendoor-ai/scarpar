@@ -44,9 +44,9 @@ export default async function CategoriesPage() {
 
   return (
     <div>
-      <PageHeader title="Categories" description="Group products so customers can browse by type." />
+      <PageHeader title="카테고리" description="고객이 종류별로 찾아볼 수 있게 상품을 분류합니다." />
       {error ? (
-        <EmptyState icon={AlertTriangle} title="Couldn't load categories" description={error.message} />
+        <EmptyState icon={AlertTriangle} title="카테고리를 불러오지 못했습니다" description={error.message} />
       ) : (
         <CategoryManager categories={categories} />
       )}

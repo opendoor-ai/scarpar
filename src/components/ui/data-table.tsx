@@ -147,7 +147,7 @@ function DataTable<TData, TValue>({
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   {emptyState ?? (
-                    <span className="text-muted-foreground">No results.</span>
+                    <span className="text-muted-foreground">결과가 없습니다.</span>
                   )}
                 </TableCell>
               </TableRow>
@@ -158,7 +158,7 @@ function DataTable<TData, TValue>({
 
       <div className="text-muted-foreground flex items-center justify-between text-[13px]">
         <div>
-          {filteredCount} row{filteredCount === 1 ? "" : "s"}
+          총 {filteredCount}건
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -167,11 +167,10 @@ function DataTable<TData, TValue>({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Previous
+            이전
           </Button>
           <span>
-            Page {table.getState().pagination.pageIndex + 1} of{" "}
-            {Math.max(table.getPageCount(), 1)}
+            {table.getState().pagination.pageIndex + 1} / {Math.max(table.getPageCount(), 1)} 페이지
           </span>
           <Button
             variant="outline"
@@ -179,7 +178,7 @@ function DataTable<TData, TValue>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Next
+            다음
           </Button>
         </div>
       </div>

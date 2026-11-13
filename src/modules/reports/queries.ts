@@ -262,12 +262,12 @@ export async function codSuccessByDistrict(
     const districtByOrder = new Map<string, string>()
     for (const o of (ordersRes.data ?? []) as Pick<Order, 'id' | 'address'>[]) {
       const district = (o.address as { district?: string } | null)?.district
-      districtByOrder.set(o.id, district && district.trim() ? district : 'Unknown')
+      districtByOrder.set(o.id, district && district.trim() ? district : '알 수 없음')
     }
 
     const tally = new Map<string, { delivered: number; failed: number }>()
     for (const d of deliveryRows) {
-      const district = districtByOrder.get(d.order_id) ?? 'Unknown'
+      const district = districtByOrder.get(d.order_id) ?? '알 수 없음'
       const bucket = tally.get(district) ?? { delivered: 0, failed: 0 }
       if (d.status === 'delivered') bucket.delivered += 1
       else bucket.failed += 1
@@ -373,7 +373,7 @@ export async function deliveryPerformance(
     }
     const byRider: DeliveryPerfGroup[] = [...riderGroups.entries()]
       .map(([riderId, groupRows]) => ({
-        label: riderNames.get(riderId) ?? 'Unknown rider',
+        label: riderNames.get(riderId) ?? '알 수 없는 배송기사',
         ...summarize(groupRows),
       }))
       .sort((a, b) => b.delivered + b.failed - (a.delivered + a.failed))

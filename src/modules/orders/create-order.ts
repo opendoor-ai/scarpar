@@ -69,9 +69,9 @@ const INVENTORY_OUT_MARKER = 'inventory:out'
 const INVENTORY_RESTORE_MARKER = 'inventory:restore'
 
 const CHANNEL_PLACED_MESSAGE: Record<CreateOrderInput['channel'], string> = {
-  manual: 'Order placed manually by staff',
-  pos: 'Order placed via POS',
-  storefront: 'Order placed via storefront checkout',
+  manual: '직원이 직접 등록한 주문',
+  pos: '매장(POS)에서 등록한 주문',
+  storefront: '쇼핑몰에서 접수된 주문',
 }
 
 type InventoryDirection = 'out' | 'restore'

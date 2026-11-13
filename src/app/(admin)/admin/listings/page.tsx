@@ -83,15 +83,15 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
   return (
     <div className="px-6 py-6">
       <PageHeader
-        title="Listings"
-        description="Manage property listings and buyer inquiries."
+        title="매물관리"
+        description="매물과 구매 문의를 관리합니다."
         actions={<NewListingDialog />}
       />
 
       <div className="flex flex-wrap items-center gap-1.5 pb-4">
         <Link href="/admin/listings">
           <Badge variant={status === '' ? 'default' : 'outline'} className="cursor-pointer">
-            All
+            전체
           </Badge>
         </Link>
         {LISTING_STATUSES.map((value) => (
@@ -106,17 +106,17 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
       {rows.length === 0 ? (
         <EmptyState
           icon={Building2}
-          title="No listings yet"
-          description="Create your first listing to start capturing buyer inquiries."
+          title="아직 매물이 없습니다"
+          description="첫 매물을 등록하고 문의를 받아 보세요."
         />
       ) : (
         <ListingsGrid listings={rows} />
       )}
 
       <div className="mt-8 flex flex-col gap-3">
-        <h2 className="text-foreground text-[14px] font-semibold">Inquiries</h2>
+        <h2 className="text-foreground text-[14px] font-semibold">문의</h2>
         {inquiryRows.length === 0 ? (
-          <EmptyState icon={MessageSquare} title="No inquiries yet" description="Buyer inquiries will appear here." />
+          <EmptyState icon={MessageSquare} title="아직 문의가 없습니다" description="구매 문의가 여기에 표시됩니다." />
         ) : (
           <InquiriesTable inquiries={inquiryRows} />
         )}

@@ -35,22 +35,22 @@ function AppointmentsSection({ jobId, appointments }: AppointmentsSectionProps) 
 
   async function handleDelete(id: string) {
     const result = await deleteAppointment(id, jobId)
-    if (result.ok) toast.success('Appointment deleted')
+    if (result.ok) toast.success('예약이 삭제되었습니다')
     else toast.error(result.error)
   }
 
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between">
-        <CardTitle>Appointments</CardTitle>
+        <CardTitle>예약</CardTitle>
         <AppointmentDialog jobId={jobId} />
       </CardHeader>
       <CardContent>
         {appointments.length === 0 ? (
           <EmptyState
             icon={CalendarClock}
-            title="No appointments yet"
-            description="Schedule the first visit for this job."
+            title="아직 예약이 없습니다"
+            description="이 작업의 첫 방문 일정을 잡으세요."
           />
         ) : (
           <ul className="flex flex-col gap-2">
@@ -62,8 +62,8 @@ function AppointmentsSection({ jobId, appointments }: AppointmentsSectionProps) 
                 <div className="flex flex-col">
                   <span className="text-foreground text-[13px] font-medium">{appointment.title}</span>
                   <span className="text-muted-foreground text-xs">
-                    {format(new Date(appointment.starts_at), 'd MMM, h:mm a')}
-                    {appointment.ends_at ? ` – ${format(new Date(appointment.ends_at), 'h:mm a')}` : ''}
+                    {format(new Date(appointment.starts_at), 'MM.dd HH:mm')}
+                    {appointment.ends_at ? ` – ${format(new Date(appointment.ends_at), 'HH:mm')}` : ''}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -71,13 +71,13 @@ function AppointmentsSection({ jobId, appointments }: AppointmentsSectionProps) 
                   {appointment.status === 'booked' ? (
                     <div className="flex gap-1">
                       <Button size="sm" variant="ghost" onClick={() => handleStatus(appointment.id, 'done')}>
-                        Done
+                        완료
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => handleStatus(appointment.id, 'no_show')}>
-                        No-show
+                        노쇼
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => handleStatus(appointment.id, 'cancelled')}>
-                        Cancel
+                        취소
                       </Button>
                     </div>
                   ) : null}
@@ -85,12 +85,12 @@ function AppointmentsSection({ jobId, appointments }: AppointmentsSectionProps) 
                     trigger={
                       <Button variant="ghost" size="icon">
                         <Trash2 />
-                        <span className="sr-only">Delete appointment</span>
+                        <span className="sr-only">예약 삭제</span>
                       </Button>
                     }
-                    title="Delete appointment?"
+                    title="예약을 삭제할까요?"
                     description={`"${appointment.title}" will be permanently removed.`}
-                    confirmLabel="Delete"
+                    confirmLabel="삭제"
                     destructive
                     onConfirm={() => handleDelete(appointment.id)}
                   />

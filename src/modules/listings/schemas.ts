@@ -12,14 +12,14 @@ const moneyString = z
   .trim()
   .min(1, 'Price is required')
   .refine((v) => Number.isFinite(Number(v.replace(/,/g, ''))) && Number(v.replace(/,/g, '')) >= 0, {
-    message: 'Enter a valid amount',
+    message: '금액을 정확히 입력하세요',
   })
 
 /** Empty string or a non-negative whole number — used for area_sqft/beds/baths text inputs. */
 const optionalIntString = z
   .string()
   .trim()
-  .refine((v) => v === '' || /^\d+$/.test(v), { message: 'Enter a whole number' })
+  .refine((v) => v === '' || /^\d+$/.test(v), { message: '정수를 입력하세요' })
 
 /** Compact "New listing" dialog payload — mirrors new-course-dialog.tsx's minimal-fields pattern. */
 export const newListingSchema = z.object({

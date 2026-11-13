@@ -35,7 +35,7 @@ export default async function BlocklistPage() {
       .select('user_id, full_name')
       .in('user_id', creatorIds)
     for (const p of (profiles ?? []) as { user_id: string; full_name: string | null }[]) {
-      creatorNames.set(p.user_id, p.full_name ?? 'Unknown')
+      creatorNames.set(p.user_id, p.full_name ?? '알 수 없음')
     }
   }
 
@@ -47,17 +47,16 @@ export default async function BlocklistPage() {
   return (
     <div className="px-6 py-6">
       <PageHeader
-        title="Blocklist"
-        description="Phone numbers, addresses, and IPs flagged for checkout risk."
+        title="차단 목록"
+        description="위험 주문으로 표시할 전화번호, 주소, IP"
         actions={<NewBlocklistEntryDialog />}
       />
       <div className="flex flex-col gap-4">
         <Alert>
           <ShieldAlert />
-          <AlertTitle>Automatic checkout flagging</AlertTitle>
+          <AlertTitle>자동 위험 주문 표시</AlertTitle>
           <AlertDescription>
-            When a checkout's phone or address matches a blocklist entry, the order is automatically flagged
-            as high risk per the fraud settings.
+주문의 전화번호나 주소가 차단 목록과 일치하면, 부정 주문 설정에 따라 자동으로 위험 주문으로 표시됩니다.
           </AlertDescription>
         </Alert>
         <BlocklistTable entries={rows} />

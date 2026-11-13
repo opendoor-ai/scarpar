@@ -64,7 +64,7 @@ function MediaManager({ initialItems }: MediaManagerProps) {
     }
     setUploading(false)
     if (event.target) event.target.value = ''
-    if (failures > 0) toast.error(`${failures} file(s) failed to upload.`)
+    if (failures > 0) toast.error(`파일 ${failures}개 업로드에 실패했습니다.`)
     void refresh(search)
   }
 
@@ -84,13 +84,13 @@ function MediaManager({ initialItems }: MediaManagerProps) {
       return
     }
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, alt } : item)))
-    toast.success('Updated.')
+    toast.success('저장되었습니다.')
   }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
-        <SearchInput value={search} onChange={setSearch} placeholder="Search media..." className="max-w-xs" />
+        <SearchInput value={search} onChange={setSearch} placeholder="미디어 검색..." className="max-w-xs" />
         <input
           ref={fileInputRef}
           type="file"
@@ -101,19 +101,19 @@ function MediaManager({ initialItems }: MediaManagerProps) {
         />
         <Button type="button" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
           {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
-          {uploading ? 'Uploading...' : 'Upload'}
+          {uploading ? '업로드 중...' : '업로드'}
         </Button>
       </div>
 
       {!loading && items.length === 0 ? (
         <EmptyState
           icon={FileIcon}
-          title="No media yet"
-          description="Upload images and files to use across pages, products and listings."
+          title="아직 등록된 미디어가 없습니다"
+          description="페이지와 상품에 사용할 이미지와 파일을 업로드하세요."
           action={
             <Button type="button" onClick={() => fileInputRef.current?.click()}>
               <Upload className="size-4" />
-              Upload files
+              파일 업로드
             </Button>
           }
         />
@@ -167,11 +167,11 @@ function MediaCard({ item, onDelete, onAltSave }: MediaCardProps) {
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label htmlFor={`alt-${item.id}`}>Alt text</Label>
+            <Label htmlFor={`alt-${item.id}`}>대체 텍스트(alt)</Label>
             <div className="flex gap-1.5">
               <Input id={`alt-${item.id}`} value={alt} onChange={(e) => setAlt(e.target.value)} />
               <Button type="button" variant="outline" size="sm" onClick={() => onAltSave(item.id, alt)}>
-                Save
+                저장
               </Button>
             </div>
           </div>
@@ -187,12 +187,12 @@ function MediaCard({ item, onDelete, onAltSave }: MediaCardProps) {
             trigger={
               <Button type="button" variant="destructive" size="sm">
                 <Trash2 className="size-3.5" />
-                Delete
+                삭제
               </Button>
             }
-            title="Delete this media file?"
-            description="This removes it from storage and can't be undone. Pages or products referencing it will show a broken image."
-            confirmLabel="Delete"
+            title="이 파일을 삭제할까요?"
+            description="저장소에서 완전히 삭제되며 되돌릴 수 없습니다. 이 파일을 쓰는 페이지나 상품에서는 이미지가 깨져 보입니다."
+            confirmLabel="삭제"
             destructive
             onConfirm={() => onDelete(item.id)}
           />

@@ -58,17 +58,17 @@ export default async function PlatformPage() {
 
   return (
     <div>
-      <PageHeader title="Platform" description="Cross-organization view for platform operators." />
+      <PageHeader title="플랫폼 관리" description="전체 공급사(조직)를 한눈에 관리합니다." />
 
       <div className="flex flex-col gap-6">
         <Alert>
-          <AlertTitle>Platform operators only</AlertTitle>
-          <AlertDescription>Add user ids to the platform_admins table to grant access.</AlertDescription>
+          <AlertTitle>플랫폼 운영자 전용</AlertTitle>
+          <AlertDescription>다른 운영자를 추가하려면 platform_admins 표에 회원 ID를 넣으세요.</AlertDescription>
         </Alert>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <StatCard label="Organizations" value={orgs.length} icon={Building2} />
-          <StatCard label="Active organizations" value={activeCount} icon={CheckCircle2} />
+          <StatCard label="전체 조직" value={orgs.length} icon={Building2} />
+          <StatCard label="활성 조직" value={activeCount} icon={CheckCircle2} />
         </div>
 
         <OrgsTable orgs={orgRows} />

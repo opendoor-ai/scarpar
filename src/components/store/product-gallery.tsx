@@ -17,7 +17,7 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
           <img src={src} alt={name} className="size-full object-cover" />
         ) : (
           <div className="flex size-full items-center justify-center text-xs text-muted-foreground">
-            No image
+이미지 없음
           </div>
         )}
       </div>
@@ -29,7 +29,7 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
               key={img + i}
               type="button"
               onClick={() => setActive(i)}
-              aria-label={`Show image ${i + 1}`}
+              aria-label={`${i + 1}번째 사진 보기`}
               className={cn(
                 'size-16 shrink-0 overflow-hidden rounded-md border transition-colors',
                 i === active ? 'border-primary' : 'border-border hover:border-foreground/30',

@@ -28,13 +28,13 @@ export async function toggleOrgActiveAction(input: {
 
   const parsed = toggleOrgActiveSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
 
   const supabase = await getServerClient()
   const { data: isPlatformAdmin } = await supabase.rpc('is_platform_admin')
   if (!isPlatformAdmin) {
-    return { ok: false, error: 'Forbidden' }
+    return { ok: false, error: '권한이 없습니다' }
   }
 
   try {
@@ -45,7 +45,7 @@ export async function toggleOrgActiveAction(input: {
       .eq('id', parsed.data.orgId)
       .single()
 
-    if (fetchError || !org) return { ok: false, error: 'Organization not found' }
+    if (fetchError || !org) return { ok: false, error: '조직을 찾을 수 없습니다' }
     const orgRow = org as Org
 
     const { error } = await admin
@@ -67,6 +67,6 @@ export async function toggleOrgActiveAction(input: {
 
     return { ok: true }
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Failed to update organization' }
+    return { ok: false, error: err instanceof Error ? err.message : '조직 정보를 변경하지 못했습니다' }
   }
 }

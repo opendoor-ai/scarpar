@@ -29,7 +29,7 @@ export function QtyStepper({
     <div className={cn('inline-flex items-center rounded-md border border-input', height, className)}>
       <button
         type="button"
-        aria-label="Decrease quantity"
+        aria-label="수량 줄이기"
         disabled={value <= min}
         onClick={() => onChange(clamp(value - 1))}
         className="inline-flex h-full w-7 items-center justify-center text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
@@ -39,7 +39,7 @@ export function QtyStepper({
       <input
         type="text"
         inputMode="numeric"
-        aria-label="Quantity"
+        aria-label="수량"
         value={value}
         onChange={(e) => {
           const digits = e.target.value.replace(/[^\d]/g, '')
@@ -50,7 +50,7 @@ export function QtyStepper({
       />
       <button
         type="button"
-        aria-label="Increase quantity"
+        aria-label="수량 늘리기"
         disabled={value >= max}
         onClick={() => onChange(clamp(value + 1))}
         className="inline-flex h-full w-7 items-center justify-center text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-40"

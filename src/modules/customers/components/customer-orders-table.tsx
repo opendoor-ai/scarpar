@@ -19,7 +19,7 @@ export function CustomerOrdersTable({ orders }: { orders: CustomerOrderRow[] }) 
     () => [
       {
         accessorKey: 'order_no',
-        header: 'Order',
+        header: '주문번호',
         cell: ({ row }) => (
           <Link href={`/admin/orders/${row.original.id}`} className="text-primary font-medium hover:underline">
             {row.original.order_no}
@@ -28,22 +28,22 @@ export function CustomerOrdersTable({ orders }: { orders: CustomerOrderRow[] }) 
       },
       {
         accessorKey: 'placed_at',
-        header: 'Date',
-        cell: ({ row }) => format(new Date(row.original.placed_at), 'd MMM yyyy'),
+        header: '날짜',
+        cell: ({ row }) => format(new Date(row.original.placed_at), 'yyyy.MM.dd'),
       },
       {
         accessorKey: 'total',
-        header: 'Total',
+        header: '합계',
         cell: ({ row }) => <span className="tabular-nums">{formatMoney(row.original.total)}</span>,
       },
       {
         accessorKey: 'status',
-        header: 'Status',
+        header: '상태',
         cell: ({ row }) => <StatusBadge kind="order" value={row.original.status} />,
       },
       {
         accessorKey: 'payment_status',
-        header: 'Payment',
+        header: '결제',
         cell: ({ row }) => <StatusBadge kind="payment" value={row.original.payment_status} />,
       },
     ],
@@ -57,8 +57,8 @@ export function CustomerOrdersTable({ orders }: { orders: CustomerOrderRow[] }) 
       emptyState={
         <EmptyState
           icon={ShoppingCart}
-          title="No orders yet"
-          description="Orders from this customer will show up here."
+          title="아직 주문이 없습니다"
+          description="이 고객의 주문이 여기에 표시됩니다."
         />
       }
     />

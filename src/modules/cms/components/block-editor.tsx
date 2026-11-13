@@ -78,7 +78,7 @@ function BlockEditor({ blocks, onChange, categories }: BlockEditorProps) {
           <DropdownMenuTrigger asChild>
             <Button type="button" variant="outline" className="w-full">
               <Plus className="size-4" />
-              Add block
+블록 추가
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
@@ -101,7 +101,7 @@ function BlockEditor({ blocks, onChange, categories }: BlockEditorProps) {
           />
         ) : (
           <div className="flex min-h-[200px] items-center justify-center text-sm text-muted-foreground">
-            Select a block to edit, or add one to get started.
+수정할 블록을 고르거나 새 블록을 추가하세요.
           </div>
         )}
       </div>

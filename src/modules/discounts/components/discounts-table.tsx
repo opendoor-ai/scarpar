@@ -17,15 +17,15 @@ import type { Discount } from '@/types/db'
 import { toggleDiscountActive } from '../actions'
 
 const TYPE_LABEL: Record<Discount['type'], string> = {
-  percent: 'Percent',
-  fixed: 'Fixed amount',
-  free_shipping: 'Free shipping',
+  percent: '비율',
+  fixed: '금액',
+  free_shipping: '무료배송',
 }
 
 const SCOPE_LABEL: Record<Discount['scope'], string> = {
-  all: 'All products',
-  products: 'Products',
-  categories: 'Categories',
+  all: '전체 상품',
+  products: '특정 상품',
+  categories: '특정 카테고리',
 }
 
 function valueLabel(discount: Discount): string {
@@ -36,9 +36,9 @@ function valueLabel(discount: Discount): string {
 
 function windowLabel(discount: Discount): string {
   const parts: string[] = []
-  if (discount.starts_at) parts.push(format(new Date(discount.starts_at), 'd MMM yyyy'))
-  if (discount.expires_at) parts.push(format(new Date(discount.expires_at), 'd MMM yyyy'))
-  return parts.length > 0 ? parts.join(' – ') : 'No end date'
+  if (discount.starts_at) parts.push(format(new Date(discount.starts_at), 'yyyy.MM.dd'))
+  if (discount.expires_at) parts.push(format(new Date(discount.expires_at), 'yyyy.MM.dd'))
+  return parts.length > 0 ? parts.join(' – ') : '종료일 없음'
 }
 
 function DiscountActiveSwitch({ id, isActive }: { id: string; isActive: boolean }) {
@@ -62,7 +62,7 @@ function DiscountActiveSwitch({ id, isActive }: { id: string; isActive: boolean 
       onCheckedChange={handleChange}
       disabled={pending}
       onClick={(e) => e.stopPropagation()}
-      aria-label={checked ? 'Active' : 'Inactive'}
+      aria-label={checked ? '사용 중' : '사용 안 함'}
     />
   )
 }
@@ -74,33 +74,33 @@ export function DiscountsTable({ discounts }: { discounts: Discount[] }) {
     () => [
       {
         accessorKey: 'code',
-        header: 'Code',
+        header: '코드',
         cell: ({ row }) =>
           row.original.code ? (
             <span className="font-mono text-xs">{row.original.code}</span>
           ) : (
-            <Badge variant="outline">Auto</Badge>
+            <Badge variant="outline">자동</Badge>
           ),
       },
-      { accessorKey: 'title', header: 'Title' },
+      { accessorKey: 'title', header: '이름' },
       {
         accessorKey: 'type',
-        header: 'Type',
+        header: '방식',
         cell: ({ row }) => TYPE_LABEL[row.original.type],
       },
       {
         id: 'value',
-        header: 'Value',
+        header: '할인',
         cell: ({ row }) => <span className="tabular-nums">{valueLabel(row.original)}</span>,
       },
       {
         accessorKey: 'scope',
-        header: 'Scope',
+        header: '대상',
         cell: ({ row }) => SCOPE_LABEL[row.original.scope],
       },
       {
         id: 'usage',
-        header: 'Used / Max',
+        header: '사용 / 최대',
         cell: ({ row }) => (
           <span className="tabular-nums">
             {row.original.used_count}
@@ -110,12 +110,12 @@ export function DiscountsTable({ discounts }: { discounts: Discount[] }) {
       },
       {
         id: 'window',
-        header: 'Active window',
+        header: '기간',
         cell: ({ row }) => <span className="text-muted-foreground">{windowLabel(row.original)}</span>,
       },
       {
         id: 'is_active',
-        header: 'Active',
+        header: '사용',
         cell: ({ row }) => <DiscountActiveSwitch id={row.original.id} isActive={row.original.is_active} />,
       },
     ],
@@ -130,8 +130,8 @@ export function DiscountsTable({ discounts }: { discounts: Discount[] }) {
       emptyState={
         <EmptyState
           icon={BadgePercent}
-          title="No discounts yet"
-          description="Create a discount code or automatic promotion."
+          title="아직 할인이 없습니다"
+          description="할인 코드나 자동 할인을 만들어 보세요."
         />
       }
     />

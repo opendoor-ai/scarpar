@@ -52,7 +52,7 @@ export default async function JobDetailPage({ params }: PageProps<{ id: string }
       .in('user_id', memberIds)
     teamMembers = ((profilesData ?? []) as Pick<Profile, 'user_id' | 'full_name'>[]).map((profile) => ({
       id: profile.user_id,
-      name: profile.full_name ?? 'Unnamed member',
+      name: profile.full_name ?? '이름 없음',
     }))
   }
 

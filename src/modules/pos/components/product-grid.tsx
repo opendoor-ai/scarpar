@@ -55,7 +55,7 @@ export function ProductGrid({
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
           onKeyDown={onSearchKeyDown}
-          placeholder="Search by name or SKU, or scan a barcode... (press / to focus)"
+          placeholder="상품명·SKU 검색 또는 바코드 스캔... (/ 키로 바로 입력)"
           className="h-9 pl-8"
         />
       </div>
@@ -71,7 +71,7 @@ export function ProductGrid({
               : 'bg-background hover:bg-accent',
           )}
         >
-          All
+          전체
         </button>
         {categories.map((category) => (
           <button
@@ -91,7 +91,7 @@ export function ProductGrid({
       </div>
 
       {filtered.length === 0 ? (
-        <EmptyState icon={Package} title="No products found" description="Try a different search or category." />
+        <EmptyState icon={Package} title="상품을 찾을 수 없습니다" description="다른 검색어나 카테고리를 선택해 보세요." />
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
           {filtered.map((product) =>
@@ -150,7 +150,7 @@ const ProductCard = React.forwardRef<HTMLButtonElement, { product: PosProduct; o
           <span className="text-sm font-semibold tabular-nums">{formatMoney(product.price)}</span>
           {outOfStock ? (
             <Badge variant="warning" className="text-[10px]">
-              Out
+              품절
             </Badge>
           ) : null}
         </div>

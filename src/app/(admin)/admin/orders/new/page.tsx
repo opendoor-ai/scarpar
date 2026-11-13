@@ -34,7 +34,7 @@ export default async function NewOrderPage() {
 
   return (
     <div className="px-6 py-6">
-      <PageHeader title="New order" backHref="/admin/orders" />
+      <PageHeader title="새 주문" backHref="/admin/orders" />
       <NewOrderForm deliveryZones={deliveryZones} deliveryEnabled={deliveryEnabled} defaultAdvance={defaultAdvance} />
     </div>
   )

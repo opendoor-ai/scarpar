@@ -14,7 +14,7 @@ interface ListingsGridProps {
 }
 
 function purposeLabel(purpose: ListingListRow['purpose']): string {
-  return purpose === 'sale' ? 'Sale' : 'Rent'
+  return purpose === 'sale' ? '매매' : '임대'
 }
 
 function propertyTypeLabel(type: ListingListRow['property_type']): string {
@@ -23,8 +23,8 @@ function propertyTypeLabel(type: ListingListRow['property_type']): string {
 
 function factsLine(listing: ListingListRow): string {
   const parts: string[] = []
-  if (listing.beds !== null) parts.push(`${listing.beds} bed`)
-  if (listing.baths !== null) parts.push(`${listing.baths} bath`)
+  if (listing.beds !== null) parts.push(`방 ${listing.beds}`)
+  if (listing.baths !== null) parts.push(`욕실 ${listing.baths}`)
   if (listing.area_sqft !== null) parts.push(`${listing.area_sqft} sqft`)
   return parts.join(' · ')
 }

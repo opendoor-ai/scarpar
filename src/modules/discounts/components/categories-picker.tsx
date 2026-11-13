@@ -20,7 +20,7 @@ export function CategoriesPicker({ value, onChange, categories }: CategoriesPick
   }
 
   if (categories.length === 0) {
-    return <p className="text-muted-foreground rounded-md border p-3 text-xs">No categories yet.</p>
+    return <p className="text-muted-foreground rounded-md border p-3 text-xs">아직 카테고리가 없습니다.</p>
   }
 
   return (

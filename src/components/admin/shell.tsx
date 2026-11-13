@@ -74,8 +74,8 @@ export function AdminShell({ org, role, nav, orgs, user, unreadCount, children }
 
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetContent side="left" className="w-[232px] p-0 sm:max-w-[232px]">
-            <SheetTitle className="sr-only">Navigation</SheetTitle>
-            <SheetDescription className="sr-only">Admin navigation menu</SheetDescription>
+            <SheetTitle className="sr-only">메뉴</SheetTitle>
+            <SheetDescription className="sr-only">관리자 메뉴</SheetDescription>
             <Sidebar org={org} orgs={orgs} nav={nav} onNavigate={() => setMobileOpen(false)} />
           </SheetContent>
         </Sheet>

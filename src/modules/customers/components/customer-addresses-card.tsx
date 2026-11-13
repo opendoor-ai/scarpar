@@ -40,7 +40,7 @@ export function CustomerAddressesCard({ customerId, addresses }: CustomerAddress
       toast.error(result.error)
       return
     }
-    toast.success('Address removed')
+    toast.success('주소가 삭제되었습니다')
     router.refresh()
   }
 
@@ -59,21 +59,21 @@ export function CustomerAddressesCard({ customerId, addresses }: CustomerAddress
       toast.error(result.error)
       return
     }
-    toast.success('Default address updated')
+    toast.success('기본 주소가 변경되었습니다')
     router.refresh()
   }
 
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between">
-        <CardTitle>Addresses</CardTitle>
+        <CardTitle>주소</CardTitle>
         <Button variant="outline" size="sm" onClick={openAdd}>
-          <Plus /> Add
+          <Plus /> 추가
         </Button>
       </CardHeader>
       <CardContent className="flex flex-col gap-3 pb-4">
         {addresses.length === 0 ? (
-          <EmptyState icon={Star} title="No addresses" description="Add a delivery address for this customer." />
+          <EmptyState icon={Star} title="등록된 주소가 없습니다" description="이 고객의 배송 주소를 추가하세요." />
         ) : (
           addresses.map((address) => (
             <div key={address.id} className="flex items-start gap-3 rounded-md border p-3 text-sm">
@@ -82,8 +82,8 @@ export function CustomerAddressesCard({ customerId, addresses }: CustomerAddress
                 onClick={() => handleSetDefault(address)}
                 disabled={address.is_default}
                 className="border-input mt-1 flex size-4 shrink-0 items-center justify-center rounded-full border disabled:cursor-default"
-                aria-label={address.is_default ? 'Default address' : 'Set as default address'}
-                title={address.is_default ? 'Default address' : 'Set as default'}
+                aria-label={address.is_default ? '기본 주소' : '기본 주소로 설정'}
+                title={address.is_default ? '기본 주소' : '기본으로 설정'}
               >
                 {address.is_default ? <span className="bg-primary block size-2 rounded-full" /> : null}
               </button>
@@ -98,7 +98,7 @@ export function CustomerAddressesCard({ customerId, addresses }: CustomerAddress
               </div>
               <div className="flex items-center gap-1">
                 <Button variant="ghost" size="sm" onClick={() => openEdit(address)}>
-                  Edit
+수정
                 </Button>
                 <ConfirmDialog
                   trigger={
@@ -106,8 +106,8 @@ export function CustomerAddressesCard({ customerId, addresses }: CustomerAddress
                       <Trash2 className="size-3.5" />
                     </Button>
                   }
-                  title="Remove this address?"
-                  confirmLabel="Remove"
+                  title="이 주소를 삭제할까요?"
+                  confirmLabel="삭제"
                   destructive
                   onConfirm={() => handleDelete(address.id)}
                 />

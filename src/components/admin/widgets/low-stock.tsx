@@ -44,14 +44,14 @@ export async function LowStockWidget() {
   return (
     <Card className="gap-3 p-4">
       <CardHeader className="flex-row items-center justify-between gap-2 p-0">
-        <CardTitle className="text-[13px]">Low Stock</CardTitle>
+        <CardTitle className="text-[13px]">재고 부족</CardTitle>
         <Link href="/admin/inventory" className="text-xs text-primary hover:underline">
-          View all
+          전체 보기
         </Link>
       </CardHeader>
       <CardContent className="p-0">
         {lowStock.length === 0 ? (
-          <EmptyState icon={PackageX} title="All stocked up" className="py-8" />
+          <EmptyState icon={PackageX} title="재고 부족 상품이 없습니다" className="py-8" />
         ) : (
           <ul className="flex flex-col gap-1">
             {lowStock.map((product) => (

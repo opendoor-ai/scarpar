@@ -161,10 +161,10 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
     setDiscountLoading(false)
     if (result.ok && result.data) {
       setDiscount(result.data)
-      toast.success(`Applied: ${result.data.label}`)
+      toast.success(`적용됨: ${result.data.label}`)
     } else {
       setDiscount(null)
-      setDiscountError(result.ok ? 'Could not apply this code.' : result.error)
+      setDiscountError(result.ok ? '이 할인 코드를 적용할 수 없습니다.' : result.error)
     }
   }
 
@@ -204,14 +204,14 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
     if (items.length === 0) return
 
     if ((values.paymentMethod === 'bkash' || values.paymentMethod === 'nagad') && (!values.trxId || !values.senderNumber)) {
-      if (!values.trxId) form.setError('trxId', { message: 'Enter the transaction ID' })
-      if (!values.senderNumber) form.setError('senderNumber', { message: 'Enter the sender number' })
+      if (!values.trxId) form.setError('trxId', { message: '거래 번호를 입력하세요' })
+      if (!values.senderNumber) form.setError('senderNumber', { message: '송금한 번호를 입력하세요' })
       return
     }
     if (values.paymentMethod === 'cod' && advanceRequired) {
-      if (!values.advanceMfsProvider) form.setError('advanceMfsProvider', { message: 'Choose bKash or Nagad' })
-      if (!values.trxId) form.setError('trxId', { message: 'Enter the transaction ID' })
-      if (!values.senderNumber) form.setError('senderNumber', { message: 'Enter the sender number' })
+      if (!values.advanceMfsProvider) form.setError('advanceMfsProvider', { message: '송금 방법을 선택하세요' })
+      if (!values.trxId) form.setError('trxId', { message: '거래 번호를 입력하세요' })
+      if (!values.senderNumber) form.setError('senderNumber', { message: '송금한 번호를 입력하세요' })
       if (!values.advanceMfsProvider || !values.trxId || !values.senderNumber) return
     }
 
@@ -230,7 +230,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
 
     const result = await placeOrderAction(payload)
     if (!result.ok || !result.data) {
-      toast.error(result.ok ? 'Something went wrong. Please try again.' : result.error)
+      toast.error(result.ok ? '문제가 발생했습니다. 다시 시도해 주세요.' : result.error)
       return
     }
 
@@ -272,9 +272,9 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
           name="senderNumber"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Sender number</FormLabel>
+              <FormLabel>송금한 번호</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="01XXXXXXXXX" />
+                <Input {...field} placeholder="010-1234-5678" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -289,7 +289,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-4 rounded-lg border border-border p-4">
-            <h2 className="text-sm font-semibold">Contact</h2>
+            <h2 className="text-sm font-semibold">주문자 정보</h2>
             <FormField
               control={form.control}
               name="name"
@@ -297,7 +297,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                 <FormItem>
                   <FormLabel>{t('name', lang)}</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Your name" />
+                    <Input {...field} placeholder="홍길동" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -311,7 +311,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                   <FormItem>
                     <FormLabel>{t('phone', lang)}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="01XXXXXXXXX" />
+                      <Input {...field} placeholder="010-1234-5678" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -322,7 +322,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email (optional)</FormLabel>
+                    <FormLabel>이메일 (선택)</FormLabel>
                     <FormControl>
                       <Input {...field} type="email" placeholder="you@example.com" />
                     </FormControl>
@@ -340,9 +340,9 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
               name="line1"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Street address</FormLabel>
+                  <FormLabel>주소</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="House, road, area" />
+                    <Input {...field} placeholder="도로명 주소, 상세 주소" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -354,9 +354,9 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                 name="area"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Area (optional)</FormLabel>
+                    <FormLabel>동/읍/면 (선택)</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Neighbourhood" />
+                      <Input {...field} placeholder="예: 역삼동" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -377,7 +377,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select district" />
+                          <SelectValue placeholder="지역 선택" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -408,8 +408,8 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                   label={t('cash_on_delivery', lang)}
                   description={
                     advanceRequired
-                      ? `Pay ${formatMoney(advanceDue)} advance now, rest on delivery`
-                      : 'Pay when your order arrives'
+                      ? `지금 ${formatMoney(advanceDue)} 선결제, 나머지는 받을 때 결제`
+                      : '상품을 받을 때 결제'
                   }
                   selected={paymentMethod === 'cod'}
                   onSelect={() => form.setValue('paymentMethod', 'cod')}
@@ -427,11 +427,11 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                         name="advanceMfsProvider"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Sent via</FormLabel>
+                            <FormLabel>송금 방법</FormLabel>
                             <Select value={field.value} onValueChange={field.onChange}>
                               <FormControl>
                                 <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="bKash or Nagad" />
+                                  <SelectValue placeholder="송금 방법 선택" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
@@ -452,7 +452,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
               {settings.manualMfsEnabled && settings.mfsNumbers.bkash ? (
                 <PaymentOption
                   label="bKash"
-                  description={`Send ${formatMoney(total)} to ${settings.mfsNumbers.bkash}`}
+                  description={`${settings.mfsNumbers.bkash}(으)로 ${formatMoney(total)} 송금`}
                   selected={paymentMethod === 'bkash'}
                   onSelect={() => form.setValue('paymentMethod', 'bkash')}
                 >
@@ -463,7 +463,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
               {settings.manualMfsEnabled && settings.mfsNumbers.nagad ? (
                 <PaymentOption
                   label="Nagad"
-                  description={`Send ${formatMoney(total)} to ${settings.mfsNumbers.nagad}`}
+                  description={`${settings.mfsNumbers.nagad}(으)로 ${formatMoney(total)} 송금`}
                   selected={paymentMethod === 'nagad'}
                   onSelect={() => form.setValue('paymentMethod', 'nagad')}
                 >
@@ -473,8 +473,8 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
 
               {settings.uddoktapayEnabled ? (
                 <PaymentOption
-                  label="Online payment (UddoktaPay)"
-                  description="Redirecting unavailable in demo — choose another method"
+                  label="온라인 결제 (UddoktaPay)"
+                  description="데모에서는 사용할 수 없습니다 — 다른 방법을 선택하세요"
                   selected={false}
                   disabled
                   onSelect={() => {}}
@@ -488,9 +488,9 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
             name="noteCustomer"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Order note (optional)</FormLabel>
+                <FormLabel>요청사항 (선택)</FormLabel>
                 <FormControl>
-                  <Textarea {...field} rows={3} placeholder="Delivery instructions, gift note, etc." />
+                  <Textarea {...field} rows={3} placeholder="배송 요청사항 등" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -500,18 +500,18 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
 
         <div className="flex h-fit flex-col gap-4">
           <div className="flex flex-col gap-2 rounded-lg border border-border p-4">
-            <span className="text-xs font-medium">Discount code</span>
+            <span className="text-xs font-medium">할인 코드</span>
             <div className="flex gap-2">
               <Input
                 value={discountCode}
                 onChange={(e) => setDiscountCode(e.target.value)}
-                placeholder="Enter code"
+                placeholder="코드 입력"
                 disabled={Boolean(discount)}
                 className="flex-1"
               />
               {discount ? (
                 <Button type="button" variant="outline" onClick={handleRemoveDiscount}>
-                  Remove
+                  삭제
                 </Button>
               ) : (
                 <Button
@@ -520,7 +520,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                   onClick={handleApplyDiscount}
                   disabled={discountLoading || !discountCode.trim()}
                 >
-                  {discountLoading ? '…' : 'Apply'}
+                  {discountLoading ? '…' : '적용'}
                 </Button>
               )}
             </div>
@@ -529,7 +529,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
           </div>
 
           <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
-            <h2 className="text-sm font-semibold">Order summary</h2>
+            <h2 className="text-sm font-semibold">주문 요약</h2>
 
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{t('subtotal', lang)}</span>
@@ -546,11 +546,11 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{t('delivery_charge', lang)}</span>
               <span className="tabular-nums">
-                {zoneLoading ? '…' : isFreeDelivery ? 'Free' : formatMoney(deliveryCharge)}
+                {zoneLoading ? '…' : isFreeDelivery ? '무료' : formatMoney(deliveryCharge)}
               </span>
             </div>
             {!zoneQuote && !zoneLoading ? (
-              <p className="text-xs text-muted-foreground">Select your district to calculate delivery.</p>
+              <p className="text-xs text-muted-foreground">지역을 선택하면 배송비가 계산됩니다.</p>
             ) : null}
             {zoneQuote?.etaText ? <p className="text-xs text-muted-foreground">{zoneQuote.etaText}</p> : null}
             {zoneQuote?.warning ? (
@@ -569,14 +569,14 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                   <span className="tabular-nums">{formatMoney(advanceDue)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Due on delivery</span>
+                  <span className="text-muted-foreground">받을 때 결제할 금액</span>
                   <span className="tabular-nums">{formatMoney(dueOnDelivery)}</span>
                 </div>
               </>
             ) : null}
 
             <Button type="submit" size="lg" disabled={form.formState.isSubmitting} className="mt-2 w-full">
-              {form.formState.isSubmitting ? 'Placing order…' : t('place_order', lang)}
+              {form.formState.isSubmitting ? '주문 중…' : t('place_order', lang)}
             </Button>
           </div>
         </div>

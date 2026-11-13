@@ -10,7 +10,7 @@ interface ExportButtonProps {
   label?: string
 }
 
-function ExportButton({ report, from, to, label = 'Export CSV' }: ExportButtonProps) {
+function ExportButton({ report, from, to, label = 'CSV 내보내기' }: ExportButtonProps) {
   return (
     <Button variant="outline" size="sm" asChild>
       <Link href={`/api/export/${report}?from=${from}&to=${to}`} prefetch={false}>

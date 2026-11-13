@@ -56,10 +56,59 @@ function titleCase(value: string): string {
     .join(' ')
 }
 
-function buildStatusGroup(entries: [string, StatusVariant][]): Record<string, StatusMeta> {
+/** 한국어 상태 이름. kind별로 뜻이 다른 값은 KO_LABELS_BY_KIND에서 덮어씁니다. */
+const KO_LABELS: Record<string, string> = {
+  pending: '대기',
+  confirmed: '확인됨',
+  packed: '포장 완료',
+  dispatched: '출고',
+  delivered: '배송 완료',
+  completed: '완료',
+  cancelled: '취소',
+  returned: '반품',
+  failed: '실패',
+  verified: '확인됨',
+  refunded: '환불',
+  unpaid: '미결제',
+  advance_paid: '선결제 완료',
+  paid: '결제 완료',
+  partial_refund: '부분 환불',
+  assigned: '배정됨',
+  picked_up: '집하 완료',
+  in_transit: '배송 중',
+  draft: '임시저장',
+  active: '활성',
+  archived: '보관',
+  requested: '요청됨',
+  approved: '승인',
+  rejected: '거절',
+  received: '수령',
+  quoted: '견적',
+  scheduled: '예약됨',
+  in_progress: '진행 중',
+  done: '완료',
+  invoiced: '청구 완료',
+  under_offer: '협의 중',
+  sold: '판매 완료',
+  rented: '임대 완료',
+  published: '게시됨',
+  revoked: '취소됨',
+}
+
+const KO_LABELS_BY_KIND: Partial<Record<StatusKind, Record<string, string>>> = {
+  product: { active: '판매중' },
+  review: { pending: '승인 대기' },
+  return: { refunded: '환불 완료' },
+}
+
+function koLabel(kind: StatusKind | undefined, value: string): string {
+  return (kind && KO_LABELS_BY_KIND[kind]?.[value]) ?? KO_LABELS[value] ?? titleCase(value)
+}
+
+function buildStatusGroup(entries: [string, StatusVariant][], kind?: StatusKind): Record<string, StatusMeta> {
   const group: Record<string, StatusMeta> = {}
   for (const [value, variant] of entries) {
-    group[value] = { label: titleCase(value), variant }
+    group[value] = { label: koLabel(kind, value), variant }
   }
   return group
 }
@@ -147,20 +196,20 @@ const ENROLLMENT_ENTRIES: [EnrollmentStatus, StatusVariant][] = [
 ]
 
 export const STATUS_MAP: Record<StatusKind, Record<string, StatusMeta>> = {
-  order: buildStatusGroup(ORDER_ENTRIES),
-  payment: buildStatusGroup(PAYMENT_ENTRIES),
-  delivery: buildStatusGroup(DELIVERY_ENTRIES),
-  product: buildStatusGroup(PRODUCT_ENTRIES),
-  return: buildStatusGroup(RETURN_ENTRIES),
-  job: buildStatusGroup(JOB_ENTRIES),
-  listing: buildStatusGroup(LISTING_ENTRIES),
-  review: buildStatusGroup(REVIEW_ENTRIES),
-  enrollment: buildStatusGroup(ENROLLMENT_ENTRIES),
+  order: buildStatusGroup(ORDER_ENTRIES, 'order'),
+  payment: buildStatusGroup(PAYMENT_ENTRIES, 'payment'),
+  delivery: buildStatusGroup(DELIVERY_ENTRIES, 'delivery'),
+  product: buildStatusGroup(PRODUCT_ENTRIES, 'product'),
+  return: buildStatusGroup(RETURN_ENTRIES, 'return'),
+  job: buildStatusGroup(JOB_ENTRIES, 'job'),
+  listing: buildStatusGroup(LISTING_ENTRIES, 'listing'),
+  review: buildStatusGroup(REVIEW_ENTRIES, 'review'),
+  enrollment: buildStatusGroup(ENROLLMENT_ENTRIES, 'enrollment'),
 }
 
 /** Falls back to a plain secondary badge for any value not in STATUS_MAP. */
 export function getStatusMeta(kind: StatusKind, value: string): StatusMeta {
-  return STATUS_MAP[kind]?.[value] ?? { label: titleCase(value), variant: 'secondary' }
+  return STATUS_MAP[kind]?.[value] ?? { label: koLabel(kind, value), variant: 'secondary' }
 }
 
 // ---------------------------------------------------------------------------

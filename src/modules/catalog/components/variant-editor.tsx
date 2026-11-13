@@ -114,14 +114,14 @@ function VariantEditor({ value, onChange }: VariantEditorProps) {
   return (
     <div className="flex flex-col gap-3">
       {value.length === 0 ? (
-        <EmptyState icon={Layers} title="No variants yet" description="Add a size, color, or unit variant." />
+        <EmptyState icon={Layers} title="아직 옵션이 없습니다" description="규격, 색상, 단위 같은 옵션을 추가하세요." />
       ) : (
         <div className="flex flex-col gap-2">
           {value.map((row, index) => (
             <Card key={row.key} className="gap-2 p-3">
               <div className="grid grid-cols-12 gap-2">
                 <div className="col-span-4 flex flex-col gap-1">
-                  <Label>Name</Label>
+                  <Label>옵션명</Label>
                   <Input
                     value={row.name}
                     onChange={(e) => updateRow(row.key, { name: e.target.value })}
@@ -133,15 +133,15 @@ function VariantEditor({ value, onChange }: VariantEditorProps) {
                   <Input value={row.sku} onChange={(e) => updateRow(row.key, { sku: e.target.value })} />
                 </div>
                 <div className="col-span-5 flex flex-col gap-1">
-                  <Label>Options</Label>
+                  <Label>세부 옵션</Label>
                   <Input
                     value={row.optionsText}
                     onChange={(e) => updateRow(row.key, { optionsText: e.target.value })}
-                    placeholder="e.g. Size: 12ml"
+                    placeholder="예: 규격: 1200mm"
                   />
                 </div>
                 <div className="col-span-3 flex flex-col gap-1">
-                  <Label>Price (৳)</Label>
+                  <Label>판매가 (원)</Label>
                   <Input
                     value={row.price}
                     onChange={(e) => updateRow(row.key, { price: e.target.value })}
@@ -149,7 +149,7 @@ function VariantEditor({ value, onChange }: VariantEditorProps) {
                   />
                 </div>
                 <div className="col-span-3 flex flex-col gap-1">
-                  <Label>Compare-at (৳)</Label>
+                  <Label>정가 (원)</Label>
                   <Input
                     value={row.compareAtPrice}
                     onChange={(e) => updateRow(row.key, { compareAtPrice: e.target.value })}
@@ -157,7 +157,7 @@ function VariantEditor({ value, onChange }: VariantEditorProps) {
                   />
                 </div>
                 <div className="col-span-2 flex flex-col gap-1">
-                  <Label>Stock</Label>
+                  <Label>재고</Label>
                   <Input
                     type="number"
                     value={row.stockQty}
@@ -173,7 +173,7 @@ function VariantEditor({ value, onChange }: VariantEditorProps) {
                       onChange={() => setDefault(row.key)}
                       className="size-3.5 accent-primary"
                     />
-                    Default
+                    기본
                   </label>
                   <div className="flex items-center gap-1">
                     <Button type="button" variant="ghost" size="icon" disabled={index === 0} onClick={() => move(index, -1)}>
@@ -200,7 +200,7 @@ function VariantEditor({ value, onChange }: VariantEditorProps) {
       )}
       <Button type="button" variant="outline" size="sm" onClick={addRow} className="self-start">
         <Plus className="size-4" />
-        Add variant
+옵션 추가
       </Button>
     </div>
   )

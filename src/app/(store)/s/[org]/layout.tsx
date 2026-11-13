@@ -27,7 +27,7 @@ export async function generateMetadata({
 
   return {
     title: { default: org.name, template: `%s · ${org.name}` },
-    description: `Shop ${org.name} online.`,
+    description: `${org.name} 제품 소개와 문의`,
   }
 }
 

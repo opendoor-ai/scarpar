@@ -63,7 +63,7 @@ function NewReturnDialog({ orderId, items }: NewReturnDialogProps) {
       .filter((row) => row.qty > 0)
 
     if (selected.length === 0) {
-      toast.error('Select at least one item')
+      toast.error('상품을 1개 이상 선택하세요')
       return
     }
 
@@ -74,7 +74,7 @@ function NewReturnDialog({ orderId, items }: NewReturnDialogProps) {
         toast.error(result.error)
         return
       }
-      toast.success(`Return ${result.data?.returnNo} created`)
+      toast.success(`반품 ${result.data?.returnNo}이(가) 생성되었습니다`)
       setOpen(false)
       router.refresh()
     } finally {
@@ -87,21 +87,21 @@ function NewReturnDialog({ orderId, items }: NewReturnDialogProps) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Undo2 className="size-4" />
-          New return
+반품 등록
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create return</DialogTitle>
+          <DialogTitle>반품 등록</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-8" />
-                <TableHead>Item</TableHead>
-                <TableHead className="w-20 text-right">Qty</TableHead>
-                <TableHead>Condition</TableHead>
+                <TableHead>상품</TableHead>
+                <TableHead className="w-20 text-right">수량</TableHead>
+                <TableHead>상태</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -133,7 +133,7 @@ function NewReturnDialog({ orderId, items }: NewReturnDialogProps) {
                     <Input
                       value={rows[item.id]?.condition ?? ''}
                       onChange={(e) => updateRow(item.id, { condition: e.target.value })}
-                      placeholder="e.g. unopened"
+                      placeholder="예: 미개봉"
                       className="h-7"
                     />
                   </TableCell>
@@ -142,13 +142,13 @@ function NewReturnDialog({ orderId, items }: NewReturnDialogProps) {
             </TableBody>
           </Table>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="return-reason">Reason</Label>
+            <Label htmlFor="return-reason">사유</Label>
             <Textarea id="return-reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} />
           </div>
         </div>
         <DialogFooter>
           <Button onClick={handleSubmit} disabled={submitting}>
-            {submitting ? 'Creating…' : 'Create return'}
+            {submitting ? '만드는 중…' : '반품 등록'}
           </Button>
         </DialogFooter>
       </DialogContent>

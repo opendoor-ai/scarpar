@@ -147,7 +147,7 @@ export function Sidebar({ org, orgs, nav, collapsed = false, onNavigate, onToggl
             )}
           >
             {collapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
-            {!collapsed && <span>Collapse</span>}
+            {!collapsed && <span>메뉴 접기</span>}
           </button>
         </div>
       )}

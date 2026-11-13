@@ -23,7 +23,7 @@ export const expenseSchema = z.object({
     .trim()
     .min(1, 'Amount is required')
     .refine((v) => Number.isFinite(parseAmountTaka(v)) && parseAmountTaka(v) > 0, {
-      message: 'Enter a valid amount greater than 0',
+      message: '0보다 큰 금액을 입력하세요',
     }),
   spent_at: z.string().trim().min(1, 'Date is required'),
   note: z.string().trim().max(500, 'Keep it under 500 characters').optional(),

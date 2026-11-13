@@ -81,7 +81,7 @@ export function AddressFormDialog({
       toast.error(result.error)
       return
     }
-    toast.success(isEdit ? 'Address updated' : 'Address added')
+    toast.success(isEdit ? '주소가 수정되었습니다' : '주소가 추가되었습니다')
     onOpenChange(false)
     onSaved()
   }
@@ -90,7 +90,7 @@ export function AddressFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit address' : 'Add address'}</DialogTitle>
+          <DialogTitle>{isEdit ? '주소 수정' : '주소 추가'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -100,9 +100,9 @@ export function AddressFormDialog({
                 name="label"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Label</FormLabel>
+                    <FormLabel>주소 이름</FormLabel>
                     <FormControl>
-                      <Input placeholder="Home, Office..." {...field} />
+                      <Input placeholder="본사, 공장..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -113,7 +113,7 @@ export function AddressFormDialog({
                 name="recipient"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Recipient</FormLabel>
+                    <FormLabel>받는 분</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -126,7 +126,7 @@ export function AddressFormDialog({
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone</FormLabel>
+                    <FormLabel>전화번호</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -139,11 +139,11 @@ export function AddressFormDialog({
                 name="district"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>District</FormLabel>
+                    <FormLabel>지역</FormLabel>
                     <Select value={field.value || undefined} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select district" />
+                          <SelectValue placeholder="지역 선택" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -163,7 +163,7 @@ export function AddressFormDialog({
                 name="line1"
                 render={({ field }) => (
                   <FormItem className="col-span-2">
-                    <FormLabel>Address line</FormLabel>
+                    <FormLabel>주소</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -176,7 +176,7 @@ export function AddressFormDialog({
                 name="area"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Area</FormLabel>
+                    <FormLabel>동/읍/면</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -189,7 +189,7 @@ export function AddressFormDialog({
                 name="postcode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Postcode</FormLabel>
+                    <FormLabel>우편번호</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -207,14 +207,14 @@ export function AddressFormDialog({
                   <FormControl>
                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
-                  <FormLabel className="!mt-0">Default address</FormLabel>
+                  <FormLabel className="!mt-0">기본 주소</FormLabel>
                 </FormItem>
               )}
             />
 
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Saving...' : isEdit ? 'Save changes' : 'Add address'}
+                {form.formState.isSubmitting ? '저장 중...' : isEdit ? '변경사항 저장' : '주소 추가'}
               </Button>
             </DialogFooter>
           </form>

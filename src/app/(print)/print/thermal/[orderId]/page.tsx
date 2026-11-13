@@ -40,7 +40,7 @@ export default async function ThermalPage({ params }: PageProps<{ orderId: strin
       <div className="receipt-meta">
         Order {order.order_no}
         <br />
-        {format(new Date(order.placed_at), 'd MMM yyyy, h:mm a')}
+        {format(new Date(order.placed_at), 'yyyy.MM.dd HH:mm')}
       </div>
 
       <div className="receipt-items">
@@ -66,13 +66,13 @@ export default async function ThermalPage({ params }: PageProps<{ orderId: strin
       />
 
       {order.payment_method === 'cod' && balanceDue > 0 ? (
-        <CodBig amountPaisa={balanceDue} label="Cash Due" />
+        <CodBig amountPaisa={balanceDue} label="결제할 금액" />
       ) : null}
 
       <QrBlock dataUrl={qrSrc} />
 
       <div className="receipt-footer">
-        Thank you for your order!
+        주문해 주셔서 감사합니다!
         {org.phone ? (
           <>
             <br />

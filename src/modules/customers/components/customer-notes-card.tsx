@@ -23,20 +23,20 @@ export function CustomerNotesCard({ customerId, notes }: { customerId: string; n
       return
     }
     savedRef.current = value
-    toast.success('Notes saved')
+    toast.success('메모가 저장되었습니다')
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Notes</CardTitle>
+        <CardTitle>메모</CardTitle>
       </CardHeader>
       <CardContent className="pb-4">
         <Textarea
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onBlur={handleBlur}
-          placeholder="Internal notes about this customer..."
+          placeholder="이 고객에 대한 내부 메모..."
           className="min-h-24"
           disabled={saving}
         />

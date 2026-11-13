@@ -54,7 +54,7 @@ async function resolveCustomer(
     .select('id')
     .single()
 
-  if (error || !data) return { error: error?.message ?? 'Failed to create customer' }
+  if (error || !data) return { error: error?.message ?? '고객을 추가하지 못했습니다' }
 
   return { id: data.id }
 }
@@ -89,7 +89,7 @@ export async function createJob(input: NewJobValues): Promise<ActionResult<{ id:
   requireRole(ctx, 'staff')
 
   const parsed = newJobSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
 
@@ -102,7 +102,7 @@ export async function createJob(input: NewJobValues): Promise<ActionResult<{ id:
     p_prefix: 'JOB-',
   })
 
-  if (jobNoError || !jobNo) return { ok: false, error: jobNoError?.message ?? 'Failed to generate job number' }
+  if (jobNoError || !jobNo) return { ok: false, error: jobNoError?.message ?? '작업 번호를 만들지 못했습니다' }
 
   const address =
     parsed.data.address_line1 || parsed.data.address_district
@@ -125,7 +125,7 @@ export async function createJob(input: NewJobValues): Promise<ActionResult<{ id:
     .select('id')
     .single()
 
-  if (error || !data) return { ok: false, error: error?.message ?? 'Failed to create job' }
+  if (error || !data) return { ok: false, error: error?.message ?? '작업을 만들지 못했습니다' }
 
   audit(ctx, 'job.create', 'service_job', data.id, undefined, { title: parsed.data.title, job_no: jobNo })
   revalidatePath('/admin/services')
@@ -138,7 +138,7 @@ export async function updateJob(jobId: string, input: JobFormValues): Promise<Ac
   requireRole(ctx, 'staff')
 
   const parsed = jobFormSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
   const { data: before } = await supabase
@@ -148,7 +148,7 @@ export async function updateJob(jobId: string, input: JobFormValues): Promise<Ac
     .eq('id', jobId)
     .maybeSingle()
 
-  if (!before) return { ok: false, error: 'Job not found' }
+  if (!before) return { ok: false, error: '작업을 찾을 수 없습니다' }
 
   const address =
     parsed.data.address_line1 || parsed.data.address_district
@@ -186,7 +186,7 @@ export async function updateJobStatus(jobId: string, nextStatus: ServiceJobStatu
   // Invoicing must go through generateInvoice() (it also creates the order) —
   // never let a plain status flip skip that.
   if (nextStatus === 'invoiced') {
-    return { ok: false, error: 'Use "Generate invoice" to move a job to invoiced.' }
+    return { ok: false, error: '청구 완료는 "청구서 만들기" 버튼으로 처리하세요.' }
   }
 
   const supabase = await getServerClient()
@@ -197,12 +197,12 @@ export async function updateJobStatus(jobId: string, nextStatus: ServiceJobStatu
     .eq('id', jobId)
     .maybeSingle()
 
-  if (!jobData) return { ok: false, error: 'Job not found' }
+  if (!jobData) return { ok: false, error: '작업을 찾을 수 없습니다' }
 
   const current = jobData as ServiceJob
   const allowed = JOB_STATUS_FLOW[current.status]
   if (!allowed.includes(nextStatus)) {
-    return { ok: false, error: `Cannot move a ${current.status} job to ${nextStatus}` }
+    return { ok: false, error: `작업 상태를 ${current.status}에서 ${nextStatus}(으)로 바꿀 수 없습니다` }
   }
 
   const { error } = await supabase
@@ -232,10 +232,10 @@ export async function generateInvoice(jobId: string): Promise<ActionResult<{ ord
     .eq('id', jobId)
     .maybeSingle()
 
-  if (!jobData) return { ok: false, error: 'Job not found' }
+  if (!jobData) return { ok: false, error: '작업을 찾을 수 없습니다' }
 
   const job = jobData as ServiceJob
-  if (job.status !== 'done') return { ok: false, error: 'Job must be done before invoicing' }
+  if (job.status !== 'done') return { ok: false, error: '작업을 완료한 뒤에 청구할 수 있습니다' }
 
   const { data: customerData } = await supabase
     .from('customers')
@@ -244,7 +244,7 @@ export async function generateInvoice(jobId: string): Promise<ActionResult<{ ord
     .eq('id', job.customer_id)
     .maybeSingle()
 
-  if (!customerData) return { ok: false, error: 'Customer not found' }
+  if (!customerData) return { ok: false, error: '고객을 찾을 수 없습니다' }
 
   const customer = customerData as Pick<Customer, 'id' | 'name' | 'phone' | 'email'>
 
@@ -295,7 +295,7 @@ export async function generateInvoice(jobId: string): Promise<ActionResult<{ ord
     // createOrderCore (src/modules/orders/create-order.ts) is a type-only
     // stub until the orders slice lands its implementation — a throw here
     // mid-build is expected, not a bug in this action.
-    return { ok: false, error: err instanceof Error ? err.message : 'Failed to generate invoice' }
+    return { ok: false, error: err instanceof Error ? err.message : '청구서를 만들지 못했습니다' }
   }
 }
 
@@ -311,7 +311,7 @@ export async function createAppointment(
   requireRole(ctx, 'staff')
 
   const parsed = appointmentFormSchema.safeParse(input)
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
 
   const supabase = await getServerClient()
   const { data, error } = await supabase
@@ -329,7 +329,7 @@ export async function createAppointment(
     .select('id')
     .single()
 
-  if (error || !data) return { ok: false, error: error?.message ?? 'Failed to create appointment' }
+  if (error || !data) return { ok: false, error: error?.message ?? '예약을 만들지 못했습니다' }
 
   audit(ctx, 'appointment.create', 'appointment', data.id, undefined, { job_id: jobId, title: parsed.data.title })
   if (jobId) revalidatePath(`/admin/services/${jobId}`)

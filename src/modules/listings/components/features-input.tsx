@@ -51,7 +51,7 @@ function FeaturesInput({ value, onChange }: FeaturesInputProps) {
             addFeature()
           }
         }}
-        placeholder="Add a feature, press Enter"
+        placeholder="특징 입력 후 Enter"
         className="h-8"
       />
     </div>

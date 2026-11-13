@@ -10,7 +10,7 @@ interface PrintButtonProps
   label?: string
 }
 
-function PrintButton({ label = "Print", ...props }: PrintButtonProps) {
+function PrintButton({ label = "인쇄", ...props }: PrintButtonProps) {
   return (
     <Button
       type="button"

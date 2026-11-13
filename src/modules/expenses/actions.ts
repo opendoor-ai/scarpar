@@ -28,7 +28,7 @@ export async function createExpenseAction(input: ExpenseFormValues): Promise<Act
 
   const parsed = expenseSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid expense' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '지출 내용이 올바르지 않습니다' }
   }
 
   try {
@@ -48,7 +48,7 @@ export async function createExpenseAction(input: ExpenseFormValues): Promise<Act
       .single()
 
     if (error || !data) {
-      return { ok: false, error: error?.message ?? 'Failed to save expense' }
+      return { ok: false, error: error?.message ?? '지출을 저장하지 못했습니다' }
     }
 
     const expense = data as Expense
@@ -57,7 +57,7 @@ export async function createExpenseAction(input: ExpenseFormValues): Promise<Act
     return { ok: true, data: expense }
   } catch (error) {
     console.error('[expenses] createExpenseAction failed', error)
-    return { ok: false, error: 'Failed to save expense' }
+    return { ok: false, error: '지출을 저장하지 못했습니다' }
   }
 }
 
@@ -67,7 +67,7 @@ export async function updateExpenseAction(input: UpdateExpenseInput): Promise<Ac
 
   const parsed = updateExpenseSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid expense' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '지출 내용이 올바르지 않습니다' }
   }
 
   try {
@@ -95,7 +95,7 @@ export async function updateExpenseAction(input: UpdateExpenseInput): Promise<Ac
       .single()
 
     if (error || !data) {
-      return { ok: false, error: error?.message ?? 'Failed to update expense' }
+      return { ok: false, error: error?.message ?? '지출을 수정하지 못했습니다' }
     }
 
     const expense = data as Expense
@@ -104,7 +104,7 @@ export async function updateExpenseAction(input: UpdateExpenseInput): Promise<Ac
     return { ok: true, data: expense }
   } catch (error) {
     console.error('[expenses] updateExpenseAction failed', error)
-    return { ok: false, error: 'Failed to update expense' }
+    return { ok: false, error: '지출을 수정하지 못했습니다' }
   }
 }
 
@@ -114,7 +114,7 @@ export async function deleteExpenseAction(input: DeleteExpenseInput): Promise<Ac
 
   const parsed = deleteExpenseSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: 'Invalid expense id' }
+    return { ok: false, error: '잘못된 지출 항목입니다' }
   }
 
   try {
@@ -138,6 +138,6 @@ export async function deleteExpenseAction(input: DeleteExpenseInput): Promise<Ac
     return { ok: true }
   } catch (error) {
     console.error('[expenses] deleteExpenseAction failed', error)
-    return { ok: false, error: 'Failed to delete expense' }
+    return { ok: false, error: '지출을 삭제하지 못했습니다' }
   }
 }

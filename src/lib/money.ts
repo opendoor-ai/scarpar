@@ -1,14 +1,15 @@
-// Money helpers. DB bigint paisa -> TS number paisa (1 taka = 100 paisa). No
-// float taka math — toPaisa parses via string math to avoid float artifacts.
+// Money helpers (KRW). DB stores bigint "minor units" (1원 = 100 units) — kept from the
+// original schema so no data migration is needed. Display is always whole 원.
+// No float math — toPaisa parses via string math to avoid float artifacts.
 
-const TAKA_SYMBOL = '৳'
+const WON_SUFFIX = '원'
 
 export function fromPaisa(paisa: number): number {
   return paisa / 100
 }
 
 /**
- * Parses a taka amount (string or number) into integer paisa via string math
+ * Parses a 원 amount (string or number) into integer minor units via string math
  * — avoids classic float-multiplication artifacts (e.g. 1234.5 * 100).
  * Rounds half-up on the 3rd decimal digit if more than 2 fraction digits are given.
  */
@@ -17,7 +18,7 @@ export function toPaisa(taka: string | number): number {
   if (raw === '' || raw === '-') return 0
 
   const negative = raw.startsWith('-')
-  const clean = (negative ? raw.slice(1) : raw).replace(/,/g, '')
+  const clean = (negative ? raw.slice(1) : raw).replace(/,/g, '').replace(/원/g, '')
   const [wholeRaw, fracRaw = ''] = clean.split('.')
   const whole = wholeRaw === '' ? '0' : wholeRaw
 
@@ -31,101 +32,71 @@ export function toPaisa(taka: string | number): number {
   return negative ? -paisa : paisa
 }
 
-/** "৳1,234" — drops .00, shows decimals only when the paisa remainder is non-zero. */
+/** "1,234원" — KRW has no decimals, so the minor-unit remainder is rounded away. */
 export function formatMoney(paisa: number, opts?: { symbol?: boolean }): string {
   const showSymbol = opts?.symbol ?? true
   const negative = paisa < 0
-  const abs = Math.abs(Math.round(paisa))
-  const whole = Math.floor(abs / 100)
-  const frac = abs % 100
-
-  const wholeFormatted = whole.toLocaleString('en-US')
-  const amount =
-    frac === 0 ? wholeFormatted : `${wholeFormatted}.${frac.toString().padStart(2, '0')}`
-
-  return `${negative ? '-' : ''}${showSymbol ? TAKA_SYMBOL : ''}${amount}`
+  const won = Math.round(Math.abs(paisa) / 100)
+  const amount = won.toLocaleString('ko-KR')
+  return `${negative ? '-' : ''}${amount}${showSymbol ? WON_SUFFIX : ''}`
 }
 
-const ONES = [
-  '', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
-  'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
-  'seventeen', 'eighteen', 'nineteen',
-]
-const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety']
-
-function threeDigitsToWords(n: number): string {
-  const parts: string[] = []
-  const hundreds = Math.floor(n / 100)
-  const rest = n % 100
-
-  if (hundreds) parts.push(`${ONES[hundreds]} hundred`)
-
-  if (rest) {
-    if (rest < 20) {
-      parts.push(ONES[rest])
-    } else {
-      const tensDigit = Math.floor(rest / 10)
-      const onesDigit = rest % 10
-      parts.push(onesDigit ? `${TENS[tensDigit]}-${ONES[onesDigit]}` : TENS[tensDigit])
-    }
-  }
-
-  return parts.join(' ')
-}
-
-/** BD/Indian numbering: crore (1,00,00,000) / lakh (1,00,000) / thousand / hundred. */
-function integerToWordsBD(n: number): string {
-  if (n === 0) return 'zero'
-
-  const crore = Math.floor(n / 10000000)
-  const lakh = Math.floor((n % 10000000) / 100000)
-  const thousand = Math.floor((n % 100000) / 1000)
-  const rest = n % 1000
-
-  const parts: string[] = []
-  if (crore) parts.push(`${threeDigitsToWords(crore)} crore`)
-  if (lakh) parts.push(`${threeDigitsToWords(lakh)} lakh`)
-  if (thousand) parts.push(`${threeDigitsToWords(thousand)} thousand`)
-  if (rest) parts.push(threeDigitsToWords(rest))
-
-  return parts.join(' ')
-}
-
-/** English amount-in-words for receipts, e.g. "One thousand five hundred taka". */
+/** Amount for receipts, e.g. "금 일백이십삼만사천오백원정". */
 export function moneyToWords(paisa: number): string {
   const negative = paisa < 0
-  const abs = Math.abs(Math.round(paisa))
-  const whole = Math.floor(abs / 100)
-  const frac = abs % 100
+  const won = Math.round(Math.abs(paisa) / 100)
+  return `${negative ? '마이너스 ' : ''}금 ${integerToKorean(won)}원정`
+}
 
-  let words = `${negative ? 'negative ' : ''}${integerToWordsBD(whole)} taka`
-  if (frac > 0) {
-    words += ` and ${integerToWordsBD(frac)} paisa`
+const DIGITS = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구']
+const SMALL_UNITS = ['', '십', '백', '천']
+const BIG_UNITS = ['', '만', '억', '조', '경']
+
+function integerToKorean(n: number): string {
+  if (n === 0) return '영'
+  let result = ''
+  let bigIndex = 0
+  while (n > 0) {
+    const chunk = n % 10000
+    if (chunk > 0) {
+      let chunkText = ''
+      let c = chunk
+      for (let i = 0; i < 4 && c > 0; i++) {
+        const d = c % 10
+        if (d > 0) chunkText = DIGITS[d] + SMALL_UNITS[i] + chunkText
+        c = Math.floor(c / 10)
+      }
+      result = chunkText + BIG_UNITS[bigIndex] + result
+    }
+    n = Math.floor(n / 10000)
+    bigIndex++
   }
-
-  return words.charAt(0).toUpperCase() + words.slice(1)
+  return result
 }
 
 function trimTrailingZero(s: string): string {
   return s.endsWith('.0') ? s.slice(0, -2) : s
 }
 
-/** Compact taka display: "1.2k" / "3.4L" (lakh) / "2.1Cr" (crore). No symbol by default. */
+/** Compact 원 display: "1.2천" / "3.4만" / "2.1억". No suffix by default. */
 export function formatCompact(paisa: number, opts?: { symbol?: boolean }): string {
   const showSymbol = opts?.symbol ?? false
   const negative = paisa < 0
-  const taka = Math.abs(paisa) / 100
+  const won = Math.abs(paisa) / 100
 
   let value: string
-  if (taka >= 10000000) {
-    value = `${trimTrailingZero((taka / 10000000).toFixed(1))}Cr`
-  } else if (taka >= 100000) {
-    value = `${trimTrailingZero((taka / 100000).toFixed(1))}L`
-  } else if (taka >= 1000) {
-    value = `${trimTrailingZero((taka / 1000).toFixed(1))}k`
+  if (won >= 100000000) {
+    value = `${trimTrailingZero((won / 100000000).toFixed(1))}억`
+  } else if (won >= 10000) {
+    value = `${trimTrailingZero((won / 10000).toFixed(1))}만`
   } else {
-    value = trimTrailingZero(taka.toFixed(Number.isInteger(taka) ? 0 : 1))
+    value = Math.round(won).toLocaleString('ko-KR')
   }
 
-  return `${negative ? '-' : ''}${showSymbol ? TAKA_SYMBOL : ''}${value}`
+  return `${negative ? '-' : ''}${value}${showSymbol ? WON_SUFFIX : ''}`
+}
+
+/** 상품 가격 표시: 0원이면 "가격협의" (산업기계는 가격 상담이 일반적). */
+export function formatPrice(paisa: number): string {
+  return paisa > 0 ? formatMoney(paisa) : '가격협의'
 }

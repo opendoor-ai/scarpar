@@ -6,14 +6,14 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { DeliveryStatus } from "@/lib/status"
 
 const TABS: { value: string; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "pending", label: "Pending" },
-  { value: "assigned", label: "Assigned" },
-  { value: "picked_up", label: "Picked Up" },
-  { value: "in_transit", label: "In Transit" },
-  { value: "delivered", label: "Delivered" },
-  { value: "failed", label: "Failed" },
-  { value: "returned", label: "Returned" },
+  { value: "all", label: "전체" },
+  { value: "pending", label: "대기" },
+  { value: "assigned", label: "배정됨" },
+  { value: "picked_up", label: "집하 완료" },
+  { value: "in_transit", label: "배송 중" },
+  { value: "delivered", label: "배송 완료" },
+  { value: "failed", label: "실패" },
+  { value: "returned", label: "반송" },
 ]
 
 interface DeliveryStatusTabsProps {

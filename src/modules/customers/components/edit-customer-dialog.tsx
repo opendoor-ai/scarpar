@@ -43,7 +43,7 @@ export function EditCustomerDialog({ customer }: { customer: Customer }) {
       toast.error(result.error)
       return
     }
-    toast.success('Customer updated')
+    toast.success('고객 정보가 수정되었습니다')
     setOpen(false)
     router.refresh()
   }
@@ -52,12 +52,12 @@ export function EditCustomerDialog({ customer }: { customer: Customer }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">
-          <Pencil /> Edit
+          <Pencil /> 수정
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit customer</DialogTitle>
+          <DialogTitle>고객 정보 수정</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -66,7 +66,7 @@ export function EditCustomerDialog({ customer }: { customer: Customer }) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>이름</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -79,7 +79,7 @@ export function EditCustomerDialog({ customer }: { customer: Customer }) {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone</FormLabel>
+                  <FormLabel>전화번호</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -92,7 +92,7 @@ export function EditCustomerDialog({ customer }: { customer: Customer }) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>이메일</FormLabel>
                   <FormControl>
                     <Input type="email" {...field} />
                   </FormControl>
@@ -102,7 +102,7 @@ export function EditCustomerDialog({ customer }: { customer: Customer }) {
             />
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Saving...' : 'Save changes'}
+                {form.formState.isSubmitting ? '저장 중...' : '변경사항 저장'}
               </Button>
             </DialogFooter>
           </form>

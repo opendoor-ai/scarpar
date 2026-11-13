@@ -29,11 +29,11 @@ export const createDeliverySchema = z
     otp_enabled: z.boolean().default(false),
   })
   .refine((data) => data.method !== 'rider' || !!data.rider_id, {
-    message: 'Select a rider',
+    message: '배송기사를 선택하세요',
     path: ['rider_id'],
   })
   .refine((data) => data.method !== 'courier' || !!data.courier, {
-    message: 'Select a courier',
+    message: '택배사를 선택하세요',
     path: ['courier'],
   })
 

@@ -2,8 +2,8 @@ import type { ModuleDef } from '@/modules/types'
 
 export const config: ModuleDef = {
   key: 'expenses',
-  name: 'Expenses',
-  description: 'Track business expenses by category.',
-  nav: [{ label: 'Expenses', href: '/admin/expenses', icon: 'Wallet' }],
+  name: '지출관리',
+  description: '분류별 지출 기록',
+  nav: [{ label: '지출관리', href: '/admin/expenses', icon: 'Wallet' }],
   dashboardWidgets: ['expenses-month'],
 }

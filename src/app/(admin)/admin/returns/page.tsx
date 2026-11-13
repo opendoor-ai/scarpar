@@ -48,7 +48,7 @@ export default async function ReturnsPage() {
 
   return (
     <div className="px-6 py-6">
-      <PageHeader title="Returns" />
+      <PageHeader title="반품관리" />
       <ReturnsTable data={returnRows} />
     </div>
   )

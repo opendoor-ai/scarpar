@@ -41,9 +41,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       const csv = toCsv(
         rows.map((row) => ({ date: row.date, revenue: fromPaisa(row.revenue), orders: row.orders })),
         [
-          { key: 'date', label: 'Date' },
-          { key: 'revenue', label: 'Revenue (BDT)' },
-          { key: 'orders', label: 'Orders' },
+          { key: 'date', label: '날짜' },
+          { key: 'revenue', label: '매출(원)' },
+          { key: 'orders', label: '주문 수' },
         ],
       )
       return csvResponse(filename, csv)
@@ -53,9 +53,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       const csv = toCsv(
         rows.map((row) => ({ product: row.productName, revenue: fromPaisa(row.revenue), units: row.units })),
         [
-          { key: 'product', label: 'Product' },
-          { key: 'revenue', label: 'Revenue (BDT)' },
-          { key: 'units', label: 'Units' },
+          { key: 'product', label: '상품' },
+          { key: 'revenue', label: '매출(원)' },
+          { key: 'units', label: '수량' },
         ],
       )
       return csvResponse(filename, csv)
@@ -70,10 +70,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           rate: row.rate.toFixed(1),
         })),
         [
-          { key: 'district', label: 'District' },
-          { key: 'delivered', label: 'Delivered' },
-          { key: 'failed', label: 'Failed' },
-          { key: 'rate', label: 'Success Rate (%)' },
+          { key: 'district', label: '지역' },
+          { key: 'delivered', label: '완료' },
+          { key: 'failed', label: '실패' },
+          { key: 'rate', label: '성공률(%)' },
         ],
       )
       return csvResponse(filename, csv)
@@ -90,12 +90,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           total: fromPaisa(row.total),
         })),
         [
-          { key: 'date', label: 'Date' },
-          { key: 'invoiceNo', label: 'Invoice/Order No' },
-          { key: 'customer', label: 'Customer' },
-          { key: 'subtotal', label: 'Subtotal (BDT)' },
-          { key: 'vat', label: 'VAT (BDT)' },
-          { key: 'total', label: 'Total (BDT)' },
+          { key: 'date', label: '날짜' },
+          { key: 'invoiceNo', label: '명세서/주문번호' },
+          { key: 'customer', label: '고객' },
+          { key: 'subtotal', label: '공급가액(원)' },
+          { key: 'vat', label: '부가세(원)' },
+          { key: 'total', label: '합계(원)' },
         ],
       )
       return csvResponse(filename, csv)

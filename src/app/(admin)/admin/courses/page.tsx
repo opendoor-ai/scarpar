@@ -48,16 +48,16 @@ export default async function CoursesPage() {
   return (
     <div className="px-6 py-6">
       <PageHeader
-        title="Courses"
-        description="Manage online courses, lessons, and enrollments."
+        title="강의"
+        description="온라인 강의, 수업, 수강생을 관리합니다."
         actions={<NewCourseDialog />}
       />
 
       {rows.length === 0 ? (
         <EmptyState
           icon={GraduationCap}
-          title="No courses yet"
-          description="Create your first course to start building lessons and enrolling customers."
+          title="아직 강의가 없습니다"
+          description="첫 강의를 만들고 수업과 수강생을 추가하세요."
         />
       ) : (
         <CoursesTable courses={rows} />

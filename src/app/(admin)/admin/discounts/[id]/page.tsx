@@ -38,7 +38,7 @@ export default async function EditDiscountPage({ params }: PageProps<{ id: strin
 
   return (
     <div className="px-6 py-6">
-      <PageHeader title="Edit discount" backHref="/admin/discounts" />
+      <PageHeader title="할인 수정" backHref="/admin/discounts" />
       <DiscountForm discount={discount} categories={categories} initialProducts={initialProducts} />
     </div>
   )

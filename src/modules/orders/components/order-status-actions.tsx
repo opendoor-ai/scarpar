@@ -11,15 +11,15 @@ import type { OrderStatus } from '@/types/db'
 import { updateOrderStatusAction } from '@/modules/orders/actions'
 
 const STATUS_ACTION_LABEL: Record<OrderStatus, string> = {
-  pending: 'Mark pending',
-  confirmed: 'Confirm',
-  packed: 'Mark packed',
-  dispatched: 'Dispatch',
-  delivered: 'Mark delivered',
-  completed: 'Complete',
-  cancelled: 'Cancel order',
-  returned: 'Mark returned',
-  failed: 'Mark failed',
+  pending: '대기로 변경',
+  confirmed: '주문 확인',
+  packed: '포장 완료',
+  dispatched: '출고',
+  delivered: '배송 완료',
+  completed: '거래 완료',
+  cancelled: '주문 취소',
+  returned: '반품 처리',
+  failed: '실패 처리',
 }
 
 const DESTRUCTIVE_STATUSES = new Set<OrderStatus>(['cancelled', 'failed'])
@@ -44,7 +44,7 @@ function OrderStatusActions({ orderId, status }: OrderStatusActionsProps) {
         toast.error(result.error)
         return
       }
-      toast.success(`Order updated to ${nextStatus}`)
+      toast.success('주문 상태가 변경되었습니다')
       router.refresh()
     } finally {
       setBusy(null)
@@ -67,8 +67,8 @@ function OrderStatusActions({ orderId, status }: OrderStatusActionsProps) {
             title={`${STATUS_ACTION_LABEL[next]}?`}
             description={
               next === 'confirmed'
-                ? 'This reserves stock for every item on this order.'
-                : 'This cancels the order and restores any stock that was reserved.'
+                ? '이 주문의 모든 상품 재고가 차감(예약)됩니다.'
+                : '주문이 취소되고 차감된 재고가 복구됩니다.'
             }
             destructive={DESTRUCTIVE_STATUSES.has(next)}
             confirmLabel={STATUS_ACTION_LABEL[next]}
@@ -82,7 +82,7 @@ function OrderStatusActions({ orderId, status }: OrderStatusActionsProps) {
             disabled={busy !== null}
             onClick={() => run(next)}
           >
-            {busy === next ? 'Working…' : STATUS_ACTION_LABEL[next]}
+            {busy === next ? '처리 중…' : STATUS_ACTION_LABEL[next]}
           </Button>
         ),
       )}

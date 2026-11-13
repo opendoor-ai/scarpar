@@ -59,12 +59,12 @@ export default async function OrderDetailPage({ params }: PageProps<{ id: string
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="outline" size="sm" asChild>
               <Link href={`/print/invoice/${order.id}`} target="_blank">
-                Print invoice
+거래명세서 인쇄
               </Link>
             </Button>
             {deliveryEnabled ? (
               <Button variant="outline" size="sm" asChild>
-                <Link href={`/admin/deliveries/new?order=${order.id}`}>Create delivery</Link>
+                <Link href={`/admin/deliveries/new?order=${order.id}`}>배송 등록</Link>
               </Button>
             ) : null}
             <NewReturnDialog
@@ -90,16 +90,16 @@ export default async function OrderDetailPage({ params }: PageProps<{ id: string
         <div className="flex flex-col gap-6 lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Items</CardTitle>
+              <CardTitle>주문 상품</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Item</TableHead>
-                    <TableHead className="text-right">Qty</TableHead>
-                    <TableHead className="text-right">Unit</TableHead>
-                    <TableHead className="text-right">Line total</TableHead>
+                    <TableHead>상품</TableHead>
+                    <TableHead className="text-right">수량</TableHead>
+                    <TableHead className="text-right">단가</TableHead>
+                    <TableHead className="text-right">금액</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -124,33 +124,33 @@ export default async function OrderDetailPage({ params }: PageProps<{ id: string
 
               <div className="mt-4 flex flex-col gap-1.5 border-t pt-4 text-[13px]">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-muted-foreground">상품 금액</span>
                   <span className="tabular-nums">{formatMoney(order.subtotal)}</span>
                 </div>
                 {order.discount_amount > 0 ? (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      Discount{order.discount_code ? ` (${order.discount_code})` : ''}
+                      할인{order.discount_code ? ` (${order.discount_code})` : ''}
                     </span>
                     <span className="tabular-nums">-{formatMoney(order.discount_amount)}</span>
                   </div>
                 ) : null}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Delivery</span>
+                  <span className="text-muted-foreground">배송비</span>
                   <span className="tabular-nums">{formatMoney(order.delivery_charge)}</span>
                 </div>
                 {order.tax_amount > 0 ? (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Tax</span>
+                    <span className="text-muted-foreground">부가세</span>
                     <span className="tabular-nums">{formatMoney(order.tax_amount)}</span>
                   </div>
                 ) : null}
                 <div className="flex justify-between border-t pt-1.5 text-[14px] font-semibold">
-                  <span>Total</span>
+                  <span>합계</span>
                   <span className="tabular-nums">{formatMoney(order.total)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Advance paid</span>
+                  <span className="text-muted-foreground">선결제 금액</span>
                   <span className="tabular-nums">{formatMoney(order.advance_paid)}</span>
                 </div>
                 <div
@@ -160,7 +160,7 @@ export default async function OrderDetailPage({ params }: PageProps<{ id: string
                       : 'flex justify-between text-[14px] font-semibold'
                   }
                 >
-                  <span>Due</span>
+                  <span>남은 금액</span>
                   <span className="tabular-nums">{formatMoney(due)}</span>
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default async function OrderDetailPage({ params }: PageProps<{ id: string
           />
           <Card>
             <CardHeader>
-              <CardTitle>Timeline</CardTitle>
+              <CardTitle>처리 기록</CardTitle>
             </CardHeader>
             <CardContent>
               <Timeline events={events} />

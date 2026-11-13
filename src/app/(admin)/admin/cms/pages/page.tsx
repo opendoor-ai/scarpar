@@ -20,7 +20,7 @@ export default async function CmsPagesListPage() {
 
   return (
     <>
-      <PageHeader title="Pages" description="Build and publish storefront pages." actions={<NewPageDialog />} />
+      <PageHeader title="페이지" description="홈페이지에 보일 페이지를 만들고 게시합니다." actions={<NewPageDialog />} />
       <CmsPagesTable data={(data ?? []) as CmsPageRow[]} />
     </>
   )

@@ -40,14 +40,14 @@ function TestimonialsForm({ block, onChange }: TestimonialsFormProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Field label="Source">
+      <Field label="가져올 곳">
         <Select value={mode} onValueChange={(value) => setMode(value as 'reviews' | 'manual')}>
           <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="reviews">Published product reviews</SelectItem>
-            <SelectItem value="manual">Hand-written testimonials</SelectItem>
+            <SelectItem value="reviews">게시된 상품 리뷰</SelectItem>
+            <SelectItem value="manual">직접 입력한 후기</SelectItem>
           </SelectContent>
         </Select>
       </Field>
@@ -58,10 +58,10 @@ function TestimonialsForm({ block, onChange }: TestimonialsFormProps) {
             <div key={index} className="flex flex-col gap-2 rounded-md border p-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex flex-1 flex-col gap-2">
-                  <Field label="Name">
+                  <Field label="이름">
                     <Input value={item.name} onChange={(e) => updateItem(index, { name: e.target.value })} />
                   </Field>
-                  <Field label="Quote">
+                  <Field label="후기 내용">
                     <Textarea
                       rows={2}
                       value={item.quote}
@@ -77,7 +77,7 @@ function TestimonialsForm({ block, onChange }: TestimonialsFormProps) {
           ))}
           <Button type="button" variant="outline" onClick={addItem}>
             <Plus className="size-4" />
-            Add testimonial
+후기 추가
           </Button>
         </>
       ) : null}

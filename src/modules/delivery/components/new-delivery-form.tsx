@@ -19,13 +19,13 @@ import { createDeliveryAction } from "../actions"
 import type { CreateDeliveryInput } from "../schemas"
 
 const METHODS = [
-  { value: "rider", label: "Rider" },
-  { value: "courier", label: "Courier" },
-  { value: "pickup", label: "Pickup" },
+  { value: "rider", label: "배송기사" },
+  { value: "courier", label: "택배" },
+  { value: "pickup", label: "방문 수령" },
 ] as const
 
 const COURIERS: { value: DeliveryCourier; label: string }[] = [
-  { value: "manual", label: "Manual" },
+  { value: "manual", label: "직접 배송" },
   { value: "steadfast", label: "Steadfast" },
   { value: "pathao", label: "Pathao" },
   { value: "redx", label: "RedX" },
@@ -120,7 +120,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
     if (!result.ok) {
       if (values.method === "courier" && values.courier !== "manual") {
         toast.error(result.error, {
-          description: 'Switch the courier to "Manual" and enter the tracking code yourself.',
+          description: '택배사를 "직접 배송"으로 바꾸고 송장 번호를 직접 입력하세요.',
         })
       } else {
         toast.error(result.error)
@@ -128,7 +128,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
       return
     }
 
-    toast.success(`Delivery ${result.data?.delivery_no} created`)
+    toast.success(`배송 ${result.data?.delivery_no}이(가) 등록되었습니다`)
     router.push(`/admin/deliveries/${result.data?.id}`)
   }
 
@@ -138,7 +138,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
         <Card>
           <CardContent className="flex flex-col gap-4">
             <div>
-              <FormLabel>Method</FormLabel>
+              <FormLabel>배송 방법</FormLabel>
               <div className="mt-2 flex gap-2">
                 {METHODS.map((m) => (
                   <Button
@@ -159,11 +159,11 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
                 name="rider_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Rider</FormLabel>
+                    <FormLabel>배송기사</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select rider" />
+                          <SelectValue placeholder="배송기사 선택" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -187,11 +187,11 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
                   name="courier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Courier</FormLabel>
+                      <FormLabel>택배사</FormLabel>
                       <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select courier" />
+                            <SelectValue placeholder="택배사 선택" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -213,9 +213,9 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
                     name="manual_tracking_code"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tracking code (optional)</FormLabel>
+                        <FormLabel>송장 번호 (선택)</FormLabel>
                         <FormControl>
-                          <Input placeholder="Auto-generated if left blank" {...field} />
+                          <Input placeholder="비우면 자동 생성" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -230,7 +230,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
               name="zone_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Zone</FormLabel>
+                  <FormLabel>배송 지역</FormLabel>
                   <Select
                     value={field.value}
                     onValueChange={(value) => {
@@ -240,7 +240,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select zone" />
+                        <SelectValue placeholder="배송 지역 선택" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -265,7 +265,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
               name="recipient_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Recipient name</FormLabel>
+                  <FormLabel>받는 분 이름</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -278,7 +278,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
               name="recipient_phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Recipient phone</FormLabel>
+                  <FormLabel>받는 분 전화번호</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -291,7 +291,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
               name="line1"
               render={({ field }) => (
                 <FormItem className="sm:col-span-2">
-                  <FormLabel>Address line</FormLabel>
+                  <FormLabel>주소</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -304,7 +304,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
               name="area"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Area</FormLabel>
+                  <FormLabel>동/읍/면</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -317,7 +317,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
               name="district"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>District</FormLabel>
+                  <FormLabel>지역</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -330,7 +330,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
               name="postcode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Postcode</FormLabel>
+                  <FormLabel>우편번호</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -348,7 +348,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
               name="cod_amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>COD amount (৳)</FormLabel>
+                  <FormLabel>착불 금액 (원)</FormLabel>
                   <FormControl>
                     <Input type="number" step="0.01" {...field} />
                   </FormControl>
@@ -361,7 +361,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
               name="fee"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Delivery fee (৳)</FormLabel>
+                  <FormLabel>배송비 (원)</FormLabel>
                   <FormControl>
                     <Input type="number" step="0.01" {...field} />
                   </FormControl>
@@ -374,7 +374,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
               name="otp_enabled"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-md border p-3 sm:col-span-2">
-                  <FormLabel className="text-[13px]">Require OTP on delivery (4-digit code)</FormLabel>
+                  <FormLabel className="text-[13px]">배송 시 인증 번호(4자리) 확인</FormLabel>
                   <FormControl>
                     <Switch checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
@@ -386,7 +386,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
 
         <div className="flex justify-end">
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Creating..." : "Create delivery"}
+            {form.formState.isSubmitting ? "등록 중..." : "배송 등록"}
           </Button>
         </div>
       </form>

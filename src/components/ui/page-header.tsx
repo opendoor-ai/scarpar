@@ -35,7 +35,7 @@ function PageHeader({
               className="text-muted-foreground hover:text-foreground -ml-1 inline-flex size-6 items-center justify-center rounded-md transition-colors"
             >
               <ChevronLeft className="size-4" />
-              <span className="sr-only">Back</span>
+              <span className="sr-only">뒤로</span>
             </Link>
           ) : null}
           <h1 className="text-[20px] font-semibold tracking-tight text-foreground">

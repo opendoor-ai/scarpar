@@ -2,7 +2,7 @@ import type { ModuleDef } from '@/modules/types'
 
 export const config: ModuleDef = {
   key: 'reports',
-  name: 'Reports',
-  description: 'Sales, delivery, and financial reporting.',
-  nav: [{ label: 'Reports', href: '/admin/reports', icon: 'BarChart3' }],
+  name: '보고서',
+  description: '매출, 배송, 재무 보고서',
+  nav: [{ label: '보고서', href: '/admin/reports', icon: 'BarChart3' }],
 }

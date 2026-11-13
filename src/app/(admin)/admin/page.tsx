@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { format } from 'date-fns'
+import { ko } from 'date-fns/locale'
 import { LayoutDashboard } from 'lucide-react'
 
 import { requireOrg } from '@/lib/auth'
@@ -89,15 +90,15 @@ function renderWidget(id: DashboardWidgetId): ReactNode {
 }
 
 function greetingFor(hour: number): string {
-  if (hour < 12) return 'Good morning'
-  if (hour < 17) return 'Good afternoon'
-  return 'Good evening'
+  if (hour < 12) return '좋은 아침입니다'
+  if (hour < 17) return '안녕하세요'
+  return '좋은 저녁입니다'
 }
 
 export default async function AdminDashboardPage() {
   const ctx = await requireOrg()
 
-  let firstName = ctx.user.email?.split('@')[0] ?? 'there'
+  let firstName = ctx.user.email?.split('@')[0] ?? '관리자'
   try {
     const supabase = await getServerClient()
     const { data } = await supabase
@@ -116,13 +117,13 @@ export default async function AdminDashboardPage() {
   const orderedIds = DISPLAY_ORDER.filter((id) => enabledWidgetIds.includes(id))
 
   const greeting = greetingFor(new Date().getHours())
-  const today = format(new Date(), 'EEEE, d MMMM yyyy')
+  const today = format(new Date(), 'yyyy년 M월 d일 EEEE', { locale: ko })
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <h1 className="text-[20px] font-semibold tracking-tight text-foreground">
-          {greeting}, {firstName}
+          {greeting}, {firstName}님
         </h1>
         <p className="text-sm text-muted-foreground">{today}</p>
       </div>
@@ -130,8 +131,8 @@ export default async function AdminDashboardPage() {
       {orderedIds.length === 0 ? (
         <EmptyState
           icon={LayoutDashboard}
-          title="No widgets to show"
-          description="Enable a module in Settings to see data here."
+          title="표시할 항목이 없습니다"
+          description="설정에서 기능을 켜면 여기에 현황이 표시됩니다."
         />
       ) : (
         <div className="grid grid-cols-12 gap-4">

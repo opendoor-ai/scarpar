@@ -14,7 +14,7 @@ interface ContactFormProps {
 function ContactForm({ block, onChange }: ContactFormProps) {
   return (
     <div className="flex flex-col gap-4">
-      <Field label="Heading">
+      <Field label="제목">
         <Input value={block.heading} onChange={(e) => onChange({ ...block, heading: e.target.value })} />
       </Field>
       <div className="flex items-center gap-2">
@@ -23,7 +23,7 @@ function ContactForm({ block, onChange }: ContactFormProps) {
           checked={block.showForm}
           onCheckedChange={(checked) => onChange({ ...block, showForm: checked })}
         />
-        <Label htmlFor="contact-show-form">Show contact form</Label>
+        <Label htmlFor="contact-show-form">문의 입력창 표시</Label>
       </div>
     </div>
   )

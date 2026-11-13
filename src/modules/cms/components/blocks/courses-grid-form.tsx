@@ -11,7 +11,7 @@ interface CoursesGridFormProps {
 
 function CoursesGridForm({ block, onChange }: CoursesGridFormProps) {
   return (
-    <Field label="Limit" help="Number of courses to show. Leave blank to show all active courses.">
+    <Field label="표시 개수" help="표시할 강의 수. 비워 두면 전체 표시">
       <Input
         type="number"
         min={1}

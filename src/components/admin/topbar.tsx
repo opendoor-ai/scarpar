@@ -52,7 +52,7 @@ export function Topbar({ orgName, user, role, unreadCount, onMenuClick, onSearch
           size="icon"
           className="md:hidden"
           onClick={onMenuClick}
-          aria-label="Open menu"
+          aria-label="메뉴 열기"
         >
           <Menu className="size-4" />
         </Button>
@@ -67,7 +67,7 @@ export function Topbar({ orgName, user, role, unreadCount, onMenuClick, onSearch
           className="hidden gap-2 text-muted-foreground sm:flex"
         >
           <Search className="size-3.5" />
-          <span className="text-xs">Search</span>
+          <span className="text-xs">검색</span>
           <kbd className="ml-2 rounded border border-border bg-muted px-1 text-[10px] font-medium">
             ⌘K
           </kbd>
@@ -77,7 +77,7 @@ export function Topbar({ orgName, user, role, unreadCount, onMenuClick, onSearch
           size="icon"
           onClick={onSearchClick}
           className="sm:hidden"
-          aria-label="Search"
+          aria-label="검색"
         >
           <Search className="size-4" />
         </Button>
@@ -100,7 +100,7 @@ export function Topbar({ orgName, user, role, unreadCount, onMenuClick, onSearch
               </span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={handleLogout}>Log out</DropdownMenuItem>
+            <DropdownMenuItem onSelect={handleLogout}>로그아웃</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

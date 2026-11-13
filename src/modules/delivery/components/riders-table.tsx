@@ -55,11 +55,11 @@ function RiderDialog({ rider, trigger }: { rider?: Rider; trigger: React.ReactNo
 
   async function handleSave() {
     if (!name.trim()) {
-      toast.error("Name is required")
+      toast.error("이름을 입력하세요")
       return
     }
     if (!phone.trim()) {
-      toast.error("Phone is required")
+      toast.error("전화번호를 입력하세요")
       return
     }
 
@@ -77,7 +77,7 @@ function RiderDialog({ rider, trigger }: { rider?: Rider; trigger: React.ReactNo
         toast.error(result.error)
         return
       }
-      toast.success(rider ? "Rider updated" : "Rider created")
+      toast.success(rider ? "배송기사가 수정되었습니다" : "배송기사가 추가되었습니다")
       setOpen(false)
       router.refresh()
     } finally {
@@ -90,45 +90,45 @@ function RiderDialog({ rider, trigger }: { rider?: Rider; trigger: React.ReactNo
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{rider ? "Edit rider" : "New rider"}</DialogTitle>
-          <DialogDescription>Riders can be assigned to deliveries and carry COD cash.</DialogDescription>
+          <DialogTitle>{rider ? "배송기사 수정" : "새 배송기사"}</DialogTitle>
+          <DialogDescription>배송기사는 배송을 맡고 착불금을 받을 수 있습니다.</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <Label>Name</Label>
+            <Label>이름</Label>
             <Input value={name} onChange={(event) => setName(event.target.value)} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label>Phone</Label>
+              <Label>전화번호</Label>
               <Input value={phone} onChange={(event) => setPhone(event.target.value)} />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label>Vehicle</Label>
+              <Label>운송 수단</Label>
               <Input
                 value={vehicle}
                 onChange={(event) => setVehicle(event.target.value)}
-                placeholder="motorbike, bicycle..."
+                placeholder="오토바이, 화물차..."
               />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label>Linked staff user id (optional)</Label>
+            <Label>연결할 직원 회원 ID (선택)</Label>
             <Input value={userId} onChange={(event) => setUserId(event.target.value)} placeholder="uuid" />
             <p className="text-muted-foreground text-xs">
-              Paste a staff user id to give this rider login scope to their own deliveries.
+              직원 회원 ID를 넣으면 이 배송기사가 로그인해 자기 배송만 볼 수 있습니다.
             </p>
           </div>
           <div className="flex items-center justify-between rounded-md border p-3">
-            <Label>Active</Label>
+            <Label>활성</Label>
             <Switch checked={isActive} onCheckedChange={setIsActive} />
           </div>
         </div>
 
         <DialogFooter>
           <Button disabled={loading} onClick={handleSave}>
-            {loading ? "Saving..." : "Save rider"}
+            {loading ? "저장 중..." : "배송기사 저장"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -145,7 +145,7 @@ function RiderRowActions({ rider }: { rider: Rider }) {
       toast.error(result.error)
       return
     }
-    toast.success("Rider deactivated")
+    toast.success("배송기사를 비활성화했습니다")
     router.refresh()
   }
 
@@ -156,21 +156,21 @@ function RiderRowActions({ rider }: { rider: Rider }) {
         trigger={
           <Button variant="ghost" size="icon">
             <Pencil className="size-4" />
-            <span className="sr-only">Edit</span>
+            <span className="sr-only">수정</span>
           </Button>
         }
       />
       {rider.is_active ? (
         <ConfirmDialog
-          title="Deactivate this rider?"
+          title="이 배송기사를 비활성화할까요?"
           description={`"${rider.name}" will no longer be assignable to new deliveries.`}
-          confirmLabel="Deactivate"
+          confirmLabel="비활성화"
           destructive
           onConfirm={handleDeactivate}
           trigger={
             <Button variant="ghost" size="icon">
               <UserX className="size-4" />
-              <span className="sr-only">Deactivate</span>
+              <span className="sr-only">비활성화</span>
             </Button>
           }
         />
@@ -180,17 +180,17 @@ function RiderRowActions({ rider }: { rider: Rider }) {
 }
 
 const columns: ColumnDef<RiderListRow>[] = [
-  { accessorKey: "name", header: "Name" },
-  { accessorKey: "phone", header: "Phone" },
-  { accessorKey: "vehicle", header: "Vehicle", cell: ({ row }) => row.original.vehicle ?? "—" },
+  { accessorKey: "name", header: "이름" },
+  { accessorKey: "phone", header: "전화번호" },
+  { accessorKey: "vehicle", header: "운송 수단", cell: ({ row }) => row.original.vehicle ?? "—" },
   {
     accessorKey: "activeDeliveries",
-    header: () => <div className="text-right">Active</div>,
+    header: () => <div className="text-right">활성</div>,
     cell: ({ row }) => <div className="text-right tabular-nums">{row.original.activeDeliveries}</div>,
   },
   {
     accessorKey: "cash_on_hand",
-    header: () => <div className="text-right">Cash on hand</div>,
+    header: () => <div className="text-right">보유 현금</div>,
     cell: ({ row }) => (
       <div
         className={cn(
@@ -204,9 +204,9 @@ const columns: ColumnDef<RiderListRow>[] = [
   },
   {
     id: "is_active",
-    header: "Status",
+    header: "상태",
     cell: ({ row }) =>
-      row.original.is_active ? <Badge variant="success">Active</Badge> : <Badge variant="secondary">Inactive</Badge>,
+      row.original.is_active ? <Badge variant="success">활성</Badge> : <Badge variant="secondary">비활성</Badge>,
   },
   {
     id: "actions",

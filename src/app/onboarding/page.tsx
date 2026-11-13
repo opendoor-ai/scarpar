@@ -9,7 +9,7 @@ import { OrgPicker } from './_components/org-picker'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = { title: 'Set up your organization — Scarpar' }
+export const metadata: Metadata = { title: '회사(조직) 만들기 — Scarpar' }
 
 interface Membership {
   org: Org
@@ -60,7 +60,7 @@ export default async function OnboardingPage() {
         {memberships.length > 0 ? <OrgPicker memberships={memberships} /> : null}
 
         <CreateOrgStepper
-          heading={memberships.length > 0 ? 'Create another organization' : 'Create your organization'}
+          heading={memberships.length > 0 ? '새 조직 추가하기' : '우리 회사(조직) 만들기'}
         />
       </div>
     </div>

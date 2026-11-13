@@ -47,14 +47,14 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
 
   async function onSubmit(values: JobFormValues) {
     const result = await updateJob(job.id, values)
-    if (result.ok) toast.success('Job saved')
+    if (result.ok) toast.success('작업이 저장되었습니다')
     else toast.error(result.error)
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Job details</CardTitle>
+        <CardTitle>작업 정보</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -64,7 +64,7 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>작업명</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -77,7 +77,7 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>설명</FormLabel>
                   <FormControl>
                     <Textarea rows={3} {...field} />
                   </FormControl>
@@ -92,7 +92,7 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
                 name="quote_amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quote (৳)</FormLabel>
+                    <FormLabel>견적 (원)</FormLabel>
                     <FormControl>
                       <Input inputMode="decimal" {...field} />
                     </FormControl>
@@ -105,7 +105,7 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
                 name="final_amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Final amount (optional, ৳)</FormLabel>
+                    <FormLabel>최종 금액 (선택, 원)</FormLabel>
                     <FormControl>
                       <Input inputMode="decimal" {...field} />
                     </FormControl>
@@ -118,7 +118,7 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
                 name="scheduled_at"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Scheduled at</FormLabel>
+                    <FormLabel>예정 일시</FormLabel>
                     <FormControl>
                       <Input type="datetime-local" {...field} />
                     </FormControl>
@@ -134,7 +134,7 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
                 name="address_line1"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address line 1</FormLabel>
+                    <FormLabel>주소</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -147,11 +147,11 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
                 name="address_district"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>District</FormLabel>
+                    <FormLabel>지역</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select district" />
+                          <SelectValue placeholder="지역 선택" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -171,7 +171,7 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
                 name="assigned_to"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Assigned to</FormLabel>
+                    <FormLabel>담당자</FormLabel>
                     <Select
                       value={field.value ?? 'unassigned'}
                       onValueChange={(value) => field.onChange(value === 'unassigned' ? null : value)}
@@ -182,7 +182,7 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="unassigned">Unassigned</SelectItem>
+                        <SelectItem value="unassigned">미배정</SelectItem>
                         {teamMembers.map((member) => (
                           <SelectItem key={member.id} value={member.id}>
                             {member.name}
@@ -198,7 +198,7 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
 
             <div className="flex justify-end">
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Saving...' : 'Save changes'}
+                {form.formState.isSubmitting ? '저장 중...' : '변경사항 저장'}
               </Button>
             </div>
           </form>

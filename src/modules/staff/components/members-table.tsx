@@ -30,12 +30,12 @@ export interface StaffMemberRow {
 }
 
 const ROLE_LABELS: Record<Role, string> = {
-  owner: 'Owner',
-  admin: 'Admin',
-  manager: 'Manager',
-  staff: 'Staff',
-  rider: 'Rider',
-  viewer: 'Viewer',
+  owner: '대표(소유자)',
+  admin: '관리자',
+  manager: '매니저',
+  staff: '직원',
+  rider: '배송기사',
+  viewer: '보기 전용',
 }
 
 function initials(name: string | null): string {
@@ -67,7 +67,7 @@ function MembersTable({ members, currentRole, currentUserId }: MembersTableProps
     try {
       const result = await updateMemberRoleAction({ userId, role })
       if (result.ok) {
-        toast.success('Role updated')
+        toast.success('권한이 변경되었습니다')
         router.refresh()
       } else {
         toast.error(result.error)
@@ -80,7 +80,7 @@ function MembersTable({ members, currentRole, currentUserId }: MembersTableProps
   async function handleRemove(userId: string) {
     const result = await removeMemberAction({ userId })
     if (result.ok) {
-      toast.success('Member removed')
+      toast.success('직원이 삭제되었습니다')
       router.refresh()
     } else {
       toast.error(result.error)
@@ -92,7 +92,7 @@ function MembersTable({ members, currentRole, currentUserId }: MembersTableProps
     {
       id: 'fullName',
       accessorFn: (row) => row.fullName ?? '',
-      header: 'Member',
+      header: '직원',
       cell: ({ row }) => {
         const member = row.original
         return (
@@ -102,10 +102,10 @@ function MembersTable({ members, currentRole, currentUserId }: MembersTableProps
             </Avatar>
             <div className="flex flex-col">
               <span className="flex items-center gap-1.5 text-sm font-medium">
-                {member.fullName ?? 'Unnamed'}
+                {member.fullName ?? '이름 없음'}
                 {member.userId === currentUserId ? (
                   <Badge variant="outline" className="text-2xs">
-                    You
+나
                   </Badge>
                 ) : null}
               </span>
@@ -118,14 +118,14 @@ function MembersTable({ members, currentRole, currentUserId }: MembersTableProps
     {
       id: 'phone',
       accessorFn: (row) => row.phone ?? '',
-      header: 'Phone',
+      header: '전화번호',
       cell: ({ row }) => (
         <span className="text-muted-foreground">{row.original.phone ?? '—'}</span>
       ),
     },
     {
       id: 'role',
-      header: 'Role',
+      header: '권한',
       cell: ({ row }) => {
         const member = row.original
         const disableSelect =
@@ -163,12 +163,12 @@ function MembersTable({ members, currentRole, currentUserId }: MembersTableProps
             <ConfirmDialog
               trigger={
                 <Button variant="ghost" size="sm" disabled={blockRemove}>
-                  Remove
+삭제
                 </Button>
               }
-              title={`Remove ${member.fullName ?? 'this member'}?`}
-              description="They'll immediately lose access to this organization."
-              confirmLabel="Remove"
+              title={`${member.fullName ?? '이 직원'}을(를) 삭제할까요?`}
+              description="즉시 이 회사의 관리자 화면에 접근할 수 없게 됩니다."
+              confirmLabel="삭제"
               destructive
               onConfirm={() => handleRemove(member.userId)}
             />
@@ -184,7 +184,7 @@ function MembersTable({ members, currentRole, currentUserId }: MembersTableProps
       data={members}
       searchKey="fullName"
       searchPlaceholder="Search members..."
-      emptyState={<span className="text-muted-foreground">No staff members yet.</span>}
+      emptyState={<span className="text-muted-foreground">아직 직원이 없습니다.</span>}
     />
   )
 }

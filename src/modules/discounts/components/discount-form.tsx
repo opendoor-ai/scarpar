@@ -69,7 +69,7 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
       toast.error(result.error)
       return
     }
-    toast.success(isEdit ? 'Discount updated' : 'Discount created')
+    toast.success(isEdit ? '할인이 수정되었습니다' : '할인이 만들어졌습니다')
     router.push('/admin/discounts')
     router.refresh()
   }
@@ -79,7 +79,7 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex max-w-2xl flex-col gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Details</CardTitle>
+            <CardTitle>기본 정보</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4 pb-4">
             <FormField
@@ -87,9 +87,9 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
               name="title"
               render={({ field }) => (
                 <FormItem className="col-span-2">
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>할인 이름</FormLabel>
                   <FormControl>
-                    <Input placeholder="Eid promotion" {...field} />
+                    <Input placeholder="예: 신년 특가" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -101,10 +101,10 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
               name="code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code</FormLabel>
+                  <FormLabel>할인 코드</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Empty = auto-apply"
+                      placeholder="비우면 자동 적용"
                       className="uppercase placeholder:normal-case"
                       {...field}
                       onChange={(e) => field.onChange(e.target.value.toUpperCase())}
@@ -120,7 +120,7 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Type</FormLabel>
+                  <FormLabel>할인 방식</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger className="w-full">
@@ -128,9 +128,9 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="percent">Percent off</SelectItem>
-                      <SelectItem value="fixed">Fixed amount off</SelectItem>
-                      <SelectItem value="free_shipping">Free shipping</SelectItem>
+                      <SelectItem value="percent">비율 할인 (%)</SelectItem>
+                      <SelectItem value="fixed">금액 할인</SelectItem>
+                      <SelectItem value="free_shipping">무료배송</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -144,7 +144,7 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
                 name="value"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{type === 'percent' ? 'Value (%)' : 'Value (৳)'}</FormLabel>
+                    <FormLabel>{type === 'percent' ? '할인율 (%)' : '할인 금액 (원)'}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -166,7 +166,7 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
               name="scope"
               render={({ field }) => (
                 <FormItem className="col-span-2">
-                  <FormLabel>Applies to</FormLabel>
+                  <FormLabel>적용 대상</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger className="w-full">
@@ -174,9 +174,9 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="all">All products</SelectItem>
-                      <SelectItem value="products">Specific products</SelectItem>
-                      <SelectItem value="categories">Specific categories</SelectItem>
+                      <SelectItem value="all">전체 상품</SelectItem>
+                      <SelectItem value="products">특정 상품</SelectItem>
+                      <SelectItem value="categories">특정 카테고리</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -218,7 +218,7 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
 
         <Card>
           <CardHeader>
-            <CardTitle>Limits &amp; window</CardTitle>
+            <CardTitle>조건 · 기간</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4 pb-4">
             <FormField
@@ -226,7 +226,7 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
               name="min_order"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Minimum order (৳)</FormLabel>
+                  <FormLabel>최소 주문 금액 (원)</FormLabel>
                   <FormControl>
                     <Input type="number" min={0} step="0.01" {...field} />
                   </FormControl>
@@ -239,13 +239,13 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
               name="max_uses"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Max uses</FormLabel>
+                  <FormLabel>최대 사용 횟수</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       min={1}
                       step={1}
-                      placeholder="Unlimited"
+                      placeholder="제한 없음"
                       value={field.value ?? ''}
                       onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
                     />
@@ -259,7 +259,7 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
               name="starts_at"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Starts</FormLabel>
+                  <FormLabel>시작</FormLabel>
                   <FormControl>
                     <Input type="datetime-local" {...field} />
                   </FormControl>
@@ -272,7 +272,7 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
               name="expires_at"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Expires</FormLabel>
+                  <FormLabel>종료</FormLabel>
                   <FormControl>
                     <Input type="datetime-local" {...field} />
                   </FormControl>
@@ -285,7 +285,7 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
               name="is_active"
               render={({ field }) => (
                 <FormItem className="col-span-2 flex flex-row items-center justify-between rounded-md border px-3 py-2">
-                  <FormLabel className="text-sm">Active</FormLabel>
+                  <FormLabel className="text-sm">사용</FormLabel>
                   <FormControl>
                     <Switch checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
@@ -297,10 +297,10 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => router.push('/admin/discounts')}>
-            Cancel
+            취소
           </Button>
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? 'Saving...' : isEdit ? 'Save changes' : 'Create discount'}
+            {form.formState.isSubmitting ? '저장 중...' : isEdit ? '변경사항 저장' : '할인 만들기'}
           </Button>
         </div>
       </form>

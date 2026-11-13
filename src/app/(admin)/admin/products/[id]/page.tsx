@@ -7,7 +7,8 @@ import { getServerClient } from '@/lib/supabase/server'
 import type { PageProps } from '@/lib/types'
 import type { Product, ProductImage, ProductVariant } from '@/types/db'
 
-import { ProductForm, toCategoryOptions } from '@/modules/catalog/components/product-form'
+import { ProductForm } from '@/modules/catalog/components/product-form'
+import { toCategoryOptions } from '@/modules/catalog/category-options'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,7 +46,7 @@ export default async function EditProductPage({ params }: PageProps<{ id: string
 
   return (
     <div>
-      <PageHeader title={product.name} description="Edit product details, images, and variants." backHref="/admin/products" />
+      <PageHeader title={product.name} description="상품 정보, 사진, 옵션을 수정합니다." backHref="/admin/products" />
       <ProductForm mode="edit" product={product} variants={variants} images={images} categories={categories} />
     </div>
   )

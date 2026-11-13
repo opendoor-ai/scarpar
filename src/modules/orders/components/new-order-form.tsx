@@ -20,13 +20,13 @@ import { CustomerPicker, EMPTY_CUSTOMER_VALUE, type CustomerPickerValue } from '
 import { ItemBuilder, type OrderLineItem } from './item-builder'
 
 const PAYMENT_METHOD_OPTIONS = [
-  { value: 'cod', label: 'Cash on delivery' },
+  { value: 'cod', label: '착불(현장 결제)' },
   { value: 'bkash', label: 'bKash' },
   { value: 'nagad', label: 'Nagad' },
   { value: 'uddoktapay', label: 'UddoktaPay' },
   { value: 'sslcommerz', label: 'SSLCommerz' },
-  { value: 'bank', label: 'Bank' },
-  { value: 'cash', label: 'Cash' },
+  { value: 'bank', label: '계좌이체' },
+  { value: 'cash', label: '현금' },
 ] as const
 
 export interface DefaultAdvance {
@@ -82,15 +82,15 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
     e.preventDefault()
 
     if (!customer.name.trim() || !customer.phone.trim()) {
-      toast.error('Customer name and phone are required')
+      toast.error('고객 이름과 전화번호를 입력하세요')
       return
     }
     if (!line1.trim() || !district) {
-      toast.error('Address line and district are required')
+      toast.error('주소와 지역을 입력하세요')
       return
     }
     if (items.length === 0) {
-      toast.error('Add at least one item')
+      toast.error('상품을 1개 이상 추가하세요')
       return
     }
 
@@ -132,7 +132,7 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
         toast.error(result.error)
         return
       }
-      toast.success(`Order ${result.data?.orderNo} created`)
+      toast.success(`주문 ${result.data?.orderNo}이(가) 생성되었습니다`)
       router.push(`/admin/orders/${result.data?.orderId}`)
     } finally {
       setSubmitting(false)
@@ -145,7 +145,7 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
         <div className="flex flex-col gap-6 lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Customer</CardTitle>
+              <CardTitle>고객</CardTitle>
             </CardHeader>
             <CardContent>
               <CustomerPicker value={customer} onChange={setCustomer} />
@@ -154,22 +154,22 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
 
           <Card>
             <CardHeader>
-              <CardTitle>Delivery address</CardTitle>
+              <CardTitle>배송 주소</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-3">
               <div className="col-span-2 flex flex-col gap-1.5">
-                <Label htmlFor="address-line1">Address line</Label>
-                <Input id="address-line1" value={line1} onChange={(e) => setLine1(e.target.value)} placeholder="House, road, area" />
+                <Label htmlFor="address-line1">주소</Label>
+                <Input id="address-line1" value={line1} onChange={(e) => setLine1(e.target.value)} placeholder="도로명 주소, 상세 주소" />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="address-area">Area</Label>
+                <Label htmlFor="address-area">동/읍/면</Label>
                 <Input id="address-area" value={area} onChange={(e) => setArea(e.target.value)} />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="address-district">District</Label>
+                <Label htmlFor="address-district">지역</Label>
                 <Select value={district} onValueChange={setDistrict}>
                   <SelectTrigger id="address-district" className="w-full">
-                    <SelectValue placeholder="Select district" />
+                    <SelectValue placeholder="지역 선택" />
                   </SelectTrigger>
                   <SelectContent>
                     {BD_DISTRICTS.map((d) => (
@@ -181,7 +181,7 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
                 </Select>
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="address-postcode">Postcode</Label>
+                <Label htmlFor="address-postcode">우편번호</Label>
                 <Input id="address-postcode" value={postcode} onChange={(e) => setPostcode(e.target.value)} />
               </div>
             </CardContent>
@@ -189,7 +189,7 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
 
           <Card>
             <CardHeader>
-              <CardTitle>Items</CardTitle>
+              <CardTitle>상품</CardTitle>
             </CardHeader>
             <CardContent>
               <ItemBuilder value={items} onChange={setItems} />
@@ -200,13 +200,13 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Delivery</CardTitle>
+              <CardTitle>배송</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
               {useZones ? (
                 <Select value={deliveryZoneId} onValueChange={setDeliveryZoneId}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select delivery zone" />
+                    <SelectValue placeholder="배송 지역 선택" />
                   </SelectTrigger>
                   <SelectContent>
                     {deliveryZones.map((zone) => (
@@ -218,7 +218,7 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
                 </Select>
               ) : (
                 <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="manual-delivery-charge">Delivery charge (taka)</Label>
+                  <Label htmlFor="manual-delivery-charge">배송비 (원)</Label>
                   <Input
                     id="manual-delivery-charge"
                     inputMode="decimal"
@@ -233,20 +233,20 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
 
           <Card>
             <CardHeader>
-              <CardTitle>Discount</CardTitle>
+              <CardTitle>할인</CardTitle>
             </CardHeader>
             <CardContent>
-              <Input value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} placeholder="Discount code (optional)" />
+              <Input value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} placeholder="할인 코드 (선택)" />
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Payment</CardTitle>
+              <CardTitle>결제</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
               <div className="flex flex-col gap-1.5">
-                <Label>Method</Label>
+                <Label>결제 방법</Label>
                 <Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as typeof paymentMethod)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -261,7 +261,7 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
                 </Select>
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="advance-amount">Advance amount (taka)</Label>
+                <Label htmlFor="advance-amount">선결제 금액 (원)</Label>
                 <Input
                   id="advance-amount"
                   inputMode="decimal"
@@ -278,28 +278,28 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
 
           <Card>
             <CardHeader>
-              <CardTitle>Note</CardTitle>
+              <CardTitle>메모</CardTitle>
             </CardHeader>
             <CardContent>
-              <Textarea rows={3} value={noteInternal} onChange={(e) => setNoteInternal(e.target.value)} placeholder="Internal note (optional)" />
+              <Textarea rows={3} value={noteInternal} onChange={(e) => setNoteInternal(e.target.value)} placeholder="내부 메모 (선택)" />
             </CardContent>
           </Card>
 
           <Card>
             <CardContent className="flex flex-col gap-4 pt-4">
               <div className="flex items-center justify-between text-[13px]">
-                <span className="text-muted-foreground">Estimated total</span>
+                <span className="text-muted-foreground">예상 합계</span>
                 <span className="font-semibold tabular-nums">{formatMoney(estimatedTotal)}</span>
               </div>
               <p className="text-muted-foreground text-xs">
-                Final totals (incl. any discount code) are computed on the server.
+최종 금액(할인 포함)은 저장할 때 다시 계산됩니다.
               </p>
               <label className="flex items-center gap-2 text-[13px]">
                 <Checkbox checked={confirmImmediately} onCheckedChange={(v) => setConfirmImmediately(Boolean(v))} />
-                Confirm order immediately
+바로 주문 확인 처리
               </label>
               <Button type="submit" disabled={submitting}>
-                {submitting ? 'Creating…' : 'Create order'}
+                {submitting ? '만드는 중…' : '주문 만들기'}
               </Button>
             </CardContent>
           </Card>

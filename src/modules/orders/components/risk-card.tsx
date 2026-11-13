@@ -14,9 +14,9 @@ import { checkBlocklistAction, updateRiskAction } from '@/modules/orders/actions
 import type { RiskLevel } from '@/types/db'
 
 const RISK_OPTIONS: { value: RiskLevel; label: string }[] = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
+  { value: 'low', label: '낮음' },
+  { value: 'medium', label: '보통' },
+  { value: 'high', label: '높음' },
 ]
 
 interface RiskCardProps {
@@ -45,7 +45,7 @@ function RiskCard({ orderId, riskLevel, riskNote }: RiskCardProps) {
         toast.error(result.error)
         return
       }
-      toast.success('Risk updated')
+      toast.success('위험도가 저장되었습니다')
       router.refresh()
     } finally {
       setSaving(false)
@@ -61,9 +61,9 @@ function RiskCard({ orderId, riskLevel, riskNote }: RiskCardProps) {
         return
       }
       if (result.data?.matched) {
-        toast.warning('Blocklist match found — risk set to high')
+        toast.warning('차단 목록과 일치합니다 — 위험도를 높음으로 변경했습니다')
       } else {
-        toast.success('No blocklist match')
+        toast.success('차단 목록과 일치하는 항목이 없습니다')
       }
       router.refresh()
     } finally {
@@ -83,7 +83,7 @@ function RiskCard({ orderId, riskLevel, riskNote }: RiskCardProps) {
               level === 'low' && 'text-muted-foreground',
             )}
           />
-          Fraud &amp; risk
+부정 주문 · 위험도
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
@@ -101,16 +101,16 @@ function RiskCard({ orderId, riskLevel, riskNote }: RiskCardProps) {
         </Select>
         <Textarea
           rows={2}
-          placeholder="Risk note"
+          placeholder="위험 메모"
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
         <div className="flex items-center gap-2">
           <Button size="sm" onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving…' : 'Save'}
+            {saving ? '저장 중…' : '저장'}
           </Button>
           <Button size="sm" variant="outline" onClick={handleCheckBlocklist} disabled={checking}>
-            {checking ? 'Checking…' : 'Check blocklist'}
+            {checking ? '확인 중…' : '차단 목록 확인'}
           </Button>
         </div>
       </CardContent>

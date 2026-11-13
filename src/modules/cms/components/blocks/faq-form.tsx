@@ -32,10 +32,10 @@ function FaqForm({ block, onChange }: FaqFormProps) {
         <div key={index} className="flex flex-col gap-2 rounded-md border p-3">
           <div className="flex items-start justify-between gap-2">
             <div className="flex flex-1 flex-col gap-2">
-              <Field label="Question">
+              <Field label="질문">
                 <Input value={item.q} onChange={(e) => updateItem(index, { q: e.target.value })} />
               </Field>
-              <Field label="Answer">
+              <Field label="답변">
                 <Textarea rows={2} value={item.a} onChange={(e) => updateItem(index, { a: e.target.value })} />
               </Field>
             </div>
@@ -47,7 +47,7 @@ function FaqForm({ block, onChange }: FaqFormProps) {
       ))}
       <Button type="button" variant="outline" onClick={addItem}>
         <Plus className="size-4" />
-        Add question
+질문 추가
       </Button>
     </div>
   )

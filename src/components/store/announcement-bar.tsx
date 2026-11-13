@@ -35,7 +35,7 @@ export function AnnouncementBar({ text }: { text: string }) {
       <span className="text-bengali">{text}</span>
       <button
         type="button"
-        aria-label="Dismiss announcement"
+        aria-label="공지 닫기"
         onClick={handleDismiss}
         className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 opacity-80 transition-opacity hover:bg-black/10 hover:opacity-100"
       >

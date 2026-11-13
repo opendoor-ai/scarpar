@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { t, type Lang } from '@/lib/i18n'
-import { formatMoney } from '@/lib/money'
+import { formatMoney, formatPrice } from '@/lib/money'
 import { cn } from '@/lib/utils'
 import type { Product } from '@/types/db'
 
@@ -18,7 +18,7 @@ export interface ProductCardData
 export function ProductCard({
   orgSlug,
   product,
-  lang = 'en',
+  lang = 'ko',
 }: {
   orgSlug: string
   product: ProductCardData
@@ -42,7 +42,7 @@ export function ProductCard({
           />
         ) : (
           <div className="text-2xs flex size-full items-center justify-center text-muted-foreground">
-            No image
+이미지 없음
           </div>
         )}
         {outOfStock ? (
@@ -58,7 +58,7 @@ export function ProductCard({
         <p className="line-clamp-2 text-sm text-foreground">{product.name}</p>
         <div className="flex items-baseline gap-2">
           <span className={cn('text-sm font-semibold tabular-nums', hasDiscount && 'text-destructive')}>
-            {formatMoney(product.price)}
+            {formatPrice(product.price)}
           </span>
           {hasDiscount ? (
             <span className="text-xs text-muted-foreground line-through tabular-nums">

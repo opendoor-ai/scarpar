@@ -18,7 +18,7 @@ const formSchema = z.object({
   primary_color: z.string().trim().regex(/^#[0-9a-fA-F]{6}$/, 'Use a hex color like #059669'),
   name: z.string().trim().min(1, 'Business name is required'),
   phone: z.string().trim().max(32),
-  email: z.union([z.string().trim().email('Invalid email'), z.literal('')]),
+  email: z.union([z.string().trim().email('이메일 형식이 올바르지 않습니다'), z.literal('')]),
   address: z.string().trim().max(500),
   logo_path: z.string().nullable(),
 })
@@ -49,7 +49,7 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
       toast.error(result.error)
       return
     }
-    toast.success('Storefront settings saved.')
+    toast.success('쇼핑몰 설정이 저장되었습니다.')
     form.reset(values)
   }
 
@@ -58,7 +58,7 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Storefront</CardTitle>
+            <CardTitle className="text-base">쇼핑몰</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <FormField
@@ -66,11 +66,11 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
               name="announcement"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Announcement bar text</FormLabel>
+                  <FormLabel>상단 공지 문구</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Free delivery inside Dhaka this week" />
+                    <Input {...field} placeholder="예: 이번 주 신제품 입고 — 전화 상담 환영" />
                   </FormControl>
-                  <FormDescription>Leave empty to hide the bar.</FormDescription>
+                  <FormDescription>비워 두면 공지줄이 숨겨집니다.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -80,9 +80,9 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
               name="whatsapp_number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>WhatsApp float button number</FormLabel>
+                  <FormLabel>WhatsApp 상담 버튼 번호 (국가번호 포함)</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="8801XXXXXXXXX" />
+                    <Input {...field} placeholder="821012345678" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -93,7 +93,7 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
               name="primary_color"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Accent color</FormLabel>
+                  <FormLabel>포인트 색상</FormLabel>
                   <FormControl>
                     <div className="flex items-center gap-2">
                       <input
@@ -114,7 +114,7 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Business details</CardTitle>
+            <CardTitle className="text-base">회사 정보</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <FormField
@@ -122,7 +122,7 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
               name="logo_path"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Logo</FormLabel>
+                  <FormLabel>로고</FormLabel>
                   <FormControl>
                     <MediaPicker
                       value={field.value ? { id: '', path: field.value } : null}
@@ -138,7 +138,7 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Business name</FormLabel>
+                  <FormLabel>회사명</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -152,7 +152,7 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone</FormLabel>
+                    <FormLabel>대표 전화</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -165,7 +165,7 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>이메일</FormLabel>
                     <FormControl>
                       <Input type="email" {...field} />
                     </FormControl>
@@ -179,7 +179,7 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address</FormLabel>
+                  <FormLabel>주소</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -192,7 +192,7 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
 
         <div>
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? 'Saving...' : 'Save changes'}
+            {form.formState.isSubmitting ? '저장 중...' : '변경사항 저장'}
           </Button>
         </div>
       </form>

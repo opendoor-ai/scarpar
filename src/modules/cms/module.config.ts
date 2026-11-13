@@ -2,10 +2,10 @@ import type { ModuleDef } from '@/modules/types'
 
 export const config: ModuleDef = {
   key: 'cms',
-  name: 'CMS',
-  description: 'Page builder and site menus for the storefront.',
+  name: '콘텐츠 관리',
+  description: '홈페이지 페이지 편집과 메뉴 관리',
   nav: [
-    { label: 'Pages', href: '/admin/cms/pages', icon: 'LayoutTemplate' },
-    { label: 'Menus', href: '/admin/cms/menus', icon: 'LayoutTemplate' },
+    { label: '페이지', href: '/admin/cms/pages', icon: 'LayoutTemplate' },
+    { label: '메뉴', href: '/admin/cms/menus', icon: 'LayoutTemplate' },
   ],
 }

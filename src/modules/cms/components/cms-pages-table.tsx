@@ -16,9 +16,9 @@ interface CmsPagesTableProps {
 }
 
 const TYPE_LABELS: Record<CmsPage['type'], string> = {
-  page: 'Page',
-  home: 'Home',
-  policy: 'Policy',
+  page: '일반 페이지',
+  home: '메인(홈)',
+  policy: '약관/정책',
 }
 
 function CmsPagesTable({ data }: CmsPagesTableProps) {
@@ -26,7 +26,7 @@ function CmsPagesTable({ data }: CmsPagesTableProps) {
     () => [
       {
         accessorKey: 'title',
-        header: 'Title',
+        header: '제목',
         cell: ({ row }) => (
           <Link href={`/admin/cms/pages/${row.original.id}`} className="font-medium hover:underline">
             {row.original.title}
@@ -35,33 +35,33 @@ function CmsPagesTable({ data }: CmsPagesTableProps) {
       },
       {
         accessorKey: 'slug',
-        header: 'Slug',
+        header: '주소(영문)',
         cell: ({ row }) => <span className="text-muted-foreground">/{row.original.slug}</span>,
       },
       {
         accessorKey: 'type',
-        header: 'Type',
+        header: '종류',
         cell: ({ row }) => <Badge variant="outline">{TYPE_LABELS[row.original.type]}</Badge>,
       },
       {
         accessorKey: 'status',
-        header: 'Status',
+        header: '상태',
         cell: ({ row }) => (
           <div className="flex items-center gap-1.5">
             <Badge variant={row.original.status === 'published' ? 'success' : 'secondary'}>
-              {row.original.status === 'published' ? 'Published' : 'Draft'}
+              {row.original.status === 'published' ? '게시됨' : '임시저장'}
             </Badge>
             {row.original.draft_blocks !== null ? (
-              <span className="size-1.5 rounded-full bg-amber-500" title="Has unpublished changes" />
+              <span className="size-1.5 rounded-full bg-amber-500" title="게시하지 않은 변경사항 있음" />
             ) : null}
           </div>
         ),
       },
       {
         accessorKey: 'updated_at',
-        header: 'Updated',
+        header: '수정일',
         cell: ({ row }) => (
-          <span className="text-muted-foreground">{format(new Date(row.original.updated_at), 'd MMM, h:mm a')}</span>
+          <span className="text-muted-foreground">{format(new Date(row.original.updated_at), 'MM.dd HH:mm')}</span>
         ),
       },
     ],

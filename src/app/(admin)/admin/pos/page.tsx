@@ -105,7 +105,7 @@ export default async function PosPage() {
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-foreground">POS</h1>
         <p className="text-sm text-muted-foreground">
-          Search or scan a product, build the cart, then take payment.
+          상품을 검색하거나 스캔해 장바구니에 담고 결제하세요.
         </p>
       </div>
       <PosTerminal products={posProducts} categories={posCategories} />

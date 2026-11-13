@@ -34,7 +34,7 @@ function JobStatusActions({ jobId, status }: JobStatusActionsProps) {
     setBusy(true)
     const result = await updateJobStatus(jobId, next)
     setBusy(false)
-    if (result.ok) toast.success(`Job marked ${titleCase(next)}`)
+    if (result.ok) toast.success('작업 상태가 변경되었습니다')
     else toast.error(result.error)
   }
 
@@ -42,7 +42,7 @@ function JobStatusActions({ jobId, status }: JobStatusActionsProps) {
     setBusy(true)
     const result = await generateInvoice(jobId)
     setBusy(false)
-    if (result.ok && result.data) toast.success(`Invoice ${result.data.orderNo} created`)
+    if (result.ok && result.data) toast.success(`청구서 ${result.data.orderNo}이(가) 만들어졌습니다`)
     else if (!result.ok) toast.error(result.error)
   }
 
@@ -58,7 +58,7 @@ function JobStatusActions({ jobId, status }: JobStatusActionsProps) {
 
       {status === 'done' ? (
         <Button size="sm" variant="outline" disabled={busy} onClick={handleInvoice}>
-          Generate invoice
+          청구서 만들기
         </Button>
       ) : null}
 
@@ -66,12 +66,12 @@ function JobStatusActions({ jobId, status }: JobStatusActionsProps) {
         <ConfirmDialog
           trigger={
             <Button size="sm" variant="ghost" disabled={busy}>
-              Cancel job
+              작업 취소
             </Button>
           }
-          title="Cancel this job?"
-          description="This cannot be undone from here."
-          confirmLabel="Cancel job"
+          title="이 작업을 취소할까요?"
+          description="여기서는 되돌릴 수 없습니다."
+          confirmLabel="작업 취소"
           destructive
           onConfirm={() => handleTransition('cancelled')}
         />

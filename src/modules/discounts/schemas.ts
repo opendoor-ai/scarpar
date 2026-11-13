@@ -29,7 +29,7 @@ export const discountFormSchema = z
     // Taka, converted to paisa server-side. Empty input coerces to 0, which
     // correctly means "no minimum".
     min_order: z.coerce.number().min(0, 'Cannot be negative'),
-    max_uses: z.coerce.number().int().positive('Must be a positive number').optional(),
+    max_uses: z.coerce.number().int().positive('0보다 큰 숫자를 입력하세요').optional(),
     starts_at: z.string().optional().or(z.literal('')),
     expires_at: z.string().optional().or(z.literal('')),
     is_active: z.boolean(),
@@ -37,29 +37,29 @@ export const discountFormSchema = z
   .superRefine((data, ctx) => {
     if (data.type === 'percent') {
       if (data.value === undefined || data.value < 1 || data.value > 100) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['value'], message: 'Enter a value between 1 and 100' })
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['value'], message: '1~100 사이 값을 입력하세요' })
       }
     }
     if (data.type === 'fixed') {
       if (data.value === undefined || data.value <= 0) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['value'], message: 'Enter an amount greater than 0' })
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['value'], message: '0보다 큰 금액을 입력하세요' })
       }
     }
     if (data.scope === 'products' && data.product_ids.length === 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['product_ids'], message: 'Select at least one product' })
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['product_ids'], message: '상품을 1개 이상 선택하세요' })
     }
     if (data.scope === 'categories' && data.category_ids.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['category_ids'],
-        message: 'Select at least one category',
+        message: '카테고리를 1개 이상 선택하세요',
       })
     }
     if (data.starts_at && data.expires_at) {
       const start = new Date(data.starts_at).getTime()
       const end = new Date(data.expires_at).getTime()
       if (!Number.isNaN(start) && !Number.isNaN(end) && start >= end) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['expires_at'], message: 'Must be after the start date' })
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['expires_at'], message: '시작일 이후여야 합니다' })
       }
     }
   })

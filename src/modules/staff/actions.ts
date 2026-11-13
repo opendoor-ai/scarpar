@@ -41,12 +41,12 @@ export async function createInviteAction(
 
   const parsed = inviteMemberSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
   const { email, role } = parsed.data
 
   if (role === 'owner' && ctx.role !== 'owner') {
-    return { ok: false, error: 'Only the current owner can invite another owner.' }
+    return { ok: false, error: '대표(소유자)만 다른 대표를 초대할 수 있습니다.' }
   }
 
   try {
@@ -61,7 +61,7 @@ export async function createInviteAction(
       .maybeSingle()
 
     if (existing) {
-      return { ok: false, error: 'An invite is already pending for this email.' }
+      return { ok: false, error: '이 이메일로 보낸 초대가 이미 대기 중입니다.' }
     }
 
     const { data: invite, error } = await supabase
@@ -71,7 +71,7 @@ export async function createInviteAction(
       .single()
 
     if (error || !invite) {
-      return { ok: false, error: error?.message ?? 'Failed to create invite' }
+      return { ok: false, error: error?.message ?? '초대를 만들지 못했습니다' }
     }
 
     const row = invite as Invitation
@@ -84,7 +84,7 @@ export async function createInviteAction(
 
     return { ok: true, data: { token: row.token, link } }
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Failed to create invite' }
+    return { ok: false, error: err instanceof Error ? err.message : '초대를 만들지 못했습니다' }
   }
 }
 
@@ -94,7 +94,7 @@ export async function revokeInviteAction(input: RevokeInviteInput): Promise<Acti
 
   const parsed = revokeInviteSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
 
   try {
@@ -109,14 +109,14 @@ export async function revokeInviteAction(input: RevokeInviteInput): Promise<Acti
       .maybeSingle()
 
     if (error) return { ok: false, error: error.message }
-    if (!data) return { ok: false, error: 'Invite not found or already resolved' }
+    if (!data) return { ok: false, error: '초대를 찾을 수 없거나 이미 처리되었습니다' }
 
     audit(ctx, 'staff.invite_revoked', 'invitations', parsed.data.inviteId, { status: 'pending' }, { status: 'revoked' })
     revalidatePath('/admin/staff')
 
     return { ok: true }
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Failed to revoke invite' }
+    return { ok: false, error: err instanceof Error ? err.message : '초대를 취소하지 못했습니다' }
   }
 }
 
@@ -129,7 +129,7 @@ export async function updateMemberRoleAction(input: UpdateMemberRoleInput): Prom
 
   const parsed = updateMemberRoleSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
   const { userId, role } = parsed.data
 
@@ -142,18 +142,18 @@ export async function updateMemberRoleAction(input: UpdateMemberRoleInput): Prom
       .eq('user_id', userId)
       .single()
 
-    if (fetchError || !member) return { ok: false, error: 'Member not found' }
+    if (fetchError || !member) return { ok: false, error: '직원을 찾을 수 없습니다' }
     const before = member.role as string
 
     const touchesOwner = role === 'owner' || before === 'owner'
     if (touchesOwner && ctx.role !== 'owner') {
-      return { ok: false, error: 'Only the current owner can assign or change the owner role.' }
+      return { ok: false, error: '대표(소유자)만 대표 권한을 지정하거나 바꿀 수 있습니다.' }
     }
 
     if (before === 'owner' && role !== 'owner') {
       const owners = await countOwners(ctx.org.id)
       if (owners <= 1) {
-        return { ok: false, error: 'Cannot change role: this is the only owner.' }
+        return { ok: false, error: '유일한 대표의 권한은 바꿀 수 없습니다.' }
       }
     }
 
@@ -170,7 +170,7 @@ export async function updateMemberRoleAction(input: UpdateMemberRoleInput): Prom
 
     return { ok: true }
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Failed to update role' }
+    return { ok: false, error: err instanceof Error ? err.message : '권한을 변경하지 못했습니다' }
   }
 }
 
@@ -180,7 +180,7 @@ export async function removeMemberAction(input: RemoveMemberInput): Promise<Acti
 
   const parsed = removeMemberSchema.safeParse(input)
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+    return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
   }
   const { userId } = parsed.data
 
@@ -193,16 +193,16 @@ export async function removeMemberAction(input: RemoveMemberInput): Promise<Acti
       .eq('user_id', userId)
       .single()
 
-    if (fetchError || !member) return { ok: false, error: 'Member not found' }
+    if (fetchError || !member) return { ok: false, error: '직원을 찾을 수 없습니다' }
     const before = member.role as string
 
     if (before === 'owner') {
       if (ctx.role !== 'owner') {
-        return { ok: false, error: 'Only the current owner can remove an owner.' }
+        return { ok: false, error: '대표(소유자)만 다른 대표를 삭제할 수 있습니다.' }
       }
       const owners = await countOwners(ctx.org.id)
       if (owners <= 1) {
-        return { ok: false, error: 'Cannot remove the last owner.' }
+        return { ok: false, error: '마지막 대표는 삭제할 수 없습니다.' }
       }
     }
 
@@ -219,6 +219,6 @@ export async function removeMemberAction(input: RemoveMemberInput): Promise<Acti
 
     return { ok: true }
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Failed to remove member' }
+    return { ok: false, error: err instanceof Error ? err.message : '직원을 삭제하지 못했습니다' }
   }
 }

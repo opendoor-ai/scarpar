@@ -12,8 +12,8 @@ interface RichTextFormProps {
 function RichTextForm({ block, onChange }: RichTextFormProps) {
   return (
     <Field
-      label="Content"
-      help="Basic HTML is allowed (p, strong, em, a, ul/ol/li, h2/h3, br). It renders as-is on the storefront."
+      label="내용"
+      help="기본 HTML 태그(p, strong, em, a, ul/ol/li, h2/h3, br)를 쓸 수 있습니다."
     >
       <Textarea
         rows={12}

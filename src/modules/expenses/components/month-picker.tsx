@@ -22,7 +22,7 @@ function MonthPicker({ month }: MonthPickerProps) {
   }
 
   const current = parse(month, 'yyyy-MM', new Date())
-  const label = format(current, 'MMMM yyyy')
+  const label = format(current, 'yyyy년 M월')
 
   return (
     <div data-slot="month-picker" className="flex items-center gap-1">
@@ -34,7 +34,7 @@ function MonthPicker({ month }: MonthPickerProps) {
         onClick={() => pushMonth(format(subMonths(current, 1), 'yyyy-MM'))}
       >
         <ChevronLeft className="size-4" />
-        <span className="sr-only">Previous month</span>
+        <span className="sr-only">이전 달</span>
       </Button>
       <span className="min-w-32 text-center text-[13px] font-medium tabular-nums">{label}</span>
       <Button
@@ -45,7 +45,7 @@ function MonthPicker({ month }: MonthPickerProps) {
         onClick={() => pushMonth(format(addMonths(current, 1), 'yyyy-MM'))}
       >
         <ChevronRight className="size-4" />
-        <span className="sr-only">Next month</span>
+        <span className="sr-only">다음 달</span>
       </Button>
     </div>
   )

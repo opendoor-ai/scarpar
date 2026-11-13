@@ -38,29 +38,29 @@ function CoursesTable({ courses }: CoursesTableProps) {
       },
       {
         accessorKey: 'title',
-        header: 'Title',
+        header: '강의명',
         cell: ({ row }) => <span className="text-foreground font-medium">{row.original.title}</span>,
       },
       {
         accessorKey: 'price',
-        header: () => <div className="text-right">Price</div>,
+        header: () => <div className="text-right">가격</div>,
         cell: ({ row }) => (
           <div className="text-right tabular-nums">{formatMoney(row.original.price)}</div>
         ),
       },
       {
         accessorKey: 'lessons_count',
-        header: () => <div className="text-right">Lessons</div>,
+        header: () => <div className="text-right">수업 수</div>,
         cell: ({ row }) => <div className="text-right tabular-nums">{row.original.lessons_count}</div>,
       },
       {
         accessorKey: 'enrollments_count',
-        header: () => <div className="text-right">Enrollments</div>,
+        header: () => <div className="text-right">수강생 수</div>,
         cell: ({ row }) => <div className="text-right tabular-nums">{row.original.enrollments_count}</div>,
       },
       {
         accessorKey: 'status',
-        header: 'Status',
+        header: '상태',
         cell: ({ row }) => <StatusBadge kind="product" value={row.original.status} />,
       },
     ],

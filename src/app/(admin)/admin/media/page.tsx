@@ -21,7 +21,7 @@ export default async function MediaPage() {
 
   return (
     <>
-      <PageHeader title="Media" description="Images and files used across pages, products and listings." />
+      <PageHeader title="이미지/미디어" description="페이지와 상품에 쓰는 이미지와 파일" />
       <MediaManager initialItems={(data ?? []) as Media[]} />
     </>
   )

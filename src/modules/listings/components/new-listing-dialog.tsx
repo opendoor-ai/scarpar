@@ -35,7 +35,7 @@ function NewListingDialog() {
   async function onSubmit(values: NewListingValues) {
     const result = await createListing(values)
     if (result.ok && result.data) {
-      toast.success('Listing created')
+      toast.success('매물이 등록되었습니다')
       setOpen(false)
       form.reset()
       router.push(`/admin/listings/${result.data.id}`)
@@ -55,12 +55,12 @@ function NewListingDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus />
-          New listing
+          새 매물
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New listing</DialogTitle>
+          <DialogTitle>새 매물</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -69,7 +69,7 @@ function NewListingDialog() {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>제목</FormLabel>
                   <FormControl>
                     <Input autoFocus {...field} />
                   </FormControl>
@@ -83,7 +83,7 @@ function NewListingDialog() {
                 name="purpose"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Purpose</FormLabel>
+                    <FormLabel>거래 유형</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -91,8 +91,8 @@ function NewListingDialog() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="sale">Sale</SelectItem>
-                        <SelectItem value="rent">Rent</SelectItem>
+                        <SelectItem value="sale">매매</SelectItem>
+                        <SelectItem value="rent">임대</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -104,7 +104,7 @@ function NewListingDialog() {
                 name="property_type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Property type</FormLabel>
+                    <FormLabel>매물 종류</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -112,10 +112,10 @@ function NewListingDialog() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="apartment">Apartment</SelectItem>
-                        <SelectItem value="house">House</SelectItem>
-                        <SelectItem value="land">Land</SelectItem>
-                        <SelectItem value="commercial">Commercial</SelectItem>
+                        <SelectItem value="apartment">아파트</SelectItem>
+                        <SelectItem value="house">주택</SelectItem>
+                        <SelectItem value="land">토지</SelectItem>
+                        <SelectItem value="commercial">상가/사무실</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -128,7 +128,7 @@ function NewListingDialog() {
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price (৳)</FormLabel>
+                  <FormLabel>가격 (원)</FormLabel>
                   <FormControl>
                     <Input inputMode="decimal" {...field} />
                   </FormControl>
@@ -138,7 +138,7 @@ function NewListingDialog() {
             />
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Creating...' : 'Create listing'}
+                {form.formState.isSubmitting ? '등록 중...' : '매물 등록'}
               </Button>
             </DialogFooter>
           </form>

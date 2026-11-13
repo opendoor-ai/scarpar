@@ -35,20 +35,20 @@ export function ReceiptTotals({
   return (
     <div className="receipt-totals">
       <div className="row">
-        <span>Subtotal</span>
+        <span>상품 금액</span>
         <span>{formatMoney(subtotalPaisa)}</span>
       </div>
 
       {discountPaisa > 0 ? (
         <div className="row">
-          <span>Discount{discountCode ? ` (${discountCode})` : ''}</span>
+          <span>할인{discountCode ? ` (${discountCode})` : ''}</span>
           <span>-{formatMoney(discountPaisa)}</span>
         </div>
       ) : null}
 
       {deliveryChargePaisa > 0 ? (
         <div className="row">
-          <span>Delivery</span>
+          <span>배송비</span>
           <span>{formatMoney(deliveryChargePaisa)}</span>
         </div>
       ) : null}
@@ -61,18 +61,18 @@ export function ReceiptTotals({
       ))}
 
       <div className="row row--total">
-        <span>Total</span>
+        <span>합계</span>
         <span>{formatMoney(totalPaisa)}</span>
       </div>
 
       {advancePaidPaisa > 0 ? (
         <>
           <div className="row">
-            <span>Advance Paid</span>
+            <span>선결제</span>
             <span>-{formatMoney(advancePaidPaisa)}</span>
           </div>
           <div className="row">
-            <span>Balance Due</span>
+            <span>잔액</span>
             <span>{formatMoney(balanceDue)}</span>
           </div>
         </>

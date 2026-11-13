@@ -8,13 +8,13 @@ const HAPPY_PATH_STATUSES = ["pending", "assigned", "picked_up", "in_transit", "
 /** Brand-neutral visual stepper for the public /track/[code] page. `lang` defaults to 'en'
  *  since this page doesn't yet resolve the org's localization.language setting (get_tracking()
  *  returns org_name only, not org_id) — bn labels are ready in src/lib/i18n.ts for when it does. */
-function TrackingStatusStepper({ status, lang = "en" }: { status: string; lang?: Lang }) {
+function TrackingStatusStepper({ status, lang = "ko" }: { status: string; lang?: Lang }) {
   if (status === "failed" || status === "returned") {
     return (
       <div className="border-destructive/30 bg-destructive/5 text-destructive rounded-lg border px-4 py-3 text-sm font-medium">
         {status === "failed"
-          ? "Delivery attempt failed — we will be in touch."
-          : "This delivery was returned."}
+          ? "배송에 실패했습니다 — 곧 연락드리겠습니다."
+          : "반송된 배송입니다."}
       </div>
     )
   }

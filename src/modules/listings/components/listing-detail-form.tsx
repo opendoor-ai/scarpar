@@ -64,7 +64,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
       media_ids: media.map((item) => item.id),
     })
     if (result.ok) {
-      toast.success('Listing saved')
+      toast.success('매물이 저장되었습니다')
     } else {
       toast.error(result.error)
     }
@@ -73,7 +73,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Listing details</CardTitle>
+        <CardTitle>매물 정보</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -84,7 +84,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>제목</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -97,7 +97,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price (৳)</FormLabel>
+                    <FormLabel>가격 (원)</FormLabel>
                     <FormControl>
                       <Input inputMode="decimal" {...field} />
                     </FormControl>
@@ -113,7 +113,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                 name="purpose"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Purpose</FormLabel>
+                    <FormLabel>거래 유형</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -121,8 +121,8 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="sale">Sale</SelectItem>
-                        <SelectItem value="rent">Rent</SelectItem>
+                        <SelectItem value="sale">매매</SelectItem>
+                        <SelectItem value="rent">임대</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -134,7 +134,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                 name="property_type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Property type</FormLabel>
+                    <FormLabel>매물 종류</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -142,10 +142,10 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="apartment">Apartment</SelectItem>
-                        <SelectItem value="house">House</SelectItem>
-                        <SelectItem value="land">Land</SelectItem>
-                        <SelectItem value="commercial">Commercial</SelectItem>
+                        <SelectItem value="apartment">아파트</SelectItem>
+                        <SelectItem value="house">주택</SelectItem>
+                        <SelectItem value="land">토지</SelectItem>
+                        <SelectItem value="commercial">상가/사무실</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -160,7 +160,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                 name="area_sqft"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Area (sqft)</FormLabel>
+                    <FormLabel>면적 (sqft)</FormLabel>
                     <FormControl>
                       <Input inputMode="numeric" {...field} />
                     </FormControl>
@@ -173,7 +173,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                 name="beds"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Beds</FormLabel>
+                    <FormLabel>방</FormLabel>
                     <FormControl>
                       <Input inputMode="numeric" {...field} />
                     </FormControl>
@@ -186,7 +186,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                 name="baths"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Baths</FormLabel>
+                    <FormLabel>욕실</FormLabel>
                     <FormControl>
                       <Input inputMode="numeric" {...field} />
                     </FormControl>
@@ -202,7 +202,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                 name="address.line1"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel>주소</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -215,7 +215,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                 name="address.area"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Area</FormLabel>
+                    <FormLabel>동/읍/면</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -228,11 +228,11 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                 name="address.district"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>District</FormLabel>
+                    <FormLabel>지역</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select district" />
+                          <SelectValue placeholder="지역 선택" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -254,7 +254,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>설명</FormLabel>
                   <FormControl>
                     <Textarea rows={4} {...field} />
                   </FormControl>
@@ -264,7 +264,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
             />
 
             <div className="flex flex-col gap-1.5">
-              <Label>Features</Label>
+              <Label>특징</Label>
               <FeaturesInput
                 value={features}
                 onChange={(next) => {
@@ -275,7 +275,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label>Photos</Label>
+              <Label>사진</Label>
               <MediaGallery
                 value={media}
                 onChange={(next) => {
@@ -293,7 +293,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
               name="status"
               render={({ field }) => (
                 <FormItem className="sm:w-[200px]">
-                  <FormLabel>Status</FormLabel>
+                  <FormLabel>상태</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger className="w-full">
@@ -301,11 +301,11 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="under_offer">Under offer</SelectItem>
-                      <SelectItem value="sold">Sold</SelectItem>
-                      <SelectItem value="rented">Rented</SelectItem>
+                      <SelectItem value="draft">임시저장</SelectItem>
+                      <SelectItem value="active">공개</SelectItem>
+                      <SelectItem value="under_offer">협의 중</SelectItem>
+                      <SelectItem value="sold">매매 완료</SelectItem>
+                      <SelectItem value="rented">임대 완료</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -315,7 +315,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
 
             <div className="flex justify-end">
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Saving...' : 'Save changes'}
+                {form.formState.isSubmitting ? '저장 중...' : '변경사항 저장'}
               </Button>
             </div>
           </form>

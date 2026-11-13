@@ -19,15 +19,15 @@ export interface RecentDeliveryRow {
 }
 
 const columns: ColumnDef<RecentDeliveryRow>[] = [
-  { accessorKey: 'delivery_no', header: 'Delivery No' },
+  { accessorKey: 'delivery_no', header: '배송번호' },
   {
     accessorKey: 'recipient_name',
-    header: 'Recipient',
+    header: '받는 분',
     cell: ({ row }) => row.original.recipient_name || '—',
   },
   {
     accessorKey: 'cod_amount',
-    header: () => <div className="text-right">COD</div>,
+    header: () => <div className="text-right">착불</div>,
     cell: ({ row }) => (
       <div className="text-right tabular-nums">
         {row.original.cod_amount > 0 ? formatMoney(row.original.cod_amount) : '—'}
@@ -36,18 +36,18 @@ const columns: ColumnDef<RecentDeliveryRow>[] = [
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: '상태',
     cell: ({ row }) => <StatusBadge kind="delivery" value={row.original.status} />,
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Print</div>,
+    header: () => <div className="text-right">인쇄</div>,
     cell: ({ row }) => (
       <div className="flex justify-end">
         <Button asChild variant="outline" size="sm">
           <Link href={`/print/label/${row.original.id}`} target="_blank" rel="noopener noreferrer">
             <Tag className="size-4" />
-            Label
+            라벨
           </Link>
         </Button>
       </div>
@@ -65,8 +65,8 @@ export function RecentDeliveriesTable({ deliveries }: { deliveries: RecentDelive
       emptyState={
         <EmptyState
           icon={Truck}
-          title="No deliveries yet"
-          description="Deliveries will appear here once created."
+          title="아직 배송이 없습니다"
+          description="배송을 등록하면 여기에 표시됩니다."
         />
       }
     />

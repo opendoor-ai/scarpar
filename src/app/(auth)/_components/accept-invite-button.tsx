@@ -34,7 +34,7 @@ export function AcceptInviteButton({ token }: AcceptInviteButtonProps) {
         </Alert>
       ) : null}
       <Button type="submit" className="w-full" disabled={isPending}>
-        {isPending ? 'Joining…' : 'Accept invitation'}
+        {isPending ? '참여 중…' : '초대 수락하기'}
       </Button>
     </form>
   )

@@ -23,13 +23,13 @@ export default async function DeliveryZonesPage() {
   return (
     <div className="flex flex-col gap-6 px-6 py-6">
       <PageHeader
-        title="Delivery Zones"
+        title="배송 지역"
         actions={
           <ZoneDialog
             trigger={
               <Button>
                 <Plus className="size-4" />
-                New Zone
+                새 배송 지역
               </Button>
             }
           />

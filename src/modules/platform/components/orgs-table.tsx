@@ -23,13 +23,13 @@ export interface PlatformOrgRow {
 
 function OrgsTable({ orgs }: { orgs: PlatformOrgRow[] }) {
   if (orgs.length === 0) {
-    return <EmptyState icon={Building2} title="No organizations yet" />
+    return <EmptyState icon={Building2} title="아직 조직(공급사)이 없습니다" />
   }
 
   const columns: ColumnDef<PlatformOrgRow>[] = [
     {
       accessorKey: 'name',
-      header: 'Organization',
+      header: '조직(공급사)',
       cell: ({ row }) => (
         <div className="flex flex-col">
           <span className="font-medium">{row.original.name}</span>
@@ -39,7 +39,7 @@ function OrgsTable({ orgs }: { orgs: PlatformOrgRow[] }) {
     },
     {
       accessorKey: 'vertical',
-      header: 'Vertical',
+      header: '사업 유형',
       cell: ({ row }) => (
         <Badge variant="outline" className="capitalize">
           {row.original.vertical}
@@ -48,31 +48,31 @@ function OrgsTable({ orgs }: { orgs: PlatformOrgRow[] }) {
     },
     {
       accessorKey: 'plan',
-      header: 'Plan',
+      header: '요금제',
       cell: ({ row }) => <span className="capitalize">{row.original.plan}</span>,
     },
     {
       accessorKey: 'membersCount',
-      header: 'Members',
+      header: '직원 수',
       cell: ({ row }) => <span className="tabular-nums">{row.original.membersCount}</span>,
     },
     {
       accessorKey: 'ordersCount',
-      header: 'Orders',
+      header: '주문 수',
       cell: ({ row }) => <span className="tabular-nums">{row.original.ordersCount}</span>,
     },
     {
       id: 'createdAt',
-      header: 'Created',
+      header: '생성일',
       cell: ({ row }) => (
         <span className="text-muted-foreground">
-          {format(new Date(row.original.createdAt), 'd MMM yyyy')}
+          {format(new Date(row.original.createdAt), 'yyyy.MM.dd')}
         </span>
       ),
     },
     {
       id: 'isActive',
-      header: 'Active',
+      header: '활성',
       cell: ({ row }) => (
         <OrgActiveSwitch orgId={row.original.id} isActive={row.original.isActive} />
       ),

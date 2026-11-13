@@ -35,6 +35,7 @@ import { updateOrgProfileAction } from '@/modules/settings/actions'
 import { orgProfileSchema, type OrgProfileInput } from '@/modules/settings/schemas'
 
 const TIMEZONE_OPTIONS = [
+  { value: 'Asia/Seoul', label: '서울 (UTC+9)' },
   { value: 'Asia/Dhaka', label: 'Asia/Dhaka (UTC+6)' },
   { value: 'Asia/Kolkata', label: 'Asia/Kolkata (UTC+5:30)' },
   { value: 'UTC', label: 'UTC' },
@@ -57,7 +58,7 @@ function OrgProfileSection({ org }: { org: Org }) {
   async function onSubmit(values: OrgProfileInput) {
     const result = await updateOrgProfileAction(values)
     if (result.ok) {
-      toast.success('Organization saved')
+      toast.success('회사 정보가 저장되었습니다')
       form.reset(values)
     } else {
       toast.error(result.error)
@@ -69,7 +70,7 @@ function OrgProfileSection({ org }: { org: Org }) {
   return (
     <Card id="section-organization" className="scroll-mt-6">
       <CardHeader>
-        <CardTitle className="text-base">Organization</CardTitle>
+        <CardTitle className="text-base">회사(조직) 정보</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -80,7 +81,7 @@ function OrgProfileSection({ org }: { org: Org }) {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Business name</FormLabel>
+                    <FormLabel>회사명</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -93,7 +94,7 @@ function OrgProfileSection({ org }: { org: Org }) {
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone</FormLabel>
+                    <FormLabel>대표 전화</FormLabel>
                     <FormControl>
                       <Input {...field} value={field.value ?? ''} />
                     </FormControl>
@@ -106,7 +107,7 @@ function OrgProfileSection({ org }: { org: Org }) {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>이메일</FormLabel>
                     <FormControl>
                       <Input type="email" {...field} value={field.value ?? ''} />
                     </FormControl>
@@ -119,7 +120,7 @@ function OrgProfileSection({ org }: { org: Org }) {
                 name="bin_number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>BIN number</FormLabel>
+                    <FormLabel>사업자등록번호</FormLabel>
                     <FormControl>
                       <Input {...field} value={field.value ?? ''} placeholder="1234567890123" />
                     </FormControl>
@@ -135,7 +136,7 @@ function OrgProfileSection({ org }: { org: Org }) {
                 name="address"
                 render={({ field }) => (
                   <FormItem className="sm:col-span-2">
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel>주소</FormLabel>
                     <FormControl>
                       <Input {...field} value={field.value ?? ''} />
                     </FormControl>
@@ -145,9 +146,9 @@ function OrgProfileSection({ org }: { org: Org }) {
               />
 
               <div className="flex flex-col gap-2">
-                <Label>Currency</Label>
+                <Label>통화</Label>
                 <Input value={org.currency} disabled />
-                <p className="text-xs text-muted-foreground">Multi-currency not yet supported</p>
+                <p className="text-xs text-muted-foreground">원화(KRW)로 고정되어 있습니다</p>
               </div>
 
               <FormField
@@ -155,7 +156,7 @@ function OrgProfileSection({ org }: { org: Org }) {
                 name="timezone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Timezone</FormLabel>
+                    <FormLabel>시간대</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -176,7 +177,7 @@ function OrgProfileSection({ org }: { org: Org }) {
               />
 
               <div className="flex flex-col gap-2">
-                <Label>Vertical</Label>
+                <Label>사업 유형</Label>
                 <div>
                   <Badge variant="outline" className="capitalize">
                     {org.vertical}
@@ -189,9 +190,9 @@ function OrgProfileSection({ org }: { org: Org }) {
 
             <div className="flex flex-col gap-3">
               <div>
-                <Label className="text-sm">Enabled modules</Label>
+                <Label className="text-sm">사용할 기능</Label>
                 <p className="text-xs text-muted-foreground">
-                  Choose which modules are active for this organization.
+이 회사에서 사용할 기능을 고르세요.
                 </p>
               </div>
 
@@ -224,16 +225,16 @@ function OrgProfileSection({ org }: { org: Org }) {
               </div>
 
               <Alert variant="warning">
-                <AlertTitle>Disabling a module hides its pages</AlertTitle>
+                <AlertTitle>기능을 끄면 해당 메뉴가 숨겨집니다</AlertTitle>
                 <AlertDescription>
-                  Existing data is kept — re-enabling the module restores access to it.
+데이터는 그대로 남아 있고, 다시 켜면 다시 볼 수 있습니다.
                 </AlertDescription>
               </Alert>
             </div>
 
             <div className="flex justify-end">
               <Button type="submit" disabled={!form.formState.isDirty || form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Saving…' : 'Save changes'}
+                {form.formState.isSubmitting ? '저장 중…' : '변경사항 저장'}
               </Button>
             </div>
           </form>

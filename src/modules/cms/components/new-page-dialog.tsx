@@ -45,7 +45,7 @@ function NewPageDialog() {
   async function onSubmit(values: FormValues) {
     const result = await createPageAction(values)
     if (!result.ok || !result.data) {
-      toast.error(!result.ok ? result.error : 'Something went wrong.')
+      toast.error(!result.ok ? result.error : '문제가 발생했습니다.')
       return
     }
     setOpen(false)
@@ -57,12 +57,12 @@ function NewPageDialog() {
       <DialogTrigger asChild>
         <Button type="button">
           <Plus className="size-4" />
-          New page
+새 페이지
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New page</DialogTitle>
+          <DialogTitle>새 페이지</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -71,7 +71,7 @@ function NewPageDialog() {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>제목</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -90,7 +90,7 @@ function NewPageDialog() {
               name="slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Slug</FormLabel>
+                  <FormLabel>주소(영문)</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -109,7 +109,7 @@ function NewPageDialog() {
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Type</FormLabel>
+                  <FormLabel>종류</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger className="w-full">
@@ -117,9 +117,9 @@ function NewPageDialog() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="page">Page</SelectItem>
-                      <SelectItem value="home">Home</SelectItem>
-                      <SelectItem value="policy">Policy</SelectItem>
+                      <SelectItem value="page">일반 페이지</SelectItem>
+                      <SelectItem value="home">메인(홈)</SelectItem>
+                      <SelectItem value="policy">약관/정책</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -128,7 +128,7 @@ function NewPageDialog() {
             />
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Creating...' : 'Create page'}
+                {form.formState.isSubmitting ? '만드는 중...' : '페이지 만들기'}
               </Button>
             </DialogFooter>
           </form>

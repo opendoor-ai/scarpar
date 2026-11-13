@@ -11,16 +11,16 @@ import { updateSettingsAction } from '@/modules/settings/actions'
 import { SettingField } from './setting-field'
 
 const GROUP_LABELS: Record<SettingGroup, string> = {
-  checkout: 'Checkout',
-  payments: 'Payments',
-  delivery: 'Delivery',
-  fraud: 'Fraud',
-  inventory: 'Inventory',
-  notifications: 'Notifications',
-  tax: 'Tax',
-  localization: 'Localization',
-  printing: 'Printing',
-  storefront: 'Storefront',
+  checkout: '주문',
+  payments: '결제',
+  delivery: '배송',
+  fraud: '부정 주문 방지',
+  inventory: '재고',
+  notifications: '알림',
+  tax: '세금',
+  localization: '언어',
+  printing: '출력',
+  storefront: '쇼핑몰',
 }
 
 interface SettingsGroupSectionProps {
@@ -51,7 +51,7 @@ function SettingsGroupSection({ group, defs, initialValues, role }: SettingsGrou
       const entries = dirtyKeys.map((key) => ({ key, value: values[key] }))
       const result = await updateSettingsAction({ entries })
       if (result.ok) {
-        toast.success(`${GROUP_LABELS[group]} settings saved`)
+        toast.success(`${GROUP_LABELS[group]} 설정이 저장되었습니다`)
       } else {
         toast.error(result.error)
       }
@@ -65,7 +65,7 @@ function SettingsGroupSection({ group, defs, initialValues, role }: SettingsGrou
       <CardHeader className="flex-row items-center justify-between">
         <CardTitle className="text-base">{GROUP_LABELS[group]}</CardTitle>
         <Button size="sm" disabled={!isDirty || hasErrors || saving} onClick={handleSave}>
-          {saving ? 'Saving…' : 'Save changes'}
+          {saving ? '저장 중…' : '변경사항 저장'}
         </Button>
       </CardHeader>
       <CardContent>

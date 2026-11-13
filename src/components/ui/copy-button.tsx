@@ -36,7 +36,7 @@ function CopyButton({ text, className, ...props }: CopyButtonProps) {
       {...props}
     >
       {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-      <span className="sr-only">Copy</span>
+      <span className="sr-only">복사</span>
     </Button>
   )
 }

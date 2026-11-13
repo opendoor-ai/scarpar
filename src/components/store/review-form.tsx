@@ -37,7 +37,7 @@ export function ReviewForm({ orgSlug, productId }: { orgSlug: string; productId:
   if (!open) {
     return (
       <Button type="button" variant="outline" onClick={() => setOpen(true)}>
-        Write a review
+리뷰 쓰기
       </Button>
     )
   }
@@ -45,7 +45,7 @@ export function ReviewForm({ orgSlug, productId }: { orgSlug: string; productId:
   if (submitted) {
     return (
       <p className="rounded-md border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-        Thanks — your review has been submitted and will appear here once it&apos;s moderated.
+리뷰가 접수되었습니다. 확인 후 게시됩니다.
       </p>
     )
   }
@@ -57,7 +57,7 @@ export function ReviewForm({ orgSlug, productId }: { orgSlug: string; productId:
         className="flex flex-col gap-4 rounded-lg border border-border p-4"
       >
         <div className="flex flex-col gap-1.5">
-          <span className="text-xs font-medium">Rating</span>
+          <span className="text-xs font-medium">별점</span>
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map((n) => (
               <button key={n} type="button" aria-label={`${n} stars`} onClick={() => setRating(n)}>
@@ -77,9 +77,9 @@ export function ReviewForm({ orgSlug, productId }: { orgSlug: string; productId:
           name="customerName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Your name</FormLabel>
+              <FormLabel>이름</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Jane Doe" />
+                <Input {...field} placeholder="홍길동" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -91,9 +91,9 @@ export function ReviewForm({ orgSlug, productId }: { orgSlug: string; productId:
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title (optional)</FormLabel>
+              <FormLabel>제목 (선택)</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Great product" />
+                <Input {...field} placeholder="만족스러운 제품입니다" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -105,23 +105,23 @@ export function ReviewForm({ orgSlug, productId }: { orgSlug: string; productId:
           name="body"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Review (optional)</FormLabel>
+              <FormLabel>리뷰 내용 (선택)</FormLabel>
               <FormControl>
-                <Textarea {...field} rows={4} placeholder="Tell us what you think" />
+                <Textarea {...field} rows={4} placeholder="사용해 보신 느낌을 남겨 주세요" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <p className="text-xs text-muted-foreground">Reviews appear after moderation.</p>
+        <p className="text-xs text-muted-foreground">리뷰는 확인 후 게시됩니다.</p>
 
         <div className="flex gap-2">
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? 'Submitting…' : 'Submit review'}
+            {form.formState.isSubmitting ? '등록 중…' : '리뷰 등록'}
           </Button>
           <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
-            Cancel
+            취소
           </Button>
         </div>
       </form>

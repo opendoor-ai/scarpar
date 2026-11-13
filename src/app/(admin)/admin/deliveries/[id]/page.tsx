@@ -62,7 +62,7 @@ export default async function DeliveryDetailPage({ params }: PageProps<{ id: str
             <Button asChild variant="outline">
               <Link href={`/print/label/${delivery.id}`} target="_blank" rel="noopener noreferrer">
                 <Printer className="size-4" />
-                Print label
+                라벨 인쇄
               </Link>
             </Button>
           </>
@@ -73,11 +73,11 @@ export default async function DeliveryDetailPage({ params }: PageProps<{ id: str
         <div className="flex flex-col gap-6 lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Recipient</CardTitle>
+              <CardTitle>받는 분</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-3 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Method</span>
+                <span className="text-muted-foreground">배송 방법</span>
                 <DeliveryMethodBadge
                   method={delivery.method}
                   riderName={delivery.rider?.name}
@@ -85,26 +85,26 @@ export default async function DeliveryDetailPage({ params }: PageProps<{ id: str
                 />
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Name</span>
+                <span className="text-muted-foreground">이름</span>
                 <span>{delivery.recipient_name ?? "—"}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Phone</span>
+                <span className="text-muted-foreground">전화번호</span>
                 <span>{delivery.recipient_phone ?? "—"}</span>
               </div>
               <div className="flex items-start justify-between gap-4">
-                <span className="text-muted-foreground shrink-0">Address</span>
+                <span className="text-muted-foreground shrink-0">주소</span>
                 <span className="text-right">{addressLine || "—"}</span>
               </div>
               {delivery.zone ? (
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Zone</span>
+                  <span className="text-muted-foreground">배송 지역</span>
                   <span>{delivery.zone.name}</span>
                 </div>
               ) : null}
               {delivery.tracking_code ? (
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Tracking code</span>
+                  <span className="text-muted-foreground">송장 번호</span>
                   <span className="flex items-center gap-1">
                     <span className="font-mono">{delivery.tracking_code}</span>
                     <CopyButton text={delivery.tracking_code} />
@@ -122,11 +122,11 @@ export default async function DeliveryDetailPage({ params }: PageProps<{ id: str
 
           <Card>
             <CardHeader>
-              <CardTitle>Order</CardTitle>
+              <CardTitle>주문</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-3 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Order</span>
+                <span className="text-muted-foreground">주문번호</span>
                 {delivery.order ? (
                   <Link href={`/admin/orders/${delivery.order.id}`} className="text-primary hover:underline">
                     {delivery.order.order_no}
@@ -136,15 +136,15 @@ export default async function DeliveryDetailPage({ params }: PageProps<{ id: str
                 )}
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Customer</span>
+                <span className="text-muted-foreground">고객</span>
                 <span>{delivery.order?.customer_name ?? "—"}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Delivery fee</span>
+                <span className="text-muted-foreground">배송비</span>
                 <span className="tabular-nums">{formatMoney(delivery.fee)}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">COD amount</span>
+                <span className="text-muted-foreground">착불 금액</span>
                 <span
                   className={
                     delivery.cod_amount > 0 && !delivery.cod_collected
@@ -155,14 +155,14 @@ export default async function DeliveryDetailPage({ params }: PageProps<{ id: str
                   {formatMoney(delivery.cod_amount)}
                   {delivery.cod_collected ? (
                     <Badge variant="success" className="ml-2">
-                      Collected
+                      수금 완료
                     </Badge>
                   ) : null}
                 </span>
               </div>
               {delivery.failed_reason ? (
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Failed reason</span>
+                  <span className="text-muted-foreground">실패 사유</span>
                   <span className="text-destructive">{delivery.failed_reason}</span>
                 </div>
               ) : null}
@@ -173,7 +173,7 @@ export default async function DeliveryDetailPage({ params }: PageProps<{ id: str
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Actions</CardTitle>
+              <CardTitle>처리</CardTitle>
             </CardHeader>
             <CardContent>
               <DeliveryStatusActions
@@ -188,7 +188,7 @@ export default async function DeliveryDetailPage({ params }: PageProps<{ id: str
 
           <Card>
             <CardHeader>
-              <CardTitle>Timeline</CardTitle>
+              <CardTitle>처리 기록</CardTitle>
             </CardHeader>
             <CardContent>
               <DeliveryTimeline events={events ?? []} />

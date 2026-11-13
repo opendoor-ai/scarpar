@@ -56,12 +56,12 @@ function AdjustStockDialog({ products }: AdjustStockDialogProps) {
 
   async function handleSubmit() {
     if (!selectedProduct) {
-      toast.error('Choose a product')
+      toast.error('상품을 선택하세요')
       return
     }
     const qtyDelta = Number(delta)
     if (!Number.isInteger(qtyDelta) || qtyDelta === 0) {
-      toast.error('Enter a non-zero whole number')
+      toast.error('0이 아닌 정수를 입력하세요')
       return
     }
 
@@ -77,7 +77,7 @@ function AdjustStockDialog({ products }: AdjustStockDialogProps) {
         toast.error(result.error)
         return
       }
-      toast.success('Stock adjusted')
+      toast.success('재고가 조정되었습니다')
       setOpen(false)
       reset()
       router.refresh()
@@ -97,28 +97,28 @@ function AdjustStockDialog({ products }: AdjustStockDialogProps) {
       <DialogTrigger asChild>
         <Button type="button">
           <PackagePlus className="size-4" />
-          Adjust stock
+재고 조정
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Adjust stock</DialogTitle>
+          <DialogTitle>재고 조정</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <Label>Product</Label>
+            <Label>상품</Label>
             <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
               <PopoverTrigger asChild>
                 <Button type="button" variant="outline" className="w-full justify-between font-normal">
-                  {selectedProduct ? selectedProduct.name : 'Search products...'}
+                  {selectedProduct ? selectedProduct.name : '상품 검색...'}
                   <ChevronsUpDown className="text-muted-foreground size-4" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-(--radix-popover-trigger-width) p-0" align="start">
                 <Command>
-                  <CommandInput placeholder="Search by name or SKU..." />
+                  <CommandInput placeholder="상품명 또는 SKU로 검색..." />
                   <CommandList>
-                    <CommandEmpty>No products found.</CommandEmpty>
+                    <CommandEmpty>상품을 찾을 수 없습니다.</CommandEmpty>
                     <CommandGroup>
                       {products.map((p) => (
                         <CommandItem
@@ -146,7 +146,7 @@ function AdjustStockDialog({ products }: AdjustStockDialogProps) {
 
           {selectedProduct && selectedProduct.variants.length > 0 ? (
             <div className="flex flex-col gap-1">
-              <Label>Variant</Label>
+              <Label>옵션</Label>
               <Select value={variantId} onValueChange={setVariantId}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -165,26 +165,26 @@ function AdjustStockDialog({ products }: AdjustStockDialogProps) {
 
           {selectedProduct && !selectedProduct.trackStock ? (
             <p className="text-muted-foreground text-xs">
-              This product doesn&apos;t track stock — the movement is still logged.
+              이 상품은 재고 관리를 하지 않지만, 변동 내역은 기록됩니다.
             </p>
           ) : null}
 
           <div className="flex flex-col gap-1">
-            <Label>Quantity change</Label>
+            <Label>수량 변경 (+입고 / -출고)</Label>
             <Input value={delta} onChange={(e) => setDelta(e.target.value)} placeholder="e.g. 10 or -3" inputMode="numeric" />
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label>Note</Label>
-            <Textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="Reason for this adjustment" />
+            <Label>메모</Label>
+            <Textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="조정 사유" />
           </div>
         </div>
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-            Cancel
+            취소
           </Button>
           <Button type="button" onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? 'Saving...' : 'Save adjustment'}
+            {isSubmitting ? '저장 중...' : '조정 저장'}
           </Button>
         </DialogFooter>
       </DialogContent>

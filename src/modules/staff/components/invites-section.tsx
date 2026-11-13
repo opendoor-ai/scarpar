@@ -30,7 +30,7 @@ function InvitesSection({ invites }: { invites: InviteRow[] }) {
   async function handleRevoke(id: string) {
     const result = await revokeInviteAction({ inviteId: id })
     if (result.ok) {
-      toast.success('Invite revoked')
+      toast.success('초대가 취소되었습니다')
       router.refresh()
     } else {
       toast.error(result.error)
@@ -41,26 +41,26 @@ function InvitesSection({ invites }: { invites: InviteRow[] }) {
   const columns: ColumnDef<InviteRow>[] = [
     {
       accessorKey: 'email',
-      header: 'Email',
+      header: '이메일',
       cell: ({ row }) => <span className="font-medium">{row.original.email}</span>,
     },
     {
       accessorKey: 'role',
-      header: 'Role',
+      header: '권한',
       cell: ({ row }) => <Badge variant="secondary">{ROLE_LABELS[row.original.role]}</Badge>,
     },
     {
       id: 'expiresAt',
-      header: 'Expires',
+      header: '만료일',
       cell: ({ row }) => (
         <span className="text-muted-foreground">
-          {format(new Date(row.original.expiresAt), 'd MMM yyyy')}
+          {format(new Date(row.original.expiresAt), 'yyyy.MM.dd')}
         </span>
       ),
     },
     {
       id: 'link',
-      header: 'Invite link',
+      header: '초대 링크',
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
           <span className="max-w-56 truncate text-xs text-muted-foreground">
@@ -78,12 +78,12 @@ function InvitesSection({ invites }: { invites: InviteRow[] }) {
           <ConfirmDialog
             trigger={
               <Button variant="ghost" size="sm">
-                Revoke
+취소하기
               </Button>
             }
-            title="Revoke this invite?"
-            description={`${row.original.email} will no longer be able to accept it.`}
-            confirmLabel="Revoke"
+            title="이 초대를 취소할까요?"
+            description={`${row.original.email} 님은 더 이상 이 초대를 수락할 수 없습니다.`}
+            confirmLabel="초대 취소"
             destructive
             onConfirm={() => handleRevoke(row.original.id)}
           />
@@ -96,8 +96,8 @@ function InvitesSection({ invites }: { invites: InviteRow[] }) {
     return (
       <EmptyState
         icon={MailPlus}
-        title="No pending invitations"
-        description="Invited members appear here until they accept or the invite expires."
+        title="대기 중인 초대가 없습니다"
+        description="초대한 직원은 수락하거나 만료될 때까지 여기에 표시됩니다."
       />
     )
   }

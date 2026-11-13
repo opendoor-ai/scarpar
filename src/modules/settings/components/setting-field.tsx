@@ -23,7 +23,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
  *  delivery.default_zone_fallback, delivery.free_above) are paisa amounts
  *  but don't end in "_amount", so a suffix match would under-detect them. */
 function isMoneyField(def: SettingDef): boolean {
-  return def.type === 'number' && (/paisa/i.test(def.label) || /paisa/i.test(def.help ?? ''))
+  return def.type === 'number' && (/paisa|\(원\)/i.test(def.label) || /paisa/i.test(def.help ?? ''))
 }
 
 interface SettingFieldProps {
@@ -127,7 +127,7 @@ function SettingField({ def, value, disabled, onChange, onValidityChange }: Sett
               onValidityChange?.(def.key, true)
               onChange(def.key, parsed)
             } catch {
-              setJsonError('Invalid JSON')
+              setJsonError('JSON 형식이 올바르지 않습니다')
               onValidityChange?.(def.key, false)
             }
           }}
@@ -145,11 +145,11 @@ function SettingField({ def, value, disabled, onChange, onValidityChange }: Sett
       <div className="flex items-center justify-between gap-6 border-b py-3 last:border-b-0">
         <FieldLabel def={def} />
         <div className="flex w-56 items-center gap-1.5">
-          {money ? <span className="text-sm text-muted-foreground">৳</span> : null}
+          {money ? <span className="text-sm text-muted-foreground">원</span> : null}
           <Input
             id={def.key}
             type="number"
-            step={money ? '0.01' : '1'}
+            step="1"
             value={displayValue}
             disabled={disabled}
             className="text-right tabular-nums"

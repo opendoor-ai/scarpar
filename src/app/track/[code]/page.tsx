@@ -47,11 +47,11 @@ export default async function TrackingResultPage({ params }: PageProps<{ code: s
       <main className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
         <EmptyState
           icon={PackageX}
-          title="No delivery found"
-          description={`We couldn't find anything for "${code}". Double-check the code and try again.`}
+          title="배송 정보를 찾을 수 없습니다"
+          description={`"${code}"에 해당하는 배송이 없습니다. 번호를 다시 확인해 주세요.`}
           action={
             <Link href="/track" className="text-primary text-sm hover:underline">
-              Try another code
+              다른 번호로 조회
             </Link>
           }
         />

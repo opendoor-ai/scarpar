@@ -17,13 +17,12 @@ function HtmlForm({ block, onChange }: HtmlFormProps) {
     <div className="flex flex-col gap-4">
       <Alert variant="warning">
         <AlertTriangle />
-        <AlertTitle>Admin-only escape hatch</AlertTitle>
+        <AlertTitle>고급 기능 (관리자 전용)</AlertTitle>
         <AlertDescription>
-          Raw HTML renders unescaped on the storefront. Only paste HTML you trust — this bypasses the
-          sanitization the other blocks get.
+입력한 HTML이 쇼핑몰에 그대로 표시됩니다. 믿을 수 있는 코드만 붙여 넣으세요.
         </AlertDescription>
       </Alert>
-      <Field label="Raw HTML">
+      <Field label="HTML 코드">
         <Textarea
           rows={12}
           value={block.raw}

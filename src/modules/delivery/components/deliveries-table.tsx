@@ -31,7 +31,7 @@ export interface DeliveryListRow {
 const columns: ColumnDef<DeliveryListRow>[] = [
   {
     accessorKey: "delivery_no",
-    header: "Delivery",
+    header: "배송번호",
     cell: ({ row }) => (
       <Link href={`/admin/deliveries/${row.original.id}`} className="text-primary font-medium hover:underline">
         {row.original.delivery_no}
@@ -40,7 +40,7 @@ const columns: ColumnDef<DeliveryListRow>[] = [
   },
   {
     id: "order",
-    header: "Order",
+    header: "주문번호",
     cell: ({ row }) =>
       row.original.order ? (
         <Link href={`/admin/orders/${row.original.order.id}`} className="hover:underline">
@@ -52,7 +52,7 @@ const columns: ColumnDef<DeliveryListRow>[] = [
   },
   {
     id: "method",
-    header: "Method",
+    header: "방법",
     cell: ({ row }) => (
       <DeliveryMethodBadge
         method={row.original.method}
@@ -63,7 +63,7 @@ const columns: ColumnDef<DeliveryListRow>[] = [
   },
   {
     id: "recipient",
-    header: "Recipient",
+    header: "받는 분",
     cell: ({ row }) => (
       <div className="flex flex-col">
         <span>{row.original.recipient_name ?? "—"}</span>
@@ -92,12 +92,12 @@ const columns: ColumnDef<DeliveryListRow>[] = [
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: "상태",
     cell: ({ row }) => <StatusBadge kind="delivery" value={row.original.status} />,
   },
   {
     id: "times",
-    header: "Assigned / Delivered",
+    header: "배정 / 완료",
     cell: ({ row }) => (
       <div className="text-muted-foreground flex flex-col text-xs">
         <span>{row.original.assigned_at ? format(new Date(row.original.assigned_at), "d MMM, h:mm a") : "—"}</span>

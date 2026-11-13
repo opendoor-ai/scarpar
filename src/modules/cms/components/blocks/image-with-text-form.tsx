@@ -15,19 +15,19 @@ interface ImageWithTextFormProps {
 function ImageWithTextForm({ block, onChange }: ImageWithTextFormProps) {
   return (
     <div className="flex flex-col gap-4">
-      <Field label="Image">
+      <Field label="이미지">
         <MediaPicker
           value={block.image ? { id: '', path: block.image } : null}
           onChange={(m) => onChange({ ...block, image: m?.path ?? '' })}
         />
       </Field>
-      <Field label="Heading">
+      <Field label="제목">
         <Input value={block.heading} onChange={(e) => onChange({ ...block, heading: e.target.value })} />
       </Field>
-      <Field label="Body">
+      <Field label="본문">
         <Textarea rows={5} value={block.body} onChange={(e) => onChange({ ...block, body: e.target.value })} />
       </Field>
-      <Field label="Image position">
+      <Field label="이미지 위치">
         <Select
           value={block.imageSide}
           onValueChange={(value) => onChange({ ...block, imageSide: value as ImageWithTextBlock['imageSide'] })}
@@ -36,8 +36,8 @@ function ImageWithTextForm({ block, onChange }: ImageWithTextFormProps) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="left">Left</SelectItem>
-            <SelectItem value="right">Right</SelectItem>
+            <SelectItem value="left">왼쪽</SelectItem>
+            <SelectItem value="right">오른쪽</SelectItem>
           </SelectContent>
         </Select>
       </Field>

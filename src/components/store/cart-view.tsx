@@ -12,7 +12,7 @@ import { CartLineItem } from './cart-line-item'
 import { useCart } from './cart-context'
 import { storePath } from './store-links'
 
-export function CartView({ orgSlug, lang = 'en' }: { orgSlug: string; lang?: Lang }) {
+export function CartView({ orgSlug, lang = 'ko' }: { orgSlug: string; lang?: Lang }) {
   const { items, subtotal, mounted } = useCart()
 
   if (!mounted) {
@@ -46,7 +46,7 @@ export function CartView({ orgSlug, lang = 'en' }: { orgSlug: string; lang?: Lan
           <span className="text-muted-foreground">{t('subtotal', lang)}</span>
           <span className="font-semibold tabular-nums">{formatMoney(subtotal)}</span>
         </div>
-        <p className="text-xs text-muted-foreground">Delivery calculated at checkout.</p>
+        <p className="text-xs text-muted-foreground">배송비는 주문 단계에서 계산됩니다.</p>
         <Button asChild size="lg">
           <Link href={storePath(orgSlug, '/checkout')}>{t('checkout', lang)}</Link>
         </Button>

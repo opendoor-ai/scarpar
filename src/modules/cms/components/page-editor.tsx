@@ -63,7 +63,7 @@ function PageEditor({ page, orgSlug, categories, revisions }: PageEditorProps) {
       return
     }
     setDirty(false)
-    toast.success('Draft saved.')
+    toast.success('임시저장되었습니다.')
     router.refresh()
   }
 
@@ -73,7 +73,7 @@ function PageEditor({ page, orgSlug, categories, revisions }: PageEditorProps) {
       toast.error(result.error)
       return
     }
-    toast.success('Page published.')
+    toast.success('페이지가 게시되었습니다.')
     router.refresh()
   }
 
@@ -85,7 +85,7 @@ function PageEditor({ page, orgSlug, categories, revisions }: PageEditorProps) {
     }
     setBlocks(page.blocks)
     setDirty(false)
-    toast.success('Draft discarded.')
+    toast.success('임시저장본을 버렸습니다.')
     router.refresh()
   }
 
@@ -99,7 +99,7 @@ function PageEditor({ page, orgSlug, categories, revisions }: PageEditorProps) {
               className="-ml-1 inline-flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
             >
               <ChevronLeft className="size-4" />
-              <span className="sr-only">Back</span>
+              <span className="sr-only">뒤로</span>
             </Link>
             <Input
               value={title}
@@ -108,9 +108,9 @@ function PageEditor({ page, orgSlug, categories, revisions }: PageEditorProps) {
               className="h-8 max-w-md border-transparent bg-transparent px-1.5 text-xl font-semibold shadow-none hover:border-input focus-visible:border-ring"
             />
             <Badge variant={page.status === 'published' ? 'success' : 'secondary'}>
-              {page.status === 'published' ? 'Published' : 'Draft'}
+              {page.status === 'published' ? '게시됨' : '임시저장'}
             </Badge>
-            {hasDraft && page.status === 'published' ? <Badge variant="warning">Unpublished changes</Badge> : null}
+            {hasDraft && page.status === 'published' ? <Badge variant="warning">게시 안 된 변경사항</Badge> : null}
           </div>
           <p className="pl-8 text-sm text-muted-foreground">/{page.slug}</p>
         </div>
@@ -119,7 +119,7 @@ function PageEditor({ page, orgSlug, categories, revisions }: PageEditorProps) {
             <Button variant="outline" asChild>
               <Link href={viewHref} target="_blank">
                 <ExternalLink className="size-4" />
-                View
+미리보기
               </Link>
             </Button>
           ) : null}
@@ -127,24 +127,24 @@ function PageEditor({ page, orgSlug, categories, revisions }: PageEditorProps) {
             <ConfirmDialog
               trigger={
                 <Button type="button" variant="outline">
-                  Discard draft
+임시저장본 버리기
                 </Button>
               }
-              title="Discard this draft?"
-              description="Reverts to the last published version. This can't be undone."
-              confirmLabel="Discard"
+              title="임시저장본을 버릴까요?"
+              description="마지막으로 게시한 버전으로 돌아갑니다. 되돌릴 수 없습니다."
+              confirmLabel="버리기"
               destructive
               onConfirm={handleDiscard}
             />
           ) : null}
           <Button type="button" variant="secondary" disabled={saving} onClick={handleSaveDraft}>
-            {saving ? 'Saving...' : 'Save draft'}
+            {saving ? '저장 중...' : '임시저장'}
           </Button>
           <ConfirmDialog
-            trigger={<Button type="button">Publish</Button>}
-            title="Publish this page?"
-            description="Your draft becomes the live version customers see."
-            confirmLabel="Publish"
+            trigger={<Button type="button">게시하기</Button>}
+            title="이 페이지를 게시할까요?"
+            description="임시저장본이 고객에게 보이는 실제 페이지가 됩니다."
+            confirmLabel="게시"
             onConfirm={handlePublish}
           />
         </div>

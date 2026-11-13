@@ -60,9 +60,9 @@ export const MODULE_LIST: ModuleDef[] = [
  * group in the sidebar UI (a rendering concern, not encoded here).
  */
 export const CORE_NAV: { label: string; href: string; icon: string }[] = [
-  { label: 'Dashboard', href: '/admin', icon: 'LayoutDashboard' },
-  { label: 'Media', href: '/admin/media', icon: 'Image' },
-  { label: 'Staff', href: '/admin/staff', icon: 'UserCog' },
-  { label: 'Audit Log', href: '/admin/audit', icon: 'ScrollText' },
-  { label: 'Settings', href: '/admin/settings', icon: 'Settings' },
+  { label: '대시보드', href: '/admin', icon: 'LayoutDashboard' },
+  { label: '이미지/미디어', href: '/admin/media', icon: 'Image' },
+  { label: '직원관리', href: '/admin/staff', icon: 'UserCog' },
+  { label: '활동 기록', href: '/admin/audit', icon: 'ScrollText' },
+  { label: '설정', href: '/admin/settings', icon: 'Settings' },
 ]
