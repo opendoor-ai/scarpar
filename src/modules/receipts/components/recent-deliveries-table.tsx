@@ -61,7 +61,7 @@ export function RecentDeliveriesTable({ deliveries }: { deliveries: RecentDelive
       columns={columns}
       data={deliveries}
       searchKey="delivery_no"
-      searchPlaceholder="Search by delivery no..."
+      searchPlaceholder="배송번호로 검색..."
       emptyState={
         <EmptyState
           icon={Truck}

@@ -216,7 +216,7 @@ const columns: ColumnDef<RiderListRow>[] = [
 ]
 
 function RidersTable({ riders }: { riders: RiderListRow[] }) {
-  return <DataTable columns={columns} data={riders} searchKey="name" searchPlaceholder="Search riders..." />
+  return <DataTable columns={columns} data={riders} searchKey="name" searchPlaceholder="배송기사 검색..." />
 }
 
 export { RidersTable, RiderDialog }

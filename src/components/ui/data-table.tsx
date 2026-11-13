@@ -41,7 +41,7 @@ function DataTable<TData, TValue>({
   columns,
   data,
   searchKey,
-  searchPlaceholder = "Search...",
+  searchPlaceholder = "검색...",
   toolbar,
   pageSize = 20,
   onRowClick,

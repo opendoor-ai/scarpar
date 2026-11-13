@@ -151,7 +151,7 @@ function ProductList({ products, status }: ProductListProps) {
       columns={columns}
       data={products}
       searchKey="name"
-      searchPlaceholder="Search products..."
+      searchPlaceholder="상품 검색..."
       toolbar={<ProductStatusTabs current={status} />}
       onRowClick={(row) => router.push(`/admin/products/${row.id}`)}
     />

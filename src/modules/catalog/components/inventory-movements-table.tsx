@@ -100,7 +100,7 @@ function InventoryMovementsTable({ movements }: InventoryMovementsTableProps) {
       columns={columns}
       data={movements}
       searchKey="productName"
-      searchPlaceholder="Search by product..."
+      searchPlaceholder="상품명으로 검색..."
     />
   )
 }

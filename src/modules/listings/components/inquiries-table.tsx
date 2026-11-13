@@ -97,7 +97,7 @@ function InquiriesTable({ inquiries }: InquiriesTableProps) {
     [],
   )
 
-  return <DataTable columns={columns} data={inquiries} searchKey="name" searchPlaceholder="Search inquiries..." />
+  return <DataTable columns={columns} data={inquiries} searchKey="name" searchPlaceholder="문의 검색..." />
 }
 
 export { InquiriesTable }

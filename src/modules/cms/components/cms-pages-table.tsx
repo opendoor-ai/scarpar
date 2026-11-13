@@ -68,7 +68,7 @@ function CmsPagesTable({ data }: CmsPagesTableProps) {
     [],
   )
 
-  return <DataTable columns={columns} data={data} searchKey="title" searchPlaceholder="Search pages..." />
+  return <DataTable columns={columns} data={data} searchKey="title" searchPlaceholder="페이지 검색..." />
 }
 
 export { CmsPagesTable }

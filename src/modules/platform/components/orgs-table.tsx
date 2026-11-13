@@ -80,7 +80,7 @@ function OrgsTable({ orgs }: { orgs: PlatformOrgRow[] }) {
   ]
 
   return (
-    <DataTable columns={columns} data={orgs} searchKey="name" searchPlaceholder="Search organizations..." />
+    <DataTable columns={columns} data={orgs} searchKey="name" searchPlaceholder="조직 검색..." />
   )
 }
 

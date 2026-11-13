@@ -83,7 +83,7 @@ function JobsTable({ jobs }: JobsTableProps) {
       columns={columns}
       data={jobs}
       searchKey="title"
-      searchPlaceholder="Search jobs..."
+      searchPlaceholder="작업 검색..."
       onRowClick={(job) => router.push(`/admin/services/${job.id}`)}
     />
   )

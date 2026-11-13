@@ -289,7 +289,7 @@ const columns: ColumnDef<DeliveryZone>[] = [
 ]
 
 function ZonesTable({ zones }: { zones: DeliveryZone[] }) {
-  return <DataTable columns={columns} data={zones} searchKey="name" searchPlaceholder="Search zones..." />
+  return <DataTable columns={columns} data={zones} searchKey="name" searchPlaceholder="배송 지역 검색..." />
 }
 
 export { ZonesTable, ZoneDialog }

@@ -113,7 +113,7 @@ function DeliveriesTable({ deliveries }: { deliveries: DeliveryListRow[] }) {
       columns={columns}
       data={deliveries}
       searchKey="delivery_no"
-      searchPlaceholder="Search delivery no..."
+      searchPlaceholder="배송번호 검색..."
     />
   )
 }

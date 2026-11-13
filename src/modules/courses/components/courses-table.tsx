@@ -72,7 +72,7 @@ function CoursesTable({ courses }: CoursesTableProps) {
       columns={columns}
       data={courses}
       searchKey="title"
-      searchPlaceholder="Search courses..."
+      searchPlaceholder="강의 검색..."
       onRowClick={(course) => router.push(`/admin/courses/${course.id}`)}
     />
   )

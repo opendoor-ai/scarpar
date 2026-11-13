@@ -68,7 +68,7 @@ export function Sidebar({ org, orgs, nav, collapsed = false, onNavigate, onToggl
   const groups = React.useMemo(() => groupMainNav(nav.main), [nav.main])
 
   return (
-    <div className="flex h-full flex-col bg-sidebar">
+    <div className="flex h-full w-full min-w-0 flex-col bg-sidebar">
       <div
         className={cn(
           'flex h-12 shrink-0 items-center border-b border-sidebar-border px-4',

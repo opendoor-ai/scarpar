@@ -166,7 +166,7 @@ function CategoryManager({ categories }: CategoryManagerProps) {
           }
         />
       ) : (
-        <DataTable columns={columns} data={categories} searchKey="name" searchPlaceholder="Search categories..." />
+        <DataTable columns={columns} data={categories} searchKey="name" searchPlaceholder="카테고리 검색..." />
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

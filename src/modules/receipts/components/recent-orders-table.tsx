@@ -66,7 +66,7 @@ export function RecentOrdersTable({ orders }: { orders: RecentOrderRow[] }) {
       columns={columns}
       data={orders}
       searchKey="order_no"
-      searchPlaceholder="Search by order no..."
+      searchPlaceholder="주문번호로 검색..."
       emptyState={
         <EmptyState
           icon={ReceiptIcon}

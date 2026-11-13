@@ -183,7 +183,7 @@ function MembersTable({ members, currentRole, currentUserId }: MembersTableProps
       columns={columns}
       data={members}
       searchKey="fullName"
-      searchPlaceholder="Search members..."
+      searchPlaceholder="직원 검색..."
       emptyState={<span className="text-muted-foreground">아직 직원이 없습니다.</span>}
     />
   )
