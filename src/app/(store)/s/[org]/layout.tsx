@@ -2,7 +2,9 @@ import type { CSSProperties } from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
+import { env } from '@/lib/env'
 import { getOrgSettings, settingStr } from '@/lib/settings'
+import { SITE_NAME } from '@/lib/site'
 import { getAnonClient } from '@/lib/supabase/anon'
 import type { LayoutProps } from '@/lib/types'
 import type { Menu } from '@/types/db'
@@ -25,9 +27,12 @@ export async function generateMetadata({
   const org = await getStoreOrg(orgSlug)
   if (!org) return {}
 
+  const description = `${org.name} — 산업기계·중고기계 제품 정보와 공급사 연락처. ${SITE_NAME}에서 바로 전화·문자로 문의하세요.`
   return {
     title: { default: org.name, template: `%s · ${org.name}` },
-    description: `${org.name} 제품 소개와 문의`,
+    description,
+    alternates: { canonical: `${env.APP_URL}/s/${org.slug}` },
+    openGraph: { title: org.name, description, siteName: SITE_NAME, locale: 'ko_KR', type: 'website' },
   }
 }
 

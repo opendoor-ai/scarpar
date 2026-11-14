@@ -21,6 +21,8 @@ import { InfoTable } from '@/components/store/product-detail/info-table'
 import { CONDITION_BADGE_CLASS, CONDITION_LABEL, productCode } from '@/components/store/product-detail/labels'
 import { RelatedProducts } from '@/components/store/product-detail/related-products'
 import { SupplierCard } from '@/components/store/product-detail/supplier-card'
+import { ProductJsonLd } from '@/components/store/product-detail/product-json-ld'
+import { SITE_NAME } from '@/lib/site'
 import { ChannelBanners } from '@/components/store/product-detail/channel-banners'
 import { PurchaseGuide } from '@/components/store/product-detail/purchase-guide'
 import { QuestionsSection, getQuestionCount } from '@/components/store/product-detail/questions-section'
@@ -189,6 +191,18 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
 
   return (
     <div className="mx-auto max-w-6xl px-4 pt-4 pb-28 sm:px-6 md:pb-12">
+      <ProductJsonLd
+        product={product}
+        org={org}
+        url={productUrl}
+        images={imageUrls}
+        storeUrl={`${env.APP_URL}${storePath(org.slug)}`}
+        productsUrl={`${env.APP_URL}${storePath(org.slug, '/products')}`}
+        categoryTrail={categoryTrail.map((c) => ({
+          name: c.name,
+          url: `${env.APP_URL}${storePath(org.slug, '/products')}?category=${encodeURIComponent(c.slug)}`,
+        }))}
+      />
       {/* 현재 위치 */}
       <nav
         aria-label="현재 위치"
@@ -308,7 +322,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
                 product={product}
                 supplierName={org.name}
                 supplierPhone={org.phone}
-                platformName="전자동기계광고"
+                platformName={SITE_NAME}
               />
             </div>
             <div id="product-guide" className="scroll-mt-28 pt-12">
@@ -325,7 +339,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
       </div>
 
       <p className="mt-12 border-t border-border pt-6 text-center text-xs leading-relaxed text-muted-foreground">
-        전자동기계광고는 통신판매중개자이며, 개별 거래의 당사자가 아닙니다. 상품 정보, 거래 조건 및 거래에 대한 책임은
+        {SITE_NAME}는 통신판매중개자이며, 개별 거래의 당사자가 아닙니다. 상품 정보, 거래 조건 및 거래에 대한 책임은
         해당 공급사에 있습니다.
       </p>
     </div>

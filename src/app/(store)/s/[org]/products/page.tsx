@@ -1,6 +1,8 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PackageSearch } from 'lucide-react'
 
+import { env } from '@/lib/env'
 import { type Lang } from '@/lib/i18n'
 import { categoryWithDescendants } from '@/lib/category-tree'
 import { getOrgSettings, settingStr } from '@/lib/settings'
@@ -23,6 +25,41 @@ type ProductRow = Pick<
   Product,
   'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
 >
+
+/** 상품 목록 제목·설명·대표주소 — 카테고리를 고르면 "카테고리명 제품"으로 바뀝니다. */
+export async function generateMetadata({
+  params,
+  searchParams,
+}: PageProps<{ org: string }, { category?: string; q?: string; page?: string }>): Promise<Metadata> {
+  const { org: orgSlug } = await params
+  const { category: categorySlug } = await searchParams
+  const org = await getStoreOrg(orgSlug)
+  if (!org) return {}
+
+  let categoryName: string | null = null
+  if (categorySlug) {
+    const { data } = await getAnonClient()
+      .from('categories')
+      .select('name')
+      .eq('org_id', org.id)
+      .eq('slug', categorySlug)
+      .maybeSingle()
+    categoryName = (data as { name: string } | null)?.name ?? null
+  }
+
+  const title = categoryName ? `${categoryName} 제품` : '전체 제품'
+  const description = categoryName
+    ? `${org.name}의 ${categoryName} 제품 목록입니다. 사양 확인과 전화·문자 문의가 가능합니다.`
+    : `${org.name}의 전체 제품 목록입니다. 산업기계·중고기계 사양 확인과 전화·문자 문의가 가능합니다.`
+  const canonical = `${env.APP_URL}/s/${org.slug}/products${categoryName && categorySlug ? `?category=${encodeURIComponent(categorySlug)}` : ''}`
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: { title: `${title} · ${org.name}`, description, url: canonical, siteName: org.name, locale: 'ko_KR' },
+  }
+}
 
 export default async function ProductsPage({
   params,
