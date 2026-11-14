@@ -6,12 +6,14 @@ import type { Category } from '@/types/db'
 
 import { storePath } from './store-links'
 
-function productsHref(orgSlug: string, opts: { category?: string; query?: string }): string {
+/** basePath를 주면 그 주소(예: 통합 검색 '/products')를, 없으면 공급사 미니샵 목록 주소를 씁니다. */
+function productsHref(orgSlug: string, opts: { category?: string; query?: string; basePath?: string }): string {
   const params = new URLSearchParams()
   if (opts.category) params.set('category', opts.category)
   if (opts.query) params.set('q', opts.query)
   const qs = params.toString()
-  return storePath(orgSlug, `/products${qs ? `?${qs}` : ''}`)
+  const base = opts.basePath ?? storePath(orgSlug, '/products')
+  return `${base}${qs ? `?${qs}` : ''}`
 }
 
 const PILL = 'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors'
@@ -28,12 +30,14 @@ export function CategoryPills({
   activeSlug,
   query,
   lang = 'ko',
+  basePath,
 }: {
   orgSlug: string
   categories: Pick<Category, 'id' | 'name' | 'slug' | 'parent_id'>[]
   activeSlug?: string
   query?: string
   lang?: Lang
+  basePath?: string
 }) {
   if (categories.length === 0) return null
 
@@ -49,13 +53,13 @@ export function CategoryPills({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap gap-2">
-        <Link href={productsHref(orgSlug, { query })} className={cn(PILL, !activeSlug ? PILL_ACTIVE : PILL_IDLE)}>
+        <Link href={productsHref(orgSlug, { query, basePath })} className={cn(PILL, !activeSlug ? PILL_ACTIVE : PILL_IDLE)}>
           {t('all_products', lang)}
         </Link>
         {roots.map((c) => (
           <Link
             key={c.id}
-            href={productsHref(orgSlug, { category: c.slug, query })}
+            href={productsHref(orgSlug, { category: c.slug, query, basePath })}
             className={cn(PILL, activeRoot?.id === c.id ? PILL_ACTIVE : PILL_IDLE)}
           >
             {c.name}
@@ -66,7 +70,7 @@ export function CategoryPills({
       {activeRoot && subs.length > 0 ? (
         <div className="flex flex-wrap gap-2 rounded-lg bg-muted/50 p-2">
           <Link
-            href={productsHref(orgSlug, { category: activeRoot.slug, query })}
+            href={productsHref(orgSlug, { category: activeRoot.slug, query, basePath })}
             className={cn(PILL, active?.id === activeRoot.id ? 'border-foreground bg-background' : 'border-transparent hover:bg-background')}
           >
             {activeRoot.name} 전체
@@ -74,7 +78,7 @@ export function CategoryPills({
           {subs.map((c) => (
             <Link
               key={c.id}
-              href={productsHref(orgSlug, { category: c.slug, query })}
+              href={productsHref(orgSlug, { category: c.slug, query, basePath })}
               className={cn(PILL, active?.id === c.id ? 'border-foreground bg-background' : 'border-transparent hover:bg-background')}
             >
               {c.name}
@@ -91,20 +95,24 @@ export function ProductSearchBox({
   query,
   category,
   lang = 'ko',
+  basePath,
+  placeholder,
 }: {
   orgSlug: string
   query?: string
   category?: string
   lang?: Lang
+  basePath?: string
+  placeholder?: string
 }) {
   return (
-    <form action={storePath(orgSlug, '/products')} method="GET" className="relative w-full sm:w-72">
+    <form action={basePath ?? storePath(orgSlug, '/products')} method="GET" className="relative w-full sm:w-72">
       {category ? <input type="hidden" name="category" value={category} /> : null}
       <input
         type="search"
         name="q"
         defaultValue={query}
-        placeholder={t('search', lang)}
+        placeholder={placeholder ?? t('search', lang)}
         className="h-8 w-full rounded-md border border-input bg-transparent px-3 text-[13px] shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
       />
     </form>

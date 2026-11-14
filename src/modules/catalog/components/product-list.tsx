@@ -12,7 +12,7 @@ import { DataTable } from '@/components/ui/data-table'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { formatMoney } from '@/lib/money'
+import { formatMoney, formatPrice } from '@/lib/money'
 import { mediaUrl } from '@/lib/media-url'
 import type { ProductStatus } from '@/types/db'
 
@@ -112,7 +112,7 @@ const columns: ColumnDef<ProductListRow>[] = [
       const { variantCount, minVariantPrice, price } = row.original
       return (
         <div className="text-right tabular-nums">
-          {variantCount > 0 && minVariantPrice != null ? `${formatMoney(minVariantPrice)}~` : formatMoney(price)}
+          {variantCount > 0 && minVariantPrice != null ? `${formatMoney(minVariantPrice)}~` : formatPrice(price)}
         </div>
       )
     },

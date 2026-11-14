@@ -19,10 +19,13 @@ export function ProductCard({
   orgSlug,
   product,
   lang = 'ko',
+  supplierName,
 }: {
   orgSlug: string
   product: ProductCardData
   lang?: Lang
+  /** 통합 검색에서 어느 공급사 상품인지 표시 */
+  supplierName?: string
 }) {
   const outOfStock = product.track_stock && product.stock_qty <= 0 && !product.allow_backorder
   const hasDiscount = product.compare_at_price != null && product.compare_at_price > product.price
@@ -55,6 +58,7 @@ export function ProductCard({
       </div>
 
       <div className="flex flex-col gap-1 p-3">
+        {supplierName ? <p className="truncate text-xs text-muted-foreground">{supplierName}</p> : null}
         <p className="line-clamp-2 text-sm text-foreground">{product.name}</p>
         <div className="flex items-baseline gap-2">
           <span className={cn('text-sm font-semibold tabular-nums', hasDiscount && 'text-destructive')}>

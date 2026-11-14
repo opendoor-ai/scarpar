@@ -4,6 +4,7 @@
 import type { MetadataRoute } from 'next'
 
 import { env } from '@/lib/env'
+import { getPlatformCategories } from '@/lib/platform-categories'
 import { getAnonClient } from '@/lib/supabase/anon'
 
 // 1시간마다 새로 만듦 (상품이 늘어도 자동 반영)
@@ -40,16 +41,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       entries.push({ url: `${base}/s/${o.slug}/products`, changeFrequency: 'daily', priority: 0.7 })
     }
 
-    const categories = await fetchAll<{ org_id: string; slug: string }>((from, to) =>
-      supabase.from('categories').select('org_id, slug').in('org_id', orgIds).range(from, to),
-    )
-    for (const c of categories) {
-      const orgSlug = slugById.get(c.org_id)
-      if (!orgSlug) continue
+    // 통합 제품 검색 + 플랫폼 공통 카테고리 페이지
+    entries.push({ url: `${base}/products`, changeFrequency: 'daily', priority: 1 })
+    for (const c of await getPlatformCategories()) {
       entries.push({
-        url: `${base}/s/${orgSlug}/products?category=${encodeURIComponent(c.slug)}`,
-        changeFrequency: 'weekly',
-        priority: 0.5,
+        url: `${base}/products?category=${encodeURIComponent(c.slug)}`,
+        changeFrequency: 'daily',
+        priority: c.parent_id ? 0.6 : 0.7,
       })
     }
 

@@ -11,12 +11,15 @@ export function Pagination({
   totalPages,
   query,
   category,
+  basePath,
 }: {
   orgSlug: string
   page: number
   totalPages: number
   query?: string
   category?: string
+  /** 통합 검색처럼 공급사 주소가 아닌 목록이면 그 주소 (예: '/products') */
+  basePath?: string
 }) {
   if (totalPages <= 1) return null
 
@@ -26,7 +29,7 @@ export function Pagination({
     if (query) params.set('q', query)
     if (p > 1) params.set('page', String(p))
     const qs = params.toString()
-    return storePath(orgSlug, `/products${qs ? `?${qs}` : ''}`)
+    return `${basePath ?? storePath(orgSlug, '/products')}${qs ? `?${qs}` : ''}`
   }
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1).filter(

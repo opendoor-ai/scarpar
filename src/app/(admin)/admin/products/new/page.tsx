@@ -1,7 +1,7 @@
 import { PageHeader } from '@/components/ui/page-header'
 import { requireOrg } from '@/lib/auth'
 import { requireModule } from '@/lib/modules'
-import { getServerClient } from '@/lib/supabase/server'
+import { getPlatformCategories } from '@/lib/platform-categories'
 
 import { ProductForm } from '@/modules/catalog/components/product-form'
 import { toCategoryOptions } from '@/modules/catalog/category-options'
@@ -12,16 +12,8 @@ export default async function NewProductPage() {
   const ctx = await requireOrg()
   requireModule(ctx.org, 'catalog')
 
-  const supabase = await getServerClient()
-  const { data: categoryRows } = await supabase
-    .from('categories')
-    .select('id, name, parent_id')
-    .eq('org_id', ctx.org.id)
-    .order('name')
-
-  const categories = toCategoryOptions(
-    (categoryRows ?? []) as { id: string; name: string; parent_id: string | null }[],
-  )
+  // 플랫폼 공통 카테고리에서 고름 (모든 공급사 공통)
+  const categories = toCategoryOptions(await getPlatformCategories())
 
   return (
     <div>

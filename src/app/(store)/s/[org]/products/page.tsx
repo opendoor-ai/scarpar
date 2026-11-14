@@ -5,6 +5,7 @@ import { PackageSearch } from 'lucide-react'
 import { env } from '@/lib/env'
 import { type Lang } from '@/lib/i18n'
 import { categoryWithDescendants } from '@/lib/category-tree'
+import { getPlatformCategories } from '@/lib/platform-categories'
 import { getOrgSettings, settingStr } from '@/lib/settings'
 import { getAnonClient } from '@/lib/supabase/anon'
 import type { PageProps } from '@/lib/types'
@@ -38,13 +39,7 @@ export async function generateMetadata({
 
   let categoryName: string | null = null
   if (categorySlug) {
-    const { data } = await getAnonClient()
-      .from('categories')
-      .select('name')
-      .eq('org_id', org.id)
-      .eq('slug', categorySlug)
-      .maybeSingle()
-    categoryName = (data as { name: string } | null)?.name ?? null
+    categoryName = (await getPlatformCategories()).find((c) => c.slug === categorySlug)?.name ?? null
   }
 
   const title = categoryName ? `${categoryName} 제품` : '전체 제품'
@@ -76,13 +71,8 @@ export default async function ProductsPage({
 
   const supabase = getAnonClient()
 
-  const { data: categoryRows } = await supabase
-    .from('categories')
-    .select('id, name, slug, parent_id')
-    .eq('org_id', org.id)
-    .order('sort_order', { ascending: true })
-    .order('created_at', { ascending: true })
-  const categories = (categoryRows ?? []) as Pick<Category, 'id' | 'name' | 'slug' | 'parent_id'>[]
+  // 플랫폼 공통 카테고리 (모든 공급사 공통)
+  const categories: Pick<Category, 'id' | 'name' | 'slug' | 'parent_id'>[] = await getPlatformCategories()
   const activeCategory = categorySlug ? categories.find((c) => c.slug === categorySlug) : undefined
 
   const page = Math.max(1, Number(pageParam) || 1)

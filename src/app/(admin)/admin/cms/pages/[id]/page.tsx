@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 
 import { requireOrg } from '@/lib/auth'
 import { requireModule } from '@/lib/modules'
+import { getPlatformCategories } from '@/lib/platform-categories'
 import { getServerClient } from '@/lib/supabase/server'
 import type { CmsPage } from '@/types/db'
 import type { PageProps } from '@/lib/types'
@@ -19,7 +20,16 @@ export default async function CmsPageEditorPage({ params }: PageProps<{ id: stri
 
   const [{ data: page }, { data: categories }, { data: revisions }] = await Promise.all([
     supabase.from('cms_pages').select('*').eq('id', id).eq('org_id', ctx.org.id).single(),
-    supabase.from('categories').select('id, name').eq('org_id', ctx.org.id).order('name'),
+    // 플랫폼 공통 카테고리 ("1차 / 2차" 이름으로 표시)
+    getPlatformCategories().then((rows) => {
+      const nameById = new Map(rows.map((r) => [r.id, r.name]))
+      return {
+        data: rows.map((r) => ({
+          id: r.id,
+          name: r.parent_id ? `${nameById.get(r.parent_id) ?? ''} / ${r.name}` : r.name,
+        })),
+      }
+    }),
     supabase
       .from('cms_revisions')
       .select('id, created_at, saved_by')

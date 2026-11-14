@@ -1,4 +1,5 @@
 import { categoryWithDescendants } from '@/lib/category-tree'
+import { getPlatformCategories } from '@/lib/platform-categories'
 import { getAnonClient } from '@/lib/supabase/anon'
 import type { Product, ProductGridBlock } from '@/types/db'
 
@@ -27,14 +28,7 @@ export async function ProductGridBlockView({ block, ctx }: { block: ProductGridB
     query = query.eq('is_featured', true)
   } else if (block.mode === 'category' && block.categoryId) {
     // 1차 카테고리면 하위 2차 카테고리 상품까지 포함
-    const { data: categoryRows } = await supabase
-      .from('categories')
-      .select('id, parent_id')
-      .eq('org_id', ctx.org.id)
-    const ids = categoryWithDescendants(
-      (categoryRows ?? []) as { id: string; parent_id: string | null }[],
-      block.categoryId,
-    )
+    const ids = categoryWithDescendants(await getPlatformCategories(), block.categoryId)
     query = query.in('category_id', ids)
   } else if (block.mode === 'manual' && block.productIds) {
     query = query.in('id', block.productIds)

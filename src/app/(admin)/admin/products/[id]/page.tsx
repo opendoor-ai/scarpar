@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { PageHeader } from '@/components/ui/page-header'
 import { requireOrg } from '@/lib/auth'
 import { requireModule } from '@/lib/modules'
+import { getPlatformCategories } from '@/lib/platform-categories'
 import { getServerClient } from '@/lib/supabase/server'
 import type { PageProps } from '@/lib/types'
 import type { Product, ProductImage, ProductVariant } from '@/types/db'
@@ -23,11 +24,11 @@ export default async function EditProductPage({ params }: PageProps<{ id: string
 
   const supabase = await getServerClient()
 
-  const [productResult, variantsResult, imagesResult, categoriesResult] = await Promise.all([
+  const [productResult, variantsResult, imagesResult, platformCategories] = await Promise.all([
     supabase.from('products').select('*').eq('id', id).eq('org_id', ctx.org.id).single(),
     supabase.from('product_variants').select('*').eq('product_id', id).order('position'),
     supabase.from('product_images').select('*, media:media(path)').eq('product_id', id).order('position'),
-    supabase.from('categories').select('id, name, parent_id').eq('org_id', ctx.org.id).order('name'),
+    getPlatformCategories(),
   ])
 
   if (!productResult.data) {
@@ -40,9 +41,8 @@ export default async function EditProductPage({ params }: PageProps<{ id: string
     ...row,
     path: row.media?.path ?? '',
   }))
-  const categories = toCategoryOptions(
-    (categoriesResult.data ?? []) as { id: string; name: string; parent_id: string | null }[],
-  )
+  // 플랫폼 공통 카테고리에서 고름 (모든 공급사 공통)
+  const categories = toCategoryOptions(platformCategories)
 
   return (
     <div>

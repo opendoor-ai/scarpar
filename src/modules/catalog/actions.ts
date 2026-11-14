@@ -8,6 +8,7 @@
 // staff-tier inventory_movements table), so it is gated at 'manager' too
 // for a consistent, friendly failure instead of a raw RLS rejection.
 
+import { getPlatformCategories } from '@/lib/platform-categories'
 import { sanitizeDetailHtml } from '@/lib/detail-html'
 import { revalidatePath } from 'next/cache'
 import type { ZodError } from 'zod'
@@ -50,6 +51,13 @@ function friendlyDbError(error: { code?: string; message: string }, entity: stri
 // Products
 // ---------------------------------------------------------------------------
 
+/** 상품 카테고리는 플랫폼 공통 카테고리만 허용 (다른 조직의 임의 카테고리 연결 방지) */
+async function isAllowedCategory(categoryId: string | null): Promise<boolean> {
+  if (!categoryId) return true
+  const categories = await getPlatformCategories()
+  return categories.some((c) => c.id === categoryId)
+}
+
 export async function createProduct(input: ProductActionInput): Promise<ActionResult<{ id: string }>> {
   const ctx = await requireOrg()
   requireRole(ctx, 'manager')
@@ -57,6 +65,7 @@ export async function createProduct(input: ProductActionInput): Promise<ActionRe
   const parsed = productActionSchema.safeParse(input)
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) }
   const data = parsed.data
+  if (!(await isAllowedCategory(data.category_id))) return { ok: false, error: '카테고리를 다시 선택해 주세요' }
 
   try {
     const supabase = await getServerClient()
@@ -121,6 +130,7 @@ export async function updateProduct(
   const parsed = productActionSchema.safeParse(input)
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) }
   const data = parsed.data
+  if (!(await isAllowedCategory(data.category_id))) return { ok: false, error: '카테고리를 다시 선택해 주세요' }
 
   try {
     const supabase = await getServerClient()

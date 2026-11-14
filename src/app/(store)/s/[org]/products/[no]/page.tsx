@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import QRCode from 'qrcode'
 
 import { env } from '@/lib/env'
+import { getPlatformCategories } from '@/lib/platform-categories'
 
 import { type Lang } from '@/lib/i18n'
 import { mediaUrl } from '@/lib/media-url'
@@ -147,19 +148,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
   // 카테고리: 상위 카테고리가 있으면 "상위 > 하위" 순서로 보여준다.
   let categoryTrail: { name: string; slug: string }[] = []
   if (product.category_id) {
-    const { data: categoryRows, error: categoryError } = await supabase
-      .from('categories')
-      .select('id, name, slug, parent_id')
-      .eq('org_id', org.id)
-    if (categoryError) console.error('[product page] categories read failed:', categoryError.message)
-    else if (!(categoryRows ?? []).some((r) => r.id === product.category_id))
-      console.warn('[product page] product category not visible to anon:', product.category_id)
-    const rows = (categoryRows ?? []) as {
-      id: string
-      name: string
-      slug: string
-      parent_id: string | null
-    }[]
+    const rows = await getPlatformCategories()
     const byId = new Map(rows.map((r) => [r.id, r]))
     let current = byId.get(product.category_id)
     while (current && categoryTrail.length < 5) {

@@ -8,3 +8,6 @@ export const SITE_DESCRIPTION = '산업기계·중고기계 공급사와 제품 
 
 export const NAVER_SITE_VERIFICATION = process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION || ''
 export const GOOGLE_SITE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || ''
+
+// 플랫폼 운영 조직(전자동)의 주소. 이 조직의 카테고리를 모든 공급사가 공통으로 씁니다.
+export const PLATFORM_ORG_SLUG = process.env.NEXT_PUBLIC_PLATFORM_ORG_SLUG || 'jadong'
