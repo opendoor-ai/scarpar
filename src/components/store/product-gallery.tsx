@@ -8,11 +8,14 @@ export function ProductGallery({
   images,
   name,
   badge,
+  topBadges = [],
 }: {
   images: string[]
   name: string
-  /** 사진 왼쪽 위 배지 — 예: { label: '중고', className: 'bg-amber-500 text-white' } */
+  /** 사진 왼쪽 아래 상태 배지 — 예: { label: '중고', className: 'bg-red-600 text-white' } */
   badge?: { label: string; className: string } | null
+  /** 사진 왼쪽 위 아이콘 — 직접거래·급매 등 */
+  topBadges?: { label: string; className: string }[]
 }) {
   const [active, setActive] = useState(0)
   const hasImages = images.length > 0
@@ -21,9 +24,21 @@ export function ProductGallery({
   return (
     <div className="flex flex-col gap-3">
       <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-border bg-muted">
+        {topBadges.length > 0 ? (
+          <span className="absolute top-0 left-0 z-10 flex flex-wrap gap-1">
+            {topBadges.map((b, i) => (
+              <span
+                key={b.label}
+                className={cn('px-3 py-1 text-sm font-bold italic shadow', i === 0 ? 'rounded-br-lg' : 'rounded-b-lg', b.className)}
+              >
+                {b.label}
+              </span>
+            ))}
+          </span>
+        ) : null}
         {badge ? (
           <span
-            className={cn('absolute top-3 left-3 z-10 rounded px-2.5 py-1 text-sm font-bold shadow', badge.className)}
+            className={cn('absolute bottom-3 left-3 z-10 rounded px-2.5 py-1 text-sm font-bold shadow', badge.className)}
           >
             {badge.label}
           </span>

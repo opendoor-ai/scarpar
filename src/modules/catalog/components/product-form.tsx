@@ -1,34 +1,41 @@
 'use client'
 
-// Shared create/edit product form (docs/conventions.md — Forms: RHF +
-// zodResolver + ui/form helpers). Base fields are one RHF form; variants and
-// images are separate controlled-array editors saved via their own actions
-// (saveVariants/saveImages) right after createProduct/updateProduct resolves
-// — see the module-level submit orchestration below.
+// 상품 등록·수정 화면 (카페24 상품 등록 구성 참고, 기계 광고에 실제로 쓰는 항목만)
+// 표시 설정 → 기본 정보 → 판매 정보 → 이미지 → 아이콘 → 제작 정보 → 상세설명 → 검색엔진 최적화 → (접힘) 추가 설정
+// 기본 항목은 하나의 RHF 폼이고, 옵션·사진은 저장 직후 각자의 작업(saveVariants/saveImages)으로 저장합니다.
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ChevronDown } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import {
+  BADGE_CLASS,
+  BADGE_LABEL,
+  CONDITION_BADGE_CLASS,
+  CONDITION_LABEL,
+  PRODUCT_BADGES,
+  isProductBadge,
+} from '@/components/store/product-detail/labels'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { mediaUrl } from '@/lib/media-url'
 import { fromPaisa, toPaisa } from '@/lib/money'
+import { cn } from '@/lib/utils'
 import type { Product, ProductImage, ProductVariant } from '@/types/db'
 
 import { createProduct, deleteProduct, saveImages, saveVariants, updateProduct } from '../actions'
 import { productFormSchema, type ProductActionInput, type ProductFormValues } from '../schemas'
-import { ImageGallery, fromImageRow, toImageRow, type ImageRow } from './image-gallery'
 import { AiCopyPanel } from './ai-copy-panel'
 import { CategoryTwoLevelSelect } from './category-two-level-select'
 import { DetailHtmlEditor } from './detail-html-editor'
+import { ImageGallery, fromImageRow, toImageRow, type ImageRow } from './image-gallery'
 import { VariantEditor, fromVariantRow, newVariantRow, toVariantRow, type VariantRow } from './variant-editor'
 
 import type { CategoryOption } from '../category-options'
@@ -43,7 +50,17 @@ interface ProductFormProps {
   categories: CategoryOption[]
 }
 
-const NONE_CONDITION = '__none__'
+const SECTIONS = [
+  ['display', '표시 설정'],
+  ['basic', '기본 정보'],
+  ['sale', '판매 정보'],
+  ['images', '이미지'],
+  ['icons', '아이콘'],
+  ['make', '제작 정보'],
+  ['detail', '상세설명'],
+  ['seo', '검색엔진 최적화'],
+  ['more', '추가 설정'],
+] as const
 
 function toFormValues(product?: Product): ProductFormValues {
   if (!product) {
@@ -52,22 +69,25 @@ function toFormValues(product?: Product): ProductFormValues {
       description: '',
       brand: '',
       category_id: null,
-      status: 'draft',
-      price: '',
+      status: 'active',
+      price: '0',
       compare_at_price: '',
       cost_price: '',
       sku: '',
       barcode: '',
       hs_code: '',
-      track_stock: true,
+      track_stock: false,
       stock_qty: 0,
-      low_stock_threshold: 5,
-      allow_backorder: false,
+      low_stock_threshold: 0,
+      allow_backorder: true,
       weight_grams: '',
       tags: '',
       is_featured: false,
       condition: '',
       model_name: '',
+      badges: ['direct'],
+      origin: '',
+      manufacture_year: '',
       spec_summary: '',
       short_description: '',
       detail_html: '',
@@ -97,6 +117,9 @@ function toFormValues(product?: Product): ProductFormValues {
     is_featured: product.is_featured,
     condition: product.condition ?? '',
     model_name: product.model_name ?? '',
+    badges: (product.badges ?? []).filter(isProductBadge),
+    origin: product.origin ?? '',
+    manufacture_year: product.manufacture_year ? String(product.manufacture_year) : '',
     spec_summary: product.spec_summary ?? '',
     short_description: product.short_description ?? '',
     detail_html: product.detail_html ?? '',
@@ -106,18 +129,19 @@ function toFormValues(product?: Product): ProductFormValues {
 }
 
 function toActionInput(values: ProductFormValues): ProductActionInput {
+  const opt = (v?: string) => (v?.trim() ? v.trim() : null)
   return {
     name: values.name,
-    description: values.description?.trim() ? values.description.trim() : null,
-    brand: values.brand?.trim() ? values.brand.trim() : null,
+    description: opt(values.description),
+    brand: opt(values.brand),
     category_id: values.category_id,
     status: values.status,
-    price: toPaisa(values.price),
+    price: toPaisa(values.price || '0'),
     compare_at_price: values.compare_at_price?.trim() ? toPaisa(values.compare_at_price) : null,
     cost_price: values.cost_price?.trim() ? toPaisa(values.cost_price) : null,
-    sku: values.sku?.trim() ? values.sku.trim() : null,
-    barcode: values.barcode?.trim() ? values.barcode.trim() : null,
-    hs_code: values.hs_code?.trim() ? values.hs_code.trim() : null,
+    sku: opt(values.sku),
+    barcode: opt(values.barcode),
+    hs_code: opt(values.hs_code),
     track_stock: values.track_stock,
     stock_qty: values.stock_qty,
     low_stock_threshold: values.low_stock_threshold,
@@ -131,14 +155,82 @@ function toActionInput(values: ProductFormValues): ProductActionInput {
       : [],
     is_featured: values.is_featured,
     condition: values.condition ? values.condition : null,
-    model_name: values.model_name?.trim() ? values.model_name.trim() : null,
-    spec_summary: values.spec_summary?.trim() ? values.spec_summary.trim() : null,
-    short_description: values.short_description?.trim() ? values.short_description.trim() : null,
-    detail_html: values.detail_html?.trim() ? values.detail_html.trim() : null,
-    seo_title: values.seo_title?.trim() ? values.seo_title.trim() : null,
-    seo_description: values.seo_description?.trim() ? values.seo_description.trim() : null,
+    model_name: opt(values.model_name),
+    badges: values.badges.filter(isProductBadge),
+    origin: opt(values.origin),
+    manufacture_year: values.manufacture_year?.trim() ? Number(values.manufacture_year) : null,
+    spec_summary: opt(values.spec_summary),
+    short_description: opt(values.short_description),
+    detail_html: opt(values.detail_html),
+    seo_title: opt(values.seo_title),
+    seo_description: opt(values.seo_description),
   }
 }
+
+// ------------------------------------------------------------------ 화면 틀 (카페24식 표)
+
+function Section({
+  id,
+  title,
+  description,
+  children,
+  right,
+}: {
+  id: string
+  title: string
+  description?: string
+  children: React.ReactNode
+  right?: React.ReactNode
+}) {
+  return (
+    <section id={`sec-${id}`} className="scroll-mt-28 overflow-hidden rounded-lg border border-border bg-card">
+      <div className="flex items-center justify-between gap-3 border-b border-border bg-muted/50 px-4 py-3">
+        <div>
+          <h2 className="text-sm font-bold">{title}</h2>
+          {description ? <p className="text-xs text-muted-foreground">{description}</p> : null}
+        </div>
+        {right}
+      </div>
+      <div className="divide-y divide-border">{children}</div>
+    </section>
+  )
+}
+
+function Row({
+  label,
+  required,
+  hint,
+  children,
+}: {
+  label: string
+  required?: boolean
+  hint?: React.ReactNode
+  children: React.ReactNode
+}) {
+  return (
+    <div className="grid gap-2 px-4 py-3 md:grid-cols-[170px_1fr] md:items-start">
+      <div className="pt-2 text-sm font-medium text-muted-foreground">
+        {label}
+        {required ? <span className="ml-1 rounded bg-red-500 px-1 py-px text-[10px] font-bold text-white">필수</span> : null}
+      </div>
+      <div className="flex min-w-0 flex-col gap-1.5">
+        {children}
+        {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
+      </div>
+    </div>
+  )
+}
+
+function Radio({ checked, onChange, label }: { checked: boolean; onChange: () => void; label: React.ReactNode }) {
+  return (
+    <label className="inline-flex cursor-pointer items-center gap-1.5 text-sm">
+      <input type="radio" checked={checked} onChange={onChange} className="accent-primary" />
+      {label}
+    </label>
+  )
+}
+
+// ------------------------------------------------------------------ 상품 등록 화면
 
 function ProductForm({ mode, product, variants, images, categories }: ProductFormProps) {
   const router = useRouter()
@@ -147,26 +239,33 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
   const [variantRows, setVariantRows] = useState<VariantRow[]>(() => (variants ?? []).map(toVariantRow))
   const [hasVariants, setHasVariants] = useState((variants?.length ?? 0) > 0)
   const [imageRows, setImageRows] = useState<ImageRow[]>(() => (images ?? []).map(toImageRow))
+  const [moreOpen, setMoreOpen] = useState(false)
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues: toFormValues(product),
   })
+  const price = form.watch('price')
+  const negotiable = !price || Number(price) === 0
+  const condition = form.watch('condition')
+  const badges = form.watch('badges')
 
   const persistedVariantOptions = variantRows
     .filter((row): row is VariantRow & { id: string } => Boolean(row.id))
     .map((row) => ({ id: row.id, name: row.name || '이름 없음' }))
 
+  // 대표이미지 미리보기 (첫 번째 사진)
+  const firstImage = imageRows[0] as (ImageRow & { path?: string }) | undefined
+  const previewUrl = firstImage?.path ? mediaUrl(firstImage.path) : null
+
   async function onSubmit(values: ProductFormValues) {
     startTransition(async () => {
       const input = toActionInput(values)
       const result = mode === 'create' ? await createProduct(input) : await updateProduct(product!.id, input)
-
       if (!result.ok) {
         toast.error(result.error)
         return
       }
-
       const productId = mode === 'create' ? result.data!.id : product!.id
 
       const [variantsResult, imagesResult] = await Promise.all([
@@ -174,530 +273,401 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
           product_id: productId,
           variants: (hasVariants ? variantRows : []).map((row, i) => fromVariantRow(row, i)),
         }),
-        saveImages({
-          product_id: productId,
-          images: imageRows.map((row, i) => fromImageRow(row, i)),
-        }),
+        saveImages({ product_id: productId, images: imageRows.map((row, i) => fromImageRow(row, i)) }),
       ])
-
-      if (!variantsResult.ok) {
-        toast.error(`상품은 저장됐지만 옵션 저장에 실패했습니다: ${variantsResult.error}`)
-        return
-      }
-      if (!imagesResult.ok) {
-        toast.error(`상품은 저장됐지만 사진 저장에 실패했습니다: ${imagesResult.error}`)
-        return
-      }
+      if (!variantsResult.ok) return void toast.error(`상품은 저장됐지만 옵션 저장에 실패했습니다: ${variantsResult.error}`)
+      if (!imagesResult.ok) return void toast.error(`상품은 저장됐지만 사진 저장에 실패했습니다: ${imagesResult.error}`)
 
       toast.success(mode === 'create' ? '상품이 등록되었습니다' : '상품이 수정되었습니다')
-
-      if (mode === 'create') {
-        router.push(`/admin/products/${productId}`)
-      } else {
-        router.refresh()
-      }
+      if (mode === 'create') router.push(`/admin/products/${productId}`)
+      else router.refresh()
     })
   }
 
   async function handleDelete() {
     if (!product) return
     const result = await deleteProduct(product.id)
-    if (!result.ok) {
-      toast.error(result.error)
-      return
-    }
+    if (!result.ok) return void toast.error(result.error)
     toast.success('상품이 삭제되었습니다')
     router.push('/admin/products')
   }
 
+  const text = (name: keyof ProductFormValues, placeholder?: string, maxLength?: number) => (
+    <FormField
+      control={form.control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormControl>
+            <Input {...field} value={(field.value as string | undefined) ?? ''} placeholder={placeholder} maxLength={maxLength} />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  )
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="flex flex-col gap-6 lg:col-span-2">
-            <Card className="gap-4 p-4">
-              <CardHeader className="p-0">
-                <CardTitle>기본 정보</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4 p-0">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>상품명</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+      <form onSubmit={form.handleSubmit(onSubmit, () => toast.error('입력값을 확인해 주세요. 빨간 글씨 항목이 있어요.'))} className="flex flex-col gap-5">
+        {/* 바로가기 */}
+        <nav className="sticky top-14 z-20 -mx-1 flex gap-1 overflow-x-auto rounded-lg border border-border bg-background/95 p-1 backdrop-blur [scrollbar-width:none]">
+          {SECTIONS.map(([id, label]) => (
+            <a key={id} href={`#sec-${id}`} className="shrink-0 rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
+              {label}
+            </a>
+          ))}
+        </nav>
+
+        {/* 1. 표시 설정 */}
+        <Section id="display" title="표시 설정">
+          <Row label="진열 상태">
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <div className="flex flex-wrap gap-4 pt-2">
+                  <Radio checked={field.value === 'active'} onChange={() => field.onChange('active')} label="진열함 (고객에게 보임)" />
+                  <Radio checked={field.value === 'draft'} onChange={() => field.onChange('draft')} label="진열안함 (임시저장)" />
+                  <Radio checked={field.value === 'archived'} onChange={() => field.onChange('archived')} label="보관 (판매 종료)" />
+                </div>
+              )}
+            />
+          </Row>
+          <Row label="상품 분류" hint="플랫폼 공통 분류예요. 1차 → 2차 순서로 골라요.">
+            <FormField
+              control={form.control}
+              name="category_id"
+              render={({ field }) => (
+                <FormItem>
+                  <CategoryTwoLevelSelect categories={categories} value={field.value} onChange={field.onChange} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Row>
+          <Row label="추천 상품" hint="켜면 미니샵 '추천 제품'과 메인 '스페셜픽'에 보여요.">
+            <FormField
+              control={form.control}
+              name="is_featured"
+              render={({ field }) => (
+                <div className="flex h-9 items-center gap-2">
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  <span className="text-sm text-muted-foreground">{field.value ? '추천함' : '추천 안 함'}</span>
+                </div>
+              )}
+            />
+          </Row>
+        </Section>
+
+        {/* 2. 기본 정보 */}
+        <Section
+          id="basic"
+          title="기본 정보"
+          right={
+            <span className="text-xs text-muted-foreground">
+              상품코드{' '}
+              <span className="font-semibold text-foreground tabular-nums">
+                {product?.product_no ? `P${product.product_no}` : '저장하면 자동 부여'}
+              </span>
+            </span>
+          }
+        >
+          <Row label="상품명" required hint="목록·상세페이지 제목이에요. 예: 천정복사패널, 복사패널 저온형 SR-5SM">
+            {text('name', '상품명을 입력하세요', 200)}
+          </Row>
+          <Row label="모델명" hint="상품명 아래 회색 글씨로 보여요.">
+            {text('model_name', '예: SR-5SM, VX650', 200)}
+          </Row>
+          <Row label="상품 요약설명" hint="상세페이지 정보표의 '제품사양'에 한 줄로 보여요.">
+            {text('spec_summary', '예: X축 650mm, 주축 8,000rpm, 툴 24개', 500)}
+          </Row>
+          <Row label="상품 간략설명" hint="상세페이지 제목 아래와 검색 설명에 쓰여요.">
+            {text('short_description', '예: 정밀 가공용 수직 머시닝센터, 실가동 상태 양호', 500)}
+          </Row>
+          <Row label="검색어 설정" hint="쉼표(,)로 구분해서 입력하세요. 통합 검색에서 이 단어로도 찾을 수 있게 돼요.">
+            {text('tags', '예: 머시닝센터, 수직머시닝, 중고머시닝')}
+          </Row>
+        </Section>
+
+        {/* 3. 판매 정보 */}
+        <Section id="sale" title="판매 정보" description="거래는 고객과 공급사가 직접 하고, 화면에는 가격만 안내해요.">
+          <Row label="판매가" hint={negotiable ? '"가격협의"로 표시돼요.' : '원 단위 숫자만 입력하세요.'}>
+            <div className="flex flex-wrap items-center gap-3">
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="flex items-center gap-1.5">
+                        <Input inputMode="numeric" className="w-44" {...field} disabled={negotiable} value={negotiable ? '' : field.value} placeholder={negotiable ? '가격협의' : '예: 7500000'} />
+                        <span className="text-sm">원</span>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <label className="inline-flex items-center gap-1.5 text-sm">
+                <input
+                  type="checkbox"
+                  className="accent-primary"
+                  checked={negotiable}
+                  onChange={(e) => form.setValue('price', e.target.checked ? '0' : '', { shouldDirty: true })}
                 />
+                가격협의
+              </label>
+            </div>
+          </Row>
+        </Section>
+
+        {/* 4. 이미지 */}
+        <Section id="images" title="이미지 정보" description="첫 번째 사진이 대표이미지예요. 끌어서 순서를 바꿀 수 있어요.">
+          <div className="p-4">
+            <ImageGallery value={imageRows} onChange={setImageRows} variantOptions={persistedVariantOptions} />
+          </div>
+        </Section>
+
+        {/* 5. 아이콘 */}
+        <Section id="icons" title="아이콘 설정" description="대표이미지 위에 표시되는 아이콘이에요.">
+          <Row label="상품 상태" hint="목록 카드와 상세페이지 대표이미지에 표시돼요.">
+            <FormField
+              control={form.control}
+              name="condition"
+              render={({ field }) => (
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <Radio checked={!field.value} onChange={() => field.onChange('')} label="표시 안 함" />
+                  {(['new', 'used'] as const).map((c) => (
+                    <Radio
+                      key={c}
+                      checked={field.value === c}
+                      onChange={() => field.onChange(c)}
+                      label={<span className={cn('rounded px-1.5 py-0.5 text-xs font-bold', CONDITION_BADGE_CLASS[c])}>{CONDITION_LABEL[c]}</span>}
+                    />
+                  ))}
+                </div>
+              )}
+            />
+          </Row>
+          <Row label="추가 아이콘" hint="여러 개 고를 수 있어요. 대표이미지 왼쪽 위에 보여요.">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+              <div className="flex flex-wrap gap-3 pt-2">
+                {PRODUCT_BADGES.map((b) => (
+                  <label key={b} className="inline-flex cursor-pointer items-center gap-1.5">
+                    <input
+                      type="checkbox"
+                      className="accent-primary"
+                      checked={badges.includes(b)}
+                      onChange={(e) =>
+                        form.setValue(
+                          'badges',
+                          e.target.checked ? [...badges, b] : badges.filter((x) => x !== b),
+                          { shouldDirty: true },
+                        )
+                      }
+                    />
+                    <span className={cn('rounded px-1.5 py-0.5 text-xs font-bold', BADGE_CLASS[b])}>{BADGE_LABEL[b]}</span>
+                  </label>
+                ))}
+              </div>
+              {/* 미리보기 */}
+              <div className="relative size-36 shrink-0 overflow-hidden rounded-md border border-border bg-muted sm:ml-auto">
+                {previewUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={previewUrl} alt="" className="size-full object-cover" />
+                ) : (
+                  <span className="flex size-full items-center justify-center text-[11px] text-muted-foreground">대표이미지 미리보기</span>
+                )}
+                <span className="absolute top-1 left-1 flex flex-wrap gap-0.5">
+                  {badges.filter(isProductBadge).map((b) => (
+                    <span key={b} className={cn('rounded-sm px-1 py-px text-[10px] font-bold', BADGE_CLASS[b])}>
+                      {BADGE_LABEL[b]}
+                    </span>
+                  ))}
+                </span>
+                {condition ? (
+                  <span className={cn('absolute bottom-1 left-1 rounded-sm px-1 py-px text-[10px] font-bold', CONDITION_BADGE_CLASS[condition])}>
+                    {CONDITION_LABEL[condition]}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          </Row>
+        </Section>
+
+        {/* 6. 제작 정보 */}
+        <Section id="make" title="제작 정보">
+          <Row label="제조사">{text('brand', '예: 현대위아, (주)에너지코리아', 200)}</Row>
+          <Row label="연식 (제조연도)" hint="중고 기계는 연식을 꼭 적어 주세요. 4자리 숫자 (예: 2019)">
+            <div className="w-40">{text('manufacture_year', '2019', 4)}</div>
+          </Row>
+          <Row label="원산지">{text('origin', '예: 국산, 일본, 독일', 100)}</Row>
+        </Section>
+
+        {/* 7. 상세설명 */}
+        <Section id="detail" title="상품 상세설명" description="상세페이지 '제품상세' 탭에 보여요. 표·사진·글을 넣을 수 있어요.">
+          <div className="flex flex-col gap-4 p-4">
+            <AiCopyPanel form={form} categories={categories} />
+            <FormField
+              control={form.control}
+              name="detail_html"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <DetailHtmlEditor value={field.value ?? ''} onChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </Section>
+
+        {/* 8. 검색엔진 최적화 */}
+        <Section id="seo" title="검색엔진 최적화 (SEO)" description="네이버·구글 검색 결과에 보이는 문구예요. 비워 두면 자동으로 만들어요.">
+          <Row label="브라우저 제목 (Title)" hint="비우면 상품명을 써요. 70자 이내">
+            {text('seo_title', '예: 현대위아 VX650 수직 머시닝센터 중고', 70)}
+          </Row>
+          <Row label="설명 (Description)" hint="비우면 간략설명을 써요. 160자 이내">
+            <FormField
+              control={form.control}
+              name="seo_description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Textarea rows={2} {...field} value={field.value ?? ''} maxLength={160} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Row>
+        </Section>
+
+        {/* 9. 추가 설정 (잘 안 쓰는 항목) */}
+        <section id="sec-more" className="scroll-mt-28 overflow-hidden rounded-lg border border-dashed border-border">
+          <button
+            type="button"
+            onClick={() => setMoreOpen((v) => !v)}
+            className="flex w-full items-center justify-between px-4 py-3 text-left"
+          >
+            <span>
+              <span className="text-sm font-bold">추가 설정 (선택)</span>
+              <span className="ml-2 text-xs text-muted-foreground">옵션 · 재고 · 관리코드 · 메모 — 보통은 쓰지 않아요</span>
+            </span>
+            <ChevronDown className={cn('size-4 transition-transform', moreOpen && 'rotate-180')} />
+          </button>
+          {moreOpen ? (
+            <div className="divide-y divide-border border-t border-border">
+              <Row label="옵션 (규격별 가격)">
+                <div className="flex flex-col gap-3">
+                  <label className="flex items-center gap-2 text-sm">
+                    <Switch
+                      checked={hasVariants}
+                      onCheckedChange={(checked) => {
+                        setHasVariants(checked)
+                        if (checked && variantRows.length === 0) setVariantRows([newVariantRow(true)])
+                      }}
+                    />
+                    {hasVariants ? '옵션 사용' : '옵션 사용 안 함'}
+                  </label>
+                  {hasVariants ? <VariantEditor value={variantRows} onChange={setVariantRows} /> : null}
+                </div>
+              </Row>
+              <Row label="재고 관리" hint="끄면 수량과 상관없이 항상 문의할 수 있어요. (기계 광고는 보통 끔)">
+                <div className="flex flex-col gap-3">
+                  <FormField
+                    control={form.control}
+                    name="track_stock"
+                    render={({ field }) => (
+                      <label className="flex items-center gap-2 text-sm">
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        {field.value ? '재고 관리함' : '재고 관리 안 함'}
+                      </label>
+                    )}
+                  />
+                  {form.watch('track_stock') ? (
+                    <div className="grid max-w-md grid-cols-2 gap-3">
+                      <FormField
+                        control={form.control}
+                        name="stock_qty"
+                        render={({ field }) => (
+                          <FormItem>
+                            <span className="text-xs text-muted-foreground">재고 수량</span>
+                            <FormControl>
+                              <Input type="number" {...field} value={String(field.value)} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="low_stock_threshold"
+                        render={({ field }) => (
+                          <FormItem>
+                            <span className="text-xs text-muted-foreground">재고 부족 알림 기준</span>
+                            <FormControl>
+                              <Input type="number" {...field} value={String(field.value)} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              </Row>
+              <Row label="자체 관리코드">
+                <div className="grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-3">
+                  {text('sku', 'SKU')}
+                  {text('barcode', '바코드')}
+                  {text('weight_grams', '무게(g)')}
+                </div>
+              </Row>
+              <Row label="관리자 메모" hint="고객에게 보이지 않아요.">
                 <FormField
                   control={form.control}
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>상품 설명</FormLabel>
                       <FormControl>
-                        <Textarea rows={4} {...field} />
+                        <Textarea rows={3} {...field} value={field.value ?? ''} />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
-                <div className="flex flex-col gap-4">
-                  <FormField
-                    control={form.control}
-                    name="brand"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>제조사/브랜드</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="category_id"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>카테고리</FormLabel>
-                        <CategoryTwoLevelSelect
-                          categories={categories}
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+              </Row>
+            </div>
+          ) : null}
+        </section>
 
-            <Card className="gap-4 p-4">
-              <CardHeader className="flex-row items-center justify-between p-0">
-                <CardTitle>제품 정보</CardTitle>
-                <span className="text-xs text-muted-foreground">
-                  상품코드{' '}
-                  <span className="font-semibold text-foreground tabular-nums">
-                    {product?.product_no ? `P${product.product_no}` : '저장하면 자동 부여'}
-                  </span>
-                </span>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4 p-0">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="condition"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>상태</FormLabel>
-                        <Select
-                          value={field.value || NONE_CONDITION}
-                          onValueChange={(v) => field.onChange(v === NONE_CONDITION ? '' : v)}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="w-full">
-                              <SelectValue />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value={NONE_CONDITION}>선택 안 함</SelectItem>
-                            <SelectItem value="new">신품</SelectItem>
-                            <SelectItem value="used">중고</SelectItem>
-                            <SelectItem value="refurbished">리퍼(재생)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="model_name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>모델명</FormLabel>
-                        <FormControl>
-                          <Input placeholder="예: VX650" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="spec_summary"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>제품사양 (한 줄 요약)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="예: X축 650mm, 주축 8,000rpm, 툴 24개" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+        {/* 저장 줄 */}
+        <div className="sticky bottom-0 z-20 -mx-1 rounded-t-lg border border-border bg-background/95 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] backdrop-blur">
+          <div className="flex items-center justify-between gap-2 px-4 py-3">
+            <div>
+              {mode === 'edit' && product ? (
+                <ConfirmDialog
+                  trigger={
+                    <Button type="button" variant="outline">
+                      상품 삭제
+                    </Button>
+                  }
+                  title="이 상품을 삭제할까요?"
+                  description={`"${product.name}" 상품이 완전히 삭제됩니다.`}
+                  confirmLabel="삭제"
+                  destructive
+                  onConfirm={handleDelete}
                 />
-                <FormField
-                  control={form.control}
-                  name="short_description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>간략설명</FormLabel>
-                      <FormControl>
-                        <Input placeholder="예: 정밀 가공용 수직 머시닝센터, 실가동 상태 양호" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            <Card className="gap-4 p-4">
-              <CardHeader className="p-0">
-                <CardTitle>사진</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <ImageGallery value={imageRows} onChange={setImageRows} variantOptions={persistedVariantOptions} />
-              </CardContent>
-            </Card>
-
-            <AiCopyPanel form={form} categories={categories} />
-
-            <Card className="gap-4 p-4">
-              <CardHeader className="p-0">
-                <CardTitle>상세 내용</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <FormField
-                  control={form.control}
-                  name="detail_html"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <DetailHtmlEditor value={field.value ?? ''} onChange={field.onChange} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            <Card className="gap-4 p-4">
-              <CardHeader className="p-0">
-                <CardTitle>검색 노출 문구</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4 p-0">
-                <FormField
-                  control={form.control}
-                  name="seo_title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>검색 결과 제목 (비우면 상품명 사용)</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value ?? ''} maxLength={70} placeholder="예: 현대위아 VX650 수직 머시닝센터 중고" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="seo_description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>검색 결과 설명 (비우면 간략설명·상품 설명 사용)</FormLabel>
-                      <FormControl>
-                        <Textarea rows={2} {...field} value={field.value ?? ''} maxLength={160} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            <Card className="gap-4 p-4">
-              <CardHeader className="flex-row items-center justify-between p-0">
-                <CardTitle>옵션</CardTitle>
-                <label className="flex items-center gap-2 text-xs font-medium">
-옵션 있음
-                  <Switch
-                    checked={hasVariants}
-                    onCheckedChange={(checked) => {
-                      setHasVariants(checked)
-                      if (checked && variantRows.length === 0) {
-                        setVariantRows([newVariantRow(true)])
-                      }
-                    }}
-                  />
-                </label>
-              </CardHeader>
-              {hasVariants ? (
-                <CardContent className="p-0">
-                  <VariantEditor value={variantRows} onChange={setVariantRows} />
-                </CardContent>
-              ) : (
-                <CardContent className="p-0">
-                  <p className="text-muted-foreground text-xs">
-                    꺼짐 — 아래 가격·재고에 입력한 하나의 가격과 재고로 판매합니다.
-                  </p>
-                </CardContent>
-              )}
-            </Card>
-          </div>
-
-          <div className="flex flex-col gap-6">
-            <Card className="gap-4 p-4">
-              <CardHeader className="p-0">
-                <CardTitle>상태</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4 p-0">
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>노출 상태</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="draft">임시저장</SelectItem>
-                          <SelectItem value="active">판매중(공개)</SelectItem>
-                          <SelectItem value="archived">보관(비공개)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="is_featured"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between gap-2">
-                      <FormLabel className="text-foreground text-xs">추천 상품</FormLabel>
-                      <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            <Card className="gap-4 p-4">
-              <CardHeader className="p-0">
-                <CardTitle>가격</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4 p-0">
-                <FormField
-                  control={form.control}
-                  name="price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>판매가 (원)</FormLabel>
-                      <FormControl>
-                        <Input inputMode="decimal" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="compare_at_price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>정가 (할인 전, 원)</FormLabel>
-                      <FormControl>
-                        <Input inputMode="decimal" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="cost_price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>원가 (원)</FormLabel>
-                      <FormControl>
-                        <Input inputMode="decimal" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            <Card className="gap-4 p-4">
-              <CardHeader className="p-0">
-                <CardTitle>재고</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4 p-0">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="sku"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>SKU</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="barcode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>바코드</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="hs_code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>HS 코드</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="track_stock"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between gap-2">
-                      <FormLabel className="text-foreground text-xs">재고 관리</FormLabel>
-                      <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="stock_qty"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>재고 수량</FormLabel>
-                        <FormControl>
-                          <Input type="number" {...field} value={String(field.value)} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="low_stock_threshold"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>재고 부족 기준</FormLabel>
-                        <FormControl>
-                          <Input type="number" {...field} value={String(field.value)} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="allow_backorder"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between gap-2">
-                      <FormLabel className="text-foreground text-xs">품절 시에도 주문 허용</FormLabel>
-                      <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="weight_grams"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>무게 (g)</FormLabel>
-                      <FormControl>
-                        <Input inputMode="numeric" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="tags"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>태그</FormLabel>
-                      <FormControl>
-                        <Input placeholder="쉼표로, 구분해서, 입력" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between border-t pt-4">
-          <div>
-            {mode === 'edit' && product ? (
-              <ConfirmDialog
-                trigger={
-                  <Button type="button" variant="outline">
-상품 삭제
-                  </Button>
-                }
-                title="이 상품을 삭제할까요?"
-                description={`"${product.name}" 상품이 완전히 삭제됩니다. 지난 주문 내역은 그대로 남습니다.`}
-                confirmLabel="삭제"
-                destructive
-                onConfirm={handleDelete}
-              />
-            ) : null}
-          </div>
-          <div className="flex items-center gap-2">
-            <Button type="button" variant="outline" onClick={() => router.push('/admin/products')}>
-취소
-            </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? '저장 중...' : mode === 'create' ? '상품 등록' : '변경사항 저장'}
-            </Button>
+              ) : null}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button type="button" variant="outline" onClick={() => router.push('/admin/products')}>
+                취소
+              </Button>
+              <Button type="submit" disabled={isPending} className="min-w-28">
+                {isPending ? '저장 중...' : mode === 'create' ? '상품 등록' : '변경사항 저장'}
+              </Button>
+            </div>
           </div>
         </div>
       </form>

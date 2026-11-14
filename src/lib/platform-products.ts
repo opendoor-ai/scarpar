@@ -7,11 +7,11 @@ import { getPrimaryImages } from '@/components/store/get-primary-images'
 import type { ProductCardData } from '@/components/store/product-card'
 
 export const PLATFORM_PRODUCT_COLUMNS =
-  'id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder, org_id, org:orgs!inner(slug, name)'
+  'id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder, condition, model_name, badges, org_id, org:orgs!inner(slug, name)'
 
 export type PlatformProductRow = Pick<
   Product,
-  'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
+  'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder' | 'condition' | 'model_name' | 'badges'
 > & {
   org_id: string
   org: { slug: string; name: string } | { slug: string; name: string }[] | null

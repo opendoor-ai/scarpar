@@ -35,11 +35,11 @@ export const dynamic = 'force-dynamic'
 const PAGE_SIZE = 24
 const BASE_PATH = '/products'
 const PRODUCT_COLUMNS =
-  'id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder, org_id, org:orgs!inner(slug, name)'
+  'id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder, condition, model_name, badges, org_id, org:orgs!inner(slug, name)'
 
 type Row = Pick<
   Product,
-  'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
+  'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder' | 'condition' | 'model_name' | 'badges'
 > & {
   org_id: string
   org: { slug: string; name: string } | { slug: string; name: string }[] | null

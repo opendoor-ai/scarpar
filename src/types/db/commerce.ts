@@ -92,6 +92,10 @@ export interface Product {
   is_featured: boolean
   position: number
   condition: ProductCondition | null
+  /** 대표이미지 아이콘 (0022) */
+  badges?: string[] | null
+  origin?: string | null
+  manufacture_year?: number | null
   model_name: string | null
   spec_summary: string | null
   short_description: string | null

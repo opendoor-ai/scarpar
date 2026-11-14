@@ -47,6 +47,11 @@ export const productFormSchema = z.object({
   /** '' = 선택 안 함 */
   condition: z.union([z.enum(PRODUCT_CONDITION_VALUES), z.literal('')]),
   model_name: z.string().trim().max(200).optional(),
+  badges: z.array(z.string()).max(10),
+  origin: z.string().trim().max(100).optional(),
+  manufacture_year: z
+    .union([z.string().trim().regex(/^(19|20)\d{2}$/, '연도를 4자리로 입력하세요 (예: 2019)'), z.literal('')])
+    .optional(),
   spec_summary: z.string().trim().max(500).optional(),
   short_description: z.string().trim().max(500).optional(),
   detail_html: z.string().max(100000).optional(),
@@ -77,6 +82,9 @@ export const productActionSchema = z.object({
   is_featured: z.boolean(),
   condition: z.enum(PRODUCT_CONDITION_VALUES).nullable(),
   model_name: z.string().trim().max(200).nullable(),
+  badges: z.array(z.enum(['direct', 'urgent', 'special', 'rental', 'install', 'best'])).max(10),
+  origin: z.string().trim().max(100).nullable(),
+  manufacture_year: z.number().int().min(1900).max(2100).nullable(),
   spec_summary: z.string().trim().max(500).nullable(),
   short_description: z.string().trim().max(500).nullable(),
   detail_html: z.string().max(100000).nullable(),

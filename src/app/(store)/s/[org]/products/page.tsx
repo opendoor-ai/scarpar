@@ -32,7 +32,7 @@ const PAGE_SIZE = 24
 
 type ProductRow = Pick<
   Product,
-  'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
+  'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder' | 'condition' | 'model_name' | 'badges'
 >
 
 /** 상품 목록 제목·설명·대표주소 — 카테고리를 고르면 "카테고리명 제품"으로 바뀝니다. */
@@ -88,7 +88,7 @@ export default async function ProductsPage({
 
   let query = supabase
     .from('products')
-    .select('id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder', {
+    .select('id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder, condition, model_name, badges', {
       count: 'exact',
     })
     .eq('org_id', org.id)

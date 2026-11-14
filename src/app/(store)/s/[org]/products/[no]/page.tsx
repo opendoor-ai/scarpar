@@ -19,7 +19,14 @@ import { formatPrice } from '@/lib/money'
 import { formatKrPhone } from '@/lib/phone'
 import { DetailSection } from '@/components/store/product-detail/detail-section'
 import { InfoTable } from '@/components/store/product-detail/info-table'
-import { CONDITION_BADGE_CLASS, CONDITION_LABEL, productCode } from '@/components/store/product-detail/labels'
+import {
+  BADGE_CLASS,
+  BADGE_LABEL,
+  CONDITION_BADGE_CLASS,
+  CONDITION_LABEL,
+  isProductBadge,
+  productCode,
+} from '@/components/store/product-detail/labels'
 import { RelatedProducts } from '@/components/store/product-detail/related-products'
 import { SupplierCard } from '@/components/store/product-detail/supplier-card'
 import { ProductJsonLd } from '@/components/store/product-detail/product-json-ld'
@@ -179,6 +186,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
     width: 320,
   })
 
+  const topBadges = (product.badges ?? []).filter(isProductBadge).map((b) => ({ label: BADGE_LABEL[b], className: BADGE_CLASS[b] }))
   const conditionBadge = product.condition
     ? { label: CONDITION_LABEL[product.condition], className: CONDITION_BADGE_CLASS[product.condition] }
     : null
@@ -230,7 +238,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
         {/* 오른쪽 정보칸 — PC에서는 오른쪽에 붙어서 따라오고, 휴대폰에서는 사진 바로 아래 */}
         <aside className="flex flex-col gap-4 lg:sticky lg:top-20 lg:order-2 lg:self-start">
           <div className="lg:hidden">
-            <ProductGallery images={imageUrls} name={product.name} badge={conditionBadge} />
+            <ProductGallery images={imageUrls} name={product.name} badge={conditionBadge} topBadges={topBadges} />
           </div>
           <div className="flex flex-col gap-1.5">
             {product.condition ? (
@@ -268,6 +276,8 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
               { label: '모델명', value: product.model_name },
               { label: '제품사양', value: product.spec_summary },
               { label: '제조사', value: product.brand },
+              { label: '연식', value: product.manufacture_year ? `${product.manufacture_year}년` : null },
+              { label: '원산지', value: product.origin ?? null },
               { label: '판매가', value: formatPrice(product.price), emphasis: true },
               { label: '공급사', value: org.name },
               { label: '연락처', value: org.phone ? formatKrPhone(org.phone) : null },
@@ -291,7 +301,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
         {/* 왼쪽 본문 */}
         <div className="flex min-w-0 flex-col gap-10 lg:order-1">
           <div className="hidden lg:block">
-            <ProductGallery images={imageUrls} name={product.name} badge={conditionBadge} />
+            <ProductGallery images={imageUrls} name={product.name} badge={conditionBadge} topBadges={topBadges} />
           </div>
 
           <SupplierCard org={org} productId={product.id} />

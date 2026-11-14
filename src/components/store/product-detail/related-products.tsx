@@ -9,7 +9,7 @@ import { ProductCard, type ProductCardData } from '../product-card'
 
 type Row = Pick<
   Product,
-  'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
+  'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder' | 'condition' | 'model_name' | 'badges'
 >
 
 export async function RelatedProducts({
@@ -26,7 +26,7 @@ export async function RelatedProducts({
   const supabase = getAnonClient()
   const { data } = await supabase
     .from('products')
-    .select('id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder')
+    .select('id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder, condition, model_name, badges')
     .eq('org_id', orgId)
     .eq('status', 'active')
     .neq('id', excludeId)
