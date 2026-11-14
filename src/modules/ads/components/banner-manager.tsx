@@ -164,8 +164,22 @@ export function BannerManager({ groups: initialGroups, bannersByGroup, stats, or
                   <Switch
                     checked={g.is_active}
                     onCheckedChange={(v) => {
-                      setGroups((list) => list.map((x) => (x.id === g.id ? { ...x, is_active: v } : x)))
-                      act(() => toggleGroupAction(g.id, v), v ? '그룹을 켰어요' : '그룹을 껐어요')
+                      // 메인 슬라이드 A·B타입은 하나만 켤 수 있어요
+                      const partner = v ? ({ main: 'main_b', main_b: 'main' } as Record<string, string>)[g.code] : undefined
+                      setGroups((list) =>
+                        list.map((x) =>
+                          x.id === g.id ? { ...x, is_active: v } : partner && x.code === partner ? { ...x, is_active: false } : x,
+                        ),
+                      )
+                      const partnerName = partner ? groups.find((x) => x.code === partner)?.name : undefined
+                      act(
+                        () => toggleGroupAction(g.id, v),
+                        v
+                          ? partnerName
+                            ? `그룹을 켰어요. ${partnerName}은(는) 꺼졌어요`
+                            : '그룹을 켰어요'
+                          : '그룹을 껐어요',
+                      )
                     }}
                     aria-label="그룹 켜기·끄기"
                   />

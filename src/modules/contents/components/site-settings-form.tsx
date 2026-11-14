@@ -77,7 +77,14 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettings }) {
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           {FOOTER_FIELDS.map((f) => (
-            <div key={f.key} className={f.key === 'address' || f.key === 'cs_hours' ? 'flex flex-col gap-1.5 sm:col-span-2' : 'flex flex-col gap-1.5'}>
+            <div
+              key={f.key}
+              className={
+                f.key === 'address' || f.key === 'cs_hours'
+                  ? 'flex flex-col gap-1.5 sm:col-span-2'
+                  : 'flex flex-col gap-1.5'
+              }
+            >
               <Label>{f.label}</Label>
               <Input
                 value={String(form[f.key] ?? '')}
@@ -87,8 +94,8 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettings }) {
             </div>
           ))}
           <p className="text-xs text-muted-foreground sm:col-span-2">
-            전자상거래법에 따라 통신판매중개자는 상호·대표자·사업자번호·통신판매업 신고번호·주소·연락처를 화면에 표시해야
-            해요.
+            전자상거래법에 따라 통신판매중개자는 상호·대표자·사업자번호·통신판매업 신고번호·주소·연락처를 화면에
+            표시해야 해요.
           </p>
         </CardContent>
       </Card>

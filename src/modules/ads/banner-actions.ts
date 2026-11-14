@@ -76,6 +76,7 @@ export async function saveGroupAction(id: string | null, input: GroupInput): Pro
     if (error) return { ok: false, error: dbError(error) }
     // 배너의 위치 값도 새 코드로
     if (b.code !== d.code) await admin.from('banner_ads').update({ placement: d.code }).eq('group_id', id)
+    if (d.is_active) await turnOffPartner(id)
     refresh()
     return { ok: true, data: { id } }
   }
@@ -99,11 +100,26 @@ export async function saveGroupAction(id: string | null, input: GroupInput): Pro
   return { ok: true, data: { id: (data as { id: string }).id } }
 }
 
+/** 하나만 켤 수 있는 그룹 짝 (메인 슬라이드 A·B타입) */
+const EXCLUSIVE_PAIRS: [string, string][] = [['main', 'main_b']]
+
+/** 켠 그룹과 짝인 그룹을 끔 */
+async function turnOffPartner(groupId: string) {
+  const admin = getAdminClient()
+  const { data } = await admin.from('banner_groups').select('code').eq('id', groupId).maybeSingle()
+  const code = (data as { code: string } | null)?.code
+  const pair = EXCLUSIVE_PAIRS.find((p) => code && p.includes(code))
+  if (!pair) return
+  const partner = pair[0] === code ? pair[1] : pair[0]
+  await admin.from('banner_groups').update({ is_active: false }).eq('code', partner)
+}
+
 export async function toggleGroupAction(id: string, active: boolean): Promise<ActionResult> {
   const g = await guard()
   if ('error' in g) return { ok: false, error: g.error }
   const { error } = await getAdminClient().from('banner_groups').update({ is_active: active }).eq('id', id)
   if (error) return { ok: false, error: dbError(error) }
+  if (active) await turnOffPartner(id)
   refresh()
   return { ok: true }
 }
