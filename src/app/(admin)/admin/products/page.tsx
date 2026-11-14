@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Package, Plus } from 'lucide-react'
+import { FileUp, Package, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -82,12 +82,20 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         title="상품"
         description="상품, 가격, 옵션을 관리합니다."
         actions={
+          <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link href="/admin/products/import">
+              <FileUp className="size-4" />
+              엑셀로 대량 등록
+            </Link>
+          </Button>
           <Button asChild>
             <Link href="/admin/products/new">
               <Plus className="size-4" />
 새 상품 등록
             </Link>
           </Button>
+          </div>
         }
       />
 

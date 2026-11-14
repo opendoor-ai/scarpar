@@ -15,6 +15,8 @@ import { Input } from '@/components/ui/input'
 import { signupAction } from '@/lib/actions/auth'
 import { signupSchema, type SignupInput } from '@/lib/actions/auth-schemas'
 
+import { SocialLoginButtons } from './social-login-buttons'
+
 interface SignupFormProps {
   next?: string
 }
@@ -66,6 +68,7 @@ export function SignupForm({ next }: SignupFormProps) {
         <CardDescription>몇 분이면 우리 회사 홈페이지를 시작할 수 있습니다.</CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
+        <SocialLoginButtons next={next} />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
             {formError ? (

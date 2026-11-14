@@ -153,9 +153,13 @@ export async function deleteMediaAction(id: string): Promise<ActionResult<void>>
     return { ok: false, error: '파일을 찾을 수 없습니다.' }
   }
 
-  const { error: removeError } = await supabase.storage.from(MEDIA_BUCKET).remove([row.path as string])
-  if (removeError) {
-    return { ok: false, error: removeError.message }
+  // 대량 등록으로 넣은 인터넷 사진 주소(https://...)는 우리 저장소에 파일이 없으니 기록만 지움
+  const isExternal = /^https?:\/\//i.test(row.path as string)
+  if (!isExternal) {
+    const { error: removeError } = await supabase.storage.from(MEDIA_BUCKET).remove([row.path as string])
+    if (removeError) {
+      return { ok: false, error: removeError.message }
+    }
   }
 
   const { error: deleteError } = await supabase.from('media').delete().eq('id', id).eq('org_id', ctx.org.id)

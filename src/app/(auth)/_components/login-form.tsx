@@ -14,12 +14,16 @@ import { Input } from '@/components/ui/input'
 import { loginAction } from '@/lib/actions/auth'
 import { loginSchema, type LoginInput } from '@/lib/actions/auth-schemas'
 
+import { SocialLoginButtons } from './social-login-buttons'
+
 interface LoginFormProps {
   next?: string
+  /** 간편로그인 실패 등 이전 화면에서 넘어온 안내 */
+  initialError?: string
 }
 
-export function LoginForm({ next }: LoginFormProps) {
-  const [formError, setFormError] = useState<string | null>(null)
+export function LoginForm({ next, initialError }: LoginFormProps) {
+  const [formError, setFormError] = useState<string | null>(initialError ?? null)
   const [isPending, startTransition] = useTransition()
 
   const form = useForm<LoginInput>({
@@ -47,6 +51,7 @@ export function LoginForm({ next }: LoginFormProps) {
         <CardDescription>이메일과 비밀번호를 입력하세요.</CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
+        <SocialLoginButtons next={next} />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
             {formError ? (
