@@ -3,8 +3,8 @@ import { z } from 'zod'
 import type { Inquiry, Listing } from '@/types/db'
 
 // ---------------------------------------------------------------------------
-// Form validation (RHF + zodResolver). Amounts are entered as taka strings
-// and converted to paisa via toPaisa() inside the server action.
+// Form validation (RHF + zodResolver). Amounts are entered as won strings
+// and converted to minor via toMinor() inside the server action.
 // ---------------------------------------------------------------------------
 
 const moneyString = z

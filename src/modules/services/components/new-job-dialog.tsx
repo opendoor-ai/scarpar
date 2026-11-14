@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { BD_DISTRICTS } from '@/lib/bd'
+import { REGIONS } from '@/lib/regions'
 
 import { createJob } from '../actions'
 import { newJobSchema, type CustomerSearchResult, type NewJobValues } from '../schemas'
@@ -216,7 +216,7 @@ function NewJobDialog() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {BD_DISTRICTS.map((district) => (
+                        {REGIONS.map((district) => (
                           <SelectItem key={district.name} value={district.name}>
                             {district.name}
                           </SelectItem>

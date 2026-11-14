@@ -62,7 +62,7 @@ export function ContactForm({ orgSlug }: { orgSlug: string }) {
               <FormItem>
                 <FormLabel>휴대폰 번호</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="01XXXXXXXXX" />
+                  <Input {...field} placeholder="010-0000-0000" />
                 </FormControl>
                 <FormMessage />
               </FormItem>

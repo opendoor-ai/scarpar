@@ -1,6 +1,6 @@
-# Scarpar — Production runbook
+# 전자동기계광고 — Production runbook
 
-Companion to `docs/deployment.md` (initial setup) — this covers running Scarpar after it's live.
+Companion to `docs/deployment.md` (initial setup) — this covers running 전자동기계광고 after it's live.
 Grounded against the code as of 2026-07-12; where behavior is "verified precisely" below it was traced
 in the actual source, not assumed from the architecture spec.
 
@@ -90,9 +90,9 @@ Flip via the `OrgActiveSwitch` on `/admin/platform` → `toggleOrgActive` action
 - **Supabase PITR (point-in-time recovery)** is a paid-plan feature — confirm the project's plan before
   assuming it's on (`.memory/next-steps.md` §5 flags this as unconfirmed). Free-tier projects have no
   automatic backup.
-- **Manual `pg_dump` recipe** (works on any plan): `pg_dump "$SUPABASE_DB_URL" -Fc -f scarpar_backup_$(date +%Y%m%d).dump`
+- **Manual `pg_dump` recipe** (works on any plan): `pg_dump "$SUPABASE_DB_URL" -Fc -f jadong_backup_$(date +%Y%m%d).dump`
   using the connection string from Supabase dashboard → Project Settings → Database → Connection string
-  (use the "direct connection", not the pooler, for `pg_dump`). Restore: `pg_restore -d "$SUPABASE_DB_URL" --clean --if-exists scarpar_backup_*.dump`.
+  (use the "direct connection", not the pooler, for `pg_dump`). Restore: `pg_restore -d "$SUPABASE_DB_URL" --clean --if-exists jadong_backup_*.dump`.
   Run this on a schedule (cron / GitHub Action) until Phase F's job-queue infra exists — see
   `docs/saas-roadmap.md` Phase E item 24 for making this recurring and actually drilling a restore.
 - **Storage** (`media` bucket) is not covered by `pg_dump` — back it up separately (`supabase storage`
@@ -108,18 +108,15 @@ Flip via the `OrgActiveSwitch` on `/admin/platform` → `toggleOrgActive` action
   every server action using `getAdminClient()` (`src/lib/supabase/admin.ts`) breaks the instant the old
   key is revoked, so this is a "update env, redeploy, confirm, then revoke old key" sequence, not
   "revoke then update."
-- Per-org secrets (courier API keys in `courier_accounts.config jsonb`, UddoktaPay keys in
-  `org_settings` via `payments.uddoktapay.api_key`) live in the database, not env vars — rotating those
   is an org-admin self-service action through the existing settings UI, not a platform operation.
 
 ## Incident basics
 
-- **Payment-verify stuck** (a manual MFS payment sits `pending` past a reasonable window): check
+- **Payment-verify stuck** (a manual 계좌이체 payment sits `pending` past a reasonable window): check
   `payments` table for the row, confirm `verifyPayment()` (`src/modules/orders/actions.ts`) chokepoint
   wasn't bypassed — it's the *only* code path allowed to flip `status→verified` (binding invariant,
-  `CLAUDE.md`). The UddoktaPay webhook route (`api/webhooks/uddoktapay`) exists but is a
   log-and-200 stub — it does NOT call the chokepoint yet (Phase E item 20 wires it), so today
-  "the webhook didn't fire" cannot be the cause; manual MFS verify is the only live verification
+  "the webhook didn't fire" cannot be the cause; manual 계좌이체 verify is the only live verification
   path. Diagnosis today and after item 20 ships: check `payments.provider_ref` against the
   provider's dashboard, then replay manually via the admin verify UI (same chokepoint, same audit
   trail) rather than writing a one-off SQL update.
@@ -128,7 +125,7 @@ Flip via the `OrgActiveSwitch` on `/admin/platform` → `toggleOrgActive` action
   currently an availability risk, not just noise. Mitigate ad hoc today by adding a per-source IP block
   at Vercel's edge config until Phase E's real rate limiting lands.
 - **RLS misfire symptoms**: a user sees no data / an empty table where they expect rows almost always
-  means `org_members` doesn't have their `(org_id, user_id)` row, or the `scarpar-org` cookie points at
+  means `org_members` doesn't have their `(org_id, user_id)` row, or the `jadong-org` cookie points at
   an org they've been removed from — `requireOrg()` (`src/lib/auth.ts`) already handles the "removed"
   case by redirecting to `/onboarding`, so a *silent* empty-table symptom (page loads, no redirect, no
   data) points at a client-side org-context mismatch (stale cookie vs. server state), not RLS itself
@@ -138,7 +135,7 @@ Flip via the `OrgActiveSwitch` on `/admin/platform` → `toggleOrgActive` action
 
 ## Upgrade strategy for template-derived client repos
 
-Every client build (per the workspace's `scarpar-builder` skill NEW/INTEGRATE modes) starts as either a
+Every client build (per the workspace's `jadong-builder` skill NEW/INTEGRATE modes) starts as either a
 clone of this repo or a copy-in into an existing Next.js site. Once a client repo has diverged with
 custom modules/branding:
 - **Cherry-pick** platform-level fixes (a bug in `verifyPayment()`, a settings-registry addition, a new

@@ -143,7 +143,7 @@ function CustomerPicker({ value, onChange }: CustomerPickerProps) {
               id="customer-phone"
               value={value.phone}
               onChange={(e) => onChange({ ...value, phone: e.target.value })}
-              placeholder="01XXXXXXXXX"
+              placeholder="010-0000-0000"
             />
           </div>
           <div className="col-span-2 flex flex-col gap-1.5">

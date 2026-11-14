@@ -1,11 +1,11 @@
 // Money helpers (KRW). DB stores bigint "minor units" (1원 = 100 units) — kept from the
 // original schema so no data migration is needed. Display is always whole 원.
-// No float math — toPaisa parses via string math to avoid float artifacts.
+// No float math — toMinor parses via string math to avoid float artifacts.
 
 const WON_SUFFIX = '원'
 
-export function fromPaisa(paisa: number): number {
-  return paisa / 100
+export function fromMinor(minor: number): number {
+  return minor / 100
 }
 
 /**
@@ -13,8 +13,8 @@ export function fromPaisa(paisa: number): number {
  * — avoids classic float-multiplication artifacts (e.g. 1234.5 * 100).
  * Rounds half-up on the 3rd decimal digit if more than 2 fraction digits are given.
  */
-export function toPaisa(taka: string | number): number {
-  const raw = String(taka).trim()
+export function toMinor(won: string | number): number {
+  const raw = String(won).trim()
   if (raw === '' || raw === '-') return 0
 
   const negative = raw.startsWith('-')
@@ -26,25 +26,25 @@ export function toPaisa(taka: string | number): number {
   const keep = fracExtended.slice(0, 2)
   const roundUp = Number(fracExtended[2] ?? '0') >= 5
 
-  let paisa = Number(whole) * 100 + Number(keep === '' ? '0' : keep)
-  if (roundUp) paisa += 1
+  let minor = Number(whole) * 100 + Number(keep === '' ? '0' : keep)
+  if (roundUp) minor += 1
 
-  return negative ? -paisa : paisa
+  return negative ? -minor : minor
 }
 
 /** "1,234원" — KRW has no decimals, so the minor-unit remainder is rounded away. */
-export function formatMoney(paisa: number, opts?: { symbol?: boolean }): string {
+export function formatMoney(minor: number, opts?: { symbol?: boolean }): string {
   const showSymbol = opts?.symbol ?? true
-  const negative = paisa < 0
-  const won = Math.round(Math.abs(paisa) / 100)
+  const negative = minor < 0
+  const won = Math.round(Math.abs(minor) / 100)
   const amount = won.toLocaleString('ko-KR')
   return `${negative ? '-' : ''}${amount}${showSymbol ? WON_SUFFIX : ''}`
 }
 
 /** Amount for receipts, e.g. "금 일백이십삼만사천오백원정". */
-export function moneyToWords(paisa: number): string {
-  const negative = paisa < 0
-  const won = Math.round(Math.abs(paisa) / 100)
+export function moneyToWords(minor: number): string {
+  const negative = minor < 0
+  const won = Math.round(Math.abs(minor) / 100)
   return `${negative ? '마이너스 ' : ''}금 ${integerToKorean(won)}원정`
 }
 
@@ -79,10 +79,10 @@ function trimTrailingZero(s: string): string {
 }
 
 /** Compact 원 display: "1.2천" / "3.4만" / "2.1억". No suffix by default. */
-export function formatCompact(paisa: number, opts?: { symbol?: boolean }): string {
+export function formatCompact(minor: number, opts?: { symbol?: boolean }): string {
   const showSymbol = opts?.symbol ?? false
-  const negative = paisa < 0
-  const won = Math.abs(paisa) / 100
+  const negative = minor < 0
+  const won = Math.abs(minor) / 100
 
   let value: string
   if (won >= 100000000) {
@@ -97,6 +97,6 @@ export function formatCompact(paisa: number, opts?: { symbol?: boolean }): strin
 }
 
 /** 상품 가격 표시: 0원이면 "가격협의" (산업기계는 가격 상담이 일반적). */
-export function formatPrice(paisa: number): string {
-  return paisa > 0 ? formatMoney(paisa) : '가격협의'
+export function formatPrice(minor: number): string {
+  return minor > 0 ? formatMoney(minor) : '가격협의'
 }

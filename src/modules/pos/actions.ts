@@ -16,10 +16,10 @@ import type { ActionResult } from '@/lib/types'
 const posCheckoutSchema = z.object({
   customerName: z.string().trim().max(120).optional(),
   customerPhone: z.string().trim().max(20).optional(),
-  paymentMethod: z.enum(['cash', 'bkash', 'nagad']),
-  /** Paisa. Only meaningful for cash — omit for bKash/Nagad (assumed paid in full). */
+  paymentMethod: z.enum(['cash', 'transfer', 'card']),
+  /** Minor. Only meaningful for cash — omit for 계좌이체/카드 (assumed paid in full). */
   amountReceived: z.number().int().nonnegative().optional(),
-  /** Flat paisa discount, already converted from the taka input on the client. */
+  /** Flat minor discount, already converted from the won input on the client. */
   discountAmount: z.number().int().nonnegative().default(0),
   items: z
     .array(
@@ -38,7 +38,7 @@ export interface PosCheckoutResult {
   orderId: string
   orderNo: string
   total: number
-  /** Paisa. 0 for non-cash tenders or when amountReceived wasn't provided. */
+  /** Minor. 0 for non-cash tenders or when amountReceived wasn't provided. */
   changeDue: number
 }
 
@@ -52,7 +52,7 @@ const WALK_IN_PHONE = '0000000000'
  * docs/conventions.md), creates the order via the shared createOrderCore contract
  * (channel 'pos', status 'completed', payment_status 'paid', stock decremented), then
  * inserts an already-verified payment row — POS is staff physically at the till, so
- * there's no manual-verify chokepoint to go through, unlike storefront manual MFS.
+ * there's no manual-verify chokepoint to go through, unlike storefront manual 계좌이체.
  */
 export async function posCheckoutAction(input: PosCheckoutInput): Promise<ActionResult<PosCheckoutResult>> {
   const ctx = await requireOrg()

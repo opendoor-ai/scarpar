@@ -23,7 +23,7 @@ export type PaymentStatus = 'unpaid' | 'advance_paid' | 'paid' | 'refunded' | 'p
 
 export type ChannelType = 'storefront' | 'pos' | 'manual'
 
-export type PaymentMethod = 'cod' | 'bkash' | 'nagad' | 'uddoktapay' | 'sslcommerz' | 'bank' | 'cash'
+export type PaymentMethod = 'cod' | 'transfer' | 'card' | 'bank' | 'cash'
 
 export type RiskLevel = 'low' | 'medium' | 'high'
 

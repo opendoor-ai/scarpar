@@ -123,7 +123,7 @@ create table deliveries (
   delivery_no       text not null,
   method            text not null check (method in ('rider','courier','pickup')),
   rider_id          uuid references riders(id) on delete set null,
-  courier           text check (courier in ('steadfast','pathao','redx','manual')),
+  courier           text check (courier in ('cj','hanjin','lotte','manual')),
   consignment_id    text,
   tracking_code     text,
   status            text not null default 'pending'

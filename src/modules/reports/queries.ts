@@ -68,7 +68,7 @@ const DEAD_ORDER_STATUSES: OrderStatus[] = ['cancelled', 'failed']
 
 export interface SalesByDayRow {
   date: string
-  revenue: number // paisa
+  revenue: number // minor
   orders: number
 }
 
@@ -163,7 +163,7 @@ export async function ordersByStatus(
 
 export interface TopProductRow {
   productName: string
-  revenue: number // paisa
+  revenue: number // minor
   units: number
 }
 
@@ -402,7 +402,7 @@ export async function deliveryPerformance(
 
 export interface ExpenseCategoryRow {
   category: string
-  total: number // paisa
+  total: number // minor
 }
 
 /** Expense sum per category in range (expenses.spent_at is a plain `date` column). */
@@ -435,7 +435,7 @@ export async function expensesByCategory(
 }
 
 export interface PnlResult {
-  revenue: number // paisa
+  revenue: number // minor
   cogs: number
   expenses: number
   net: number
@@ -524,20 +524,20 @@ export async function pnl(orgId: string, range?: { from?: string; to?: string })
   }
 }
 
-export interface MushakRow {
+export interface VatSalesRow {
   date: string
   invoiceNo: string
   customer: string
-  subtotal: number // paisa
-  vat: number // paisa
-  total: number // paisa
+  subtotal: number // minor
+  vat: number // minor
+  total: number // minor
 }
 
-/** Mushak 6.2 sales register: delivered/completed orders in range, flat rows for CSV. */
-export async function mushakSalesRegister(
+/** 부가세 매출 내역: delivered/completed orders in range, flat rows for CSV. */
+export async function vatSalesRegister(
   orgId: string,
   range?: { from?: string; to?: string },
-): Promise<MushakRow[]> {
+): Promise<VatSalesRow[]> {
   const r = resolveRange(range)
   try {
     const supabase = await getServerClient()
@@ -566,7 +566,7 @@ export async function mushakSalesRegister(
       total: o.total,
     }))
   } catch (error) {
-    console.error('[reports] mushakSalesRegister failed', error)
+    console.error('[reports] vatSalesRegister failed', error)
     return []
   }
 }

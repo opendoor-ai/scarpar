@@ -25,7 +25,7 @@ export interface CreateOrderItemInput {
   variant_name?: string | null
   sku?: string | null
   image_path?: string | null
-  unit_price: number // paisa, server-verified
+  unit_price: number // minor, server-verified
   qty: number
 }
 
@@ -37,14 +37,14 @@ export interface CreateOrderInput {
   customer: { id?: string | null; name: string; phone: string; email?: string | null }
   address?: Record<string, unknown> | null // { line1, area, district, postcode }
   delivery_zone_id?: string | null
-  delivery_charge: number // paisa
+  delivery_charge: number // minor
   items: CreateOrderItemInput[]
   discount_code?: string | null
-  discount_amount: number // paisa
+  discount_amount: number // minor
   tax_amount?: number
   advance_due?: number
   advance_paid?: number
-  payment_method: 'cod' | 'bkash' | 'nagad' | 'uddoktapay' | 'sslcommerz' | 'bank' | 'cash'
+  payment_method: 'cod' | 'transfer' | 'card' | 'bank' | 'cash'
   risk_level?: 'low' | 'medium' | 'high' | null
   risk_note?: string | null
   note_customer?: string | null

@@ -14,7 +14,7 @@ import type { ActionResult } from '@/lib/types'
 
 const updateStorefrontSettingsSchema = z.object({
   announcement: z.string().trim().max(300),
-  whatsapp_number: z.string().trim().max(20),
+  kakao_channel_url: z.string().trim().max(300),
   primary_color: z
     .string()
     .trim()
@@ -45,12 +45,12 @@ export async function updateOrgSettingsAction(input: UpdateStorefrontSettingsInp
     return { ok: false, error: parsed.error.issues[0]?.message ?? '설정값이 올바르지 않습니다.' }
   }
 
-  const { announcement, whatsapp_number, primary_color, org } = parsed.data
+  const { announcement, kakao_channel_url, primary_color, org } = parsed.data
   const supabase = await getServerClient()
 
   const settingsRows = [
     { org_id: ctx.org.id, key: 'storefront.announcement', value: announcement, updated_by: ctx.user.id },
-    { org_id: ctx.org.id, key: 'storefront.whatsapp_number', value: whatsapp_number, updated_by: ctx.user.id },
+    { org_id: ctx.org.id, key: 'storefront.kakao_channel_url', value: kakao_channel_url, updated_by: ctx.user.id },
     { org_id: ctx.org.id, key: 'storefront.primary_color', value: primary_color, updated_by: ctx.user.id },
   ]
 
@@ -79,7 +79,7 @@ export async function updateOrgSettingsAction(input: UpdateStorefrontSettingsInp
 
   audit(ctx, 'org_settings:update', 'org_settings', ctx.org.id, undefined, {
     announcement,
-    whatsapp_number,
+    kakao_channel_url,
     primary_color,
   })
   audit(ctx, 'org:update', 'orgs', ctx.org.id, undefined, org)

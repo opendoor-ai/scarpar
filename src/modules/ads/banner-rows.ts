@@ -19,6 +19,9 @@ export type BannerRowDb = {
   ends_at: string | null
   is_active: boolean
   category_id: string | null
+  target_cate_nos?: number[] | null
+  show_in_search?: boolean | null
+  search_keywords?: string | null
   advertiser_org_id: string | null
   advertiser_name: string | null
   payment_status: BannerItem['payment_status']
@@ -47,6 +50,9 @@ export function rowToItem(r: BannerRowDb): BannerItem {
     ends_on: r.ends_at ? toKstDate(r.ends_at) : '',
     is_active: r.is_active,
     category_id: r.category_id,
+    target_cate_nos: (r.target_cate_nos ?? []).join(', '),
+    show_in_search: Boolean(r.show_in_search),
+    search_keywords: r.search_keywords ?? '',
     advertiser_org_id: r.advertiser_org_id,
     advertiser_name: r.advertiser_name ?? '',
     payment_status: r.payment_status ?? 'free',

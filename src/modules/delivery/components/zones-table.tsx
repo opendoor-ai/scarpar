@@ -24,8 +24,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Switch } from "@/components/ui/switch"
-import { BD_DISTRICTS, BD_DIVISIONS, DHAKA_METRO } from "@/lib/bd"
-import { formatMoney, fromPaisa, toPaisa } from "@/lib/money"
+import { CAPITAL_AREA, REGIONS, REGION_GROUPS } from "@/lib/regions"
+import { formatMoney, fromMinor, toMinor } from "@/lib/money"
 import type { DeliveryZone } from "@/types/db"
 import { deleteZoneAction, upsertZoneAction } from "../actions"
 
@@ -39,7 +39,7 @@ function ZoneDialog({ zone, trigger }: ZoneDialogProps) {
   const router = useRouter()
   const [open, setOpen] = React.useState(false)
   const [name, setName] = React.useState(zone?.name ?? "")
-  const [charge, setCharge] = React.useState(zone ? String(fromPaisa(zone.charge)) : "0")
+  const [charge, setCharge] = React.useState(zone ? String(fromMinor(zone.charge)) : "0")
   const [etaText, setEtaText] = React.useState(zone?.eta_text ?? "")
   const [codAvailable, setCodAvailable] = React.useState(zone?.cod_available ?? true)
   const [advanceRequired, setAdvanceRequired] = React.useState(zone?.advance_required ?? false)
@@ -50,7 +50,7 @@ function ZoneDialog({ zone, trigger }: ZoneDialogProps) {
   function handleOpenChange(next: boolean) {
     if (next) {
       setName(zone?.name ?? "")
-      setCharge(zone ? String(fromPaisa(zone.charge)) : "0")
+      setCharge(zone ? String(fromMinor(zone.charge)) : "0")
       setEtaText(zone?.eta_text ?? "")
       setCodAvailable(zone?.cod_available ?? true)
       setAdvanceRequired(zone?.advance_required ?? false)
@@ -64,8 +64,8 @@ function ZoneDialog({ zone, trigger }: ZoneDialogProps) {
     setDistricts((prev) => (checked ? [...prev, districtName] : prev.filter((d) => d !== districtName)))
   }
 
-  function selectOutsideDhaka() {
-    setDistricts(BD_DISTRICTS.filter((d) => !DHAKA_METRO.has(d.name)).map((d) => d.name))
+  function selectOutsideCapital() {
+    setDistricts(REGIONS.filter((d) => !CAPITAL_AREA.has(d.name)).map((d) => d.name))
   }
 
   async function handleSave() {
@@ -84,7 +84,7 @@ function ZoneDialog({ zone, trigger }: ZoneDialogProps) {
         id: zone?.id,
         name: name.trim(),
         districts,
-        charge: toPaisa(charge || "0"),
+        charge: toMinor(charge || "0"),
         cod_available: codAvailable,
         advance_required: advanceRequired,
         eta_text: etaText,
@@ -145,19 +145,19 @@ function ZoneDialog({ zone, trigger }: ZoneDialogProps) {
 
           <div className="flex items-center justify-between">
             <Label>Districts ({districts.length} selected)</Label>
-            <Button type="button" variant="outline" size="sm" onClick={selectOutsideDhaka}>
-              다카 외 지역 전체 선택
+            <Button type="button" variant="outline" size="sm" onClick={selectOutsideCapital}>
+              수도권 외 지역 전체 선택
             </Button>
           </div>
 
           <ScrollArea className="h-64 rounded-md border p-3">
-            {BD_DIVISIONS.map((division) => (
+            {REGION_GROUPS.map((division) => (
               <div key={division} className="mb-3 last:mb-0">
                 <p className="text-muted-foreground mb-1.5 text-[11px] font-medium tracking-wide uppercase">
                   {division}
                 </p>
                 <div className="grid grid-cols-2 gap-1.5">
-                  {BD_DISTRICTS.filter((d) => d.division === division).map((d) => (
+                  {REGIONS.filter((d) => d.division === division).map((d) => (
                     <label key={d.name} className="flex items-center gap-2 text-[13px]">
                       <Checkbox
                         checked={districts.includes(d.name)}

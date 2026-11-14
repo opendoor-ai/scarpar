@@ -13,6 +13,7 @@ import {
   LayoutTemplate,
   type LucideIcon,
   Megaphone,
+  MessageSquareText,
   Package,
   Receipt,
   ScrollText,
@@ -49,6 +50,7 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   ScrollText,
   Settings,
   Megaphone,
+  MessageSquareText,
 }
 
 export function getIcon(name: string): LucideIcon {

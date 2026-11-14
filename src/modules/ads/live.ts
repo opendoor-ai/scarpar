@@ -26,6 +26,9 @@ export interface LiveBanner {
   html: string
   product_ids: string[]
   extra_images: string[]
+  target_cate_nos: number[]
+  show_in_search: boolean
+  search_keywords: string
 }
 
 type Row = {
@@ -43,6 +46,9 @@ type Row = {
   html?: string | null
   product_ids?: string[] | null
   extra_images?: string[] | null
+  target_cate_nos?: number[] | null
+  show_in_search?: boolean | null
+  search_keywords?: string | null
 }
 
 function toLive(b: Row): LiveBanner {
@@ -63,6 +69,9 @@ function toLive(b: Row): LiveBanner {
     html: b.html ?? '',
     product_ids: b.product_ids ?? [],
     extra_images: (b.extra_images ?? []).filter(Boolean).map((u) => mediaUrl(u)),
+    target_cate_nos: b.target_cate_nos ?? [],
+    show_in_search: Boolean(b.show_in_search),
+    search_keywords: b.search_keywords ?? '',
   }
 }
 
@@ -257,4 +266,29 @@ export async function getLivePromotedProductIds(
     console.error('[ads] promotions failed', err)
     return []
   }
+}
+
+/**
+ * 분류·검색 허브 배너: 지금 보고 있는 분류 번호(전체 카테고리 = 0)가 정확히 들어간 배너,
+ * 또는 검색어가 검색어 칸·회사명·제목에 들어간 배너("검색 결과에도 보이기"를 켠 것만)
+ */
+export async function getHubBanners(
+  code: string,
+  target: { cateNos?: number[]; query?: string },
+): Promise<LiveBanner[]> {
+  const all = await getLiveBanners(code)
+  const cateNos = new Set(target.cateNos ?? [])
+  const words = (target.query ?? '')
+    .toLowerCase()
+    .split(/\s+/)
+    .map((w) => w.trim())
+    .filter((w) => w.length >= 2)
+  return all.filter((b) => {
+    if (cateNos.size > 0 && b.target_cate_nos.some((n) => cateNos.has(n))) return true
+    if (words.length > 0 && b.show_in_search) {
+      const hay = [b.search_keywords, b.title, ...b.texts.map((t) => t.text)].join(' ').toLowerCase()
+      return words.some((w) => hay.includes(w))
+    }
+    return false
+  })
 }

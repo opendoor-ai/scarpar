@@ -1,17 +1,17 @@
 // CSV export endpoint for the reports module (docs/architecture.md §11, docs/conventions.md).
-// GET /api/export/{sales|products|delivery|mushak}?from=yyyy-mm-dd&to=yyyy-mm-dd
+// GET /api/export/{sales|products|delivery|vat}?from=yyyy-mm-dd&to=yyyy-mm-dd
 
 import type { NextRequest } from 'next/server'
 
 import { requireOrg } from '@/lib/auth'
 import { csvResponse, toCsv } from '@/lib/csv'
 import { requireModule } from '@/lib/modules'
-import { fromPaisa } from '@/lib/money'
-import { codSuccessByDistrict, mushakSalesRegister, resolveRange, salesByDay, topProducts } from '@/modules/reports/queries'
+import { fromMinor } from '@/lib/money'
+import { codSuccessByDistrict, vatSalesRegister, resolveRange, salesByDay, topProducts } from '@/modules/reports/queries'
 
 export const dynamic = 'force-dynamic'
 
-const VALID_REPORTS = ['sales', 'products', 'delivery', 'mushak'] as const
+const VALID_REPORTS = ['sales', 'products', 'delivery', 'vat'] as const
 type ReportKey = (typeof VALID_REPORTS)[number]
 
 function isReportKey(value: string): value is ReportKey {
@@ -33,13 +33,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     from: searchParams.get('from') ?? undefined,
     to: searchParams.get('to') ?? undefined,
   })
-  const filename = `scarpar-${report}-${range.from}-${range.to}.csv`
+  const filename = `jadong-${report}-${range.from}-${range.to}.csv`
 
   switch (report) {
     case 'sales': {
       const rows = await salesByDay(ctx.org.id, range)
       const csv = toCsv(
-        rows.map((row) => ({ date: row.date, revenue: fromPaisa(row.revenue), orders: row.orders })),
+        rows.map((row) => ({ date: row.date, revenue: fromMinor(row.revenue), orders: row.orders })),
         [
           { key: 'date', label: '날짜' },
           { key: 'revenue', label: '매출(원)' },
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     case 'products': {
       const rows = await topProducts(ctx.org.id, range)
       const csv = toCsv(
-        rows.map((row) => ({ product: row.productName, revenue: fromPaisa(row.revenue), units: row.units })),
+        rows.map((row) => ({ product: row.productName, revenue: fromMinor(row.revenue), units: row.units })),
         [
           { key: 'product', label: '상품' },
           { key: 'revenue', label: '매출(원)' },
@@ -78,16 +78,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       )
       return csvResponse(filename, csv)
     }
-    case 'mushak': {
-      const rows = await mushakSalesRegister(ctx.org.id, range)
+    case 'vat': {
+      const rows = await vatSalesRegister(ctx.org.id, range)
       const csv = toCsv(
         rows.map((row) => ({
           date: row.date,
           invoiceNo: row.invoiceNo,
           customer: row.customer,
-          subtotal: fromPaisa(row.subtotal),
-          vat: fromPaisa(row.vat),
-          total: fromPaisa(row.total),
+          subtotal: fromMinor(row.subtotal),
+          vat: fromMinor(row.vat),
+          total: fromMinor(row.total),
         })),
         [
           { key: 'date', label: '날짜' },

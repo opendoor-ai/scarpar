@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { fromPaisa } from '@/lib/money'
+import { fromMinor } from '@/lib/money'
 import type { Discount } from '@/types/db'
 
 import { createDiscount, updateDiscount } from '../actions'
@@ -46,12 +46,12 @@ export function DiscountForm({ discount, categories, initialProducts = [] }: Dis
       value: !discount
         ? undefined
         : discount.type === 'fixed' && discount.value != null
-          ? fromPaisa(discount.value)
+          ? fromMinor(discount.value)
           : (discount.value ?? undefined),
       scope: discount?.scope ?? 'all',
       product_ids: discount?.product_ids ?? [],
       category_ids: discount?.category_ids ?? [],
-      min_order: discount?.min_order != null ? fromPaisa(discount.min_order) : 0,
+      min_order: discount?.min_order != null ? fromMinor(discount.min_order) : 0,
       max_uses: discount?.max_uses ?? undefined,
       starts_at: toDatetimeLocal(discount?.starts_at),
       expires_at: toDatetimeLocal(discount?.expires_at),

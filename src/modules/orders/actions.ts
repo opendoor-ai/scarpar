@@ -9,7 +9,7 @@ import { getAdminClient } from '@/lib/supabase/admin'
 import { audit } from '@/lib/audit'
 import { notify } from '@/lib/notify'
 import { ORDER_STATUS_FLOW } from '@/lib/status'
-import { toPaisa, formatMoney } from '@/lib/money'
+import { toMinor, formatMoney } from '@/lib/money'
 import type { ActionResult } from '@/lib/types'
 import type { Order, OrderStatus, Payment, PaymentStatus, ReturnStatus, RiskLevel } from '@/types/db'
 // Contract owned by the discounts slice — see docs/conventions.md ("own only your
@@ -318,7 +318,7 @@ export async function createManualOrderAction(
       parsed.manual_delivery_charge,
     )
 
-    const advanceDue = parsed.advance_amount ? toPaisa(parsed.advance_amount) : 0
+    const advanceDue = parsed.advance_amount ? toMinor(parsed.advance_amount) : 0
 
     const result = await createOrderCore({
       org_id: ctx.org.id,
@@ -505,8 +505,8 @@ export async function recordPaymentAction(input: RecordPaymentInput): Promise<Ac
       .maybeSingle()
     if (!order) return { ok: false, error: '주문을 찾을 수 없습니다' }
 
-    const amountPaisa = toPaisa(parsed.amount)
-    if (amountPaisa <= 0) return { ok: false, error: '금액은 0보다 커야 합니다' }
+    const amountMinor = toMinor(parsed.amount)
+    if (amountMinor <= 0) return { ok: false, error: '금액은 0보다 커야 합니다' }
 
     const { data: payment, error } = await admin
       .from('payments')
@@ -515,7 +515,7 @@ export async function recordPaymentAction(input: RecordPaymentInput): Promise<Ac
         order_id: parsed.orderId,
         method: parsed.method,
         kind: parsed.kind,
-        amount: amountPaisa,
+        amount: amountMinor,
         status: 'pending',
         provider_ref: parsed.provider_ref ?? null,
         sender_number: parsed.sender_number ?? null,
@@ -530,14 +530,14 @@ export async function recordPaymentAction(input: RecordPaymentInput): Promise<Ac
       org_id: ctx.org.id,
       order_id: parsed.orderId,
       type: 'payment',
-      message: `결제 기록: ${parsed.kind} ${formatMoney(amountPaisa)} · ${parsed.method} (확인 대기)`,
-      data: { paymentId: payment.id, kind: parsed.kind, method: parsed.method, amount: amountPaisa },
+      message: `결제 기록: ${parsed.kind} ${formatMoney(amountMinor)} · ${parsed.method} (확인 대기)`,
+      data: { paymentId: payment.id, kind: parsed.kind, method: parsed.method, amount: amountMinor },
       actor_id: ctx.user.id,
     })
 
     audit(ctx, 'payment.record', 'payment', payment.id as string, undefined, {
       orderId: parsed.orderId,
-      amount: amountPaisa,
+      amount: amountMinor,
       kind: parsed.kind,
       method: parsed.method,
     })
@@ -1069,8 +1069,8 @@ export async function refundReturnAction(input: RefundReturnInput): Promise<Acti
     if (!orderData) return { ok: false, error: '주문을 찾을 수 없습니다' }
     const order = orderData as Order
 
-    const refundAmountPaisa = toPaisa(parsed.refund_amount)
-    if (refundAmountPaisa <= 0) return { ok: false, error: '환불 금액은 0보다 커야 합니다' }
+    const refundAmountMinor = toMinor(parsed.refund_amount)
+    if (refundAmountMinor <= 0) return { ok: false, error: '환불 금액은 0보다 커야 합니다' }
 
     const nowIso = new Date().toISOString()
 
@@ -1079,7 +1079,7 @@ export async function refundReturnAction(input: RefundReturnInput): Promise<Acti
       .update({
         status: 'refunded',
         resolution: parsed.resolution,
-        refund_amount: refundAmountPaisa,
+        refund_amount: refundAmountMinor,
         note: parsed.note ?? ret.note,
       })
       .eq('id', parsed.returnId)
@@ -1093,7 +1093,7 @@ export async function refundReturnAction(input: RefundReturnInput): Promise<Acti
       order_id: order.id,
       method: parsed.method,
       kind: 'refund',
-      amount: refundAmountPaisa,
+      amount: refundAmountMinor,
       status: 'verified',
       verified_by: ctx.user.id,
       verified_at: nowIso,
@@ -1126,14 +1126,14 @@ export async function refundReturnAction(input: RefundReturnInput): Promise<Acti
       org_id: ctx.org.id,
       order_id: order.id,
       type: 'payment',
-      message: `환불 처리: ${formatMoney(refundAmountPaisa)} via ${parsed.method} (return ${ret.return_no})`,
-      data: { returnId: parsed.returnId, amount: refundAmountPaisa, method: parsed.method },
+      message: `환불 처리: ${formatMoney(refundAmountMinor)} via ${parsed.method} (return ${ret.return_no})`,
+      data: { returnId: parsed.returnId, amount: refundAmountMinor, method: parsed.method },
       actor_id: ctx.user.id,
     })
 
     audit(ctx, 'return.refund', 'return', parsed.returnId, { status: 'received' }, {
       status: 'refunded',
-      refund_amount: refundAmountPaisa,
+      refund_amount: refundAmountMinor,
     })
 
     // Order status -> 'returned' only when the full amount taken in has now been

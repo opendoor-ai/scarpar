@@ -14,7 +14,7 @@ import { MediaPicker } from '@/components/admin/media-picker'
 
 const formSchema = z.object({
   announcement: z.string().trim().max(300),
-  whatsapp_number: z.string().trim().max(20),
+  kakao_channel_url: z.string().trim().max(300),
   primary_color: z.string().trim().regex(/^#[0-9a-fA-F]{6}$/, 'Use a hex color like #059669'),
   name: z.string().trim().min(1, 'Business name is required'),
   phone: z.string().trim().max(32),
@@ -35,7 +35,7 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
   async function onSubmit(values: FormValues) {
     const result = await updateOrgSettingsAction({
       announcement: values.announcement,
-      whatsapp_number: values.whatsapp_number,
+      kakao_channel_url: values.kakao_channel_url,
       primary_color: values.primary_color,
       org: {
         name: values.name,
@@ -77,12 +77,12 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
             />
             <FormField
               control={form.control}
-              name="whatsapp_number"
+              name="kakao_channel_url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>WhatsApp 상담 버튼 번호 (국가번호 포함)</FormLabel>
+                  <FormLabel>카카오톡 채널 주소 (오른쪽 아래 상담 버튼)</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="821012345678" />
+                    <Input {...field} placeholder="https://pf.kakao.com/_xxxx/chat" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

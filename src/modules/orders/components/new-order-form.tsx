@@ -11,8 +11,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { BD_DISTRICTS } from '@/lib/bd'
-import { formatMoney, fromPaisa, toPaisa } from '@/lib/money'
+import { REGIONS } from '@/lib/regions'
+import { formatMoney, fromMinor, toMinor } from '@/lib/money'
 import { createManualOrderAction } from '@/modules/orders/actions'
 import type { CreateManualOrderInput } from '@/modules/orders/schemas'
 import type { DeliveryZone } from '@/types/db'
@@ -21,10 +21,8 @@ import { ItemBuilder, type OrderLineItem } from './item-builder'
 
 const PAYMENT_METHOD_OPTIONS = [
   { value: 'cod', label: '착불(현장 결제)' },
-  { value: 'bkash', label: 'bKash' },
-  { value: 'nagad', label: 'Nagad' },
-  { value: 'uddoktapay', label: 'UddoktaPay' },
-  { value: 'sslcommerz', label: 'SSLCommerz' },
+  { value: 'transfer', label: '계좌이체' },
+  { value: 'card', label: '카드' },
   { value: 'bank', label: '계좌이체' },
   { value: 'cash', label: '현금' },
 ] as const
@@ -32,8 +30,8 @@ const PAYMENT_METHOD_OPTIONS = [
 export interface DefaultAdvance {
   required: boolean
   type: 'fixed' | 'percent'
-  /** paisa — meaningful only when type === 'fixed' (no percent-value setting exists yet). */
-  amountPaisa: number
+  /** minor — meaningful only when type === 'fixed' (no percent-value setting exists yet). */
+  amountMinor: number
 }
 
 interface NewOrderFormProps {
@@ -66,7 +64,7 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
   const subtotal = items.reduce((sum, item) => sum + item.unit_price * item.qty, 0)
   const deliveryCharge = useZones
     ? (deliveryZones.find((z) => z.id === deliveryZoneId)?.charge ?? 0)
-    : toPaisa(manualDeliveryCharge || '0')
+    : toMinor(manualDeliveryCharge || '0')
   const estimatedTotal = subtotal + deliveryCharge // discount unresolved client-side — server computes the real total
 
   // Pre-fill the advance amount from settings when COD is selected and the
@@ -74,7 +72,7 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
   // percent-value setting defined in the registry yet to compute a percent default.
   React.useEffect(() => {
     if (paymentMethod === 'cod' && defaultAdvance.required && defaultAdvance.type === 'fixed' && !advanceTouched) {
-      setAdvanceAmount(String(fromPaisa(defaultAdvance.amountPaisa)))
+      setAdvanceAmount(String(fromMinor(defaultAdvance.amountMinor)))
     }
   }, [paymentMethod, defaultAdvance, advanceTouched])
 
@@ -110,7 +108,7 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
           postcode: postcode.trim() || undefined,
         },
         delivery_zone_id: useZones && deliveryZoneId ? deliveryZoneId : undefined,
-        manual_delivery_charge: !useZones ? toPaisa(manualDeliveryCharge || '0') : undefined,
+        manual_delivery_charge: !useZones ? toMinor(manualDeliveryCharge || '0') : undefined,
         items: items.map((item) => ({
           product_id: item.product_id,
           variant_id: item.variant_id,
@@ -172,7 +170,7 @@ function NewOrderForm({ deliveryZones, deliveryEnabled, defaultAdvance }: NewOrd
                     <SelectValue placeholder="지역 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BD_DISTRICTS.map((d) => (
+                    {REGIONS.map((d) => (
                       <SelectItem key={d.name} value={d.name}>
                         {d.name}
                       </SelectItem>

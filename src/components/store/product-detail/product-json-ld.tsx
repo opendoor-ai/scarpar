@@ -1,7 +1,7 @@
 // 검색엔진용 구조화 데이터(JSON-LD): 구글·네이버가 "제품"과 "경로"를 정확히 이해하도록 돕습니다.
 // https://schema.org/Product , https://schema.org/BreadcrumbList
 
-import { fromPaisa } from '@/lib/money'
+import { fromMinor } from '@/lib/money'
 import type { Product } from '@/types/db'
 
 import type { StoreOrg } from '../get-store-org'
@@ -55,7 +55,7 @@ export function ProductJsonLd({ product, org, url, images, categoryTrail, storeU
       '@type': 'Offer',
       url,
       priceCurrency: 'KRW',
-      price: Math.round(fromPaisa(product.price)),
+      price: Math.round(fromMinor(product.price)),
       availability: 'https://schema.org/InStock',
       ...(product.condition ? { itemCondition: CONDITION_SCHEMA[product.condition] } : {}),
       seller,

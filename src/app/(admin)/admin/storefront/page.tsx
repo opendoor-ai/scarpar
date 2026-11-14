@@ -36,7 +36,7 @@ export default async function StorefrontSettingsPage() {
         <StorefrontSettingsForm
           defaultValues={{
             announcement: settingStr(ctx.settings, 'storefront.announcement'),
-            whatsapp_number: settingStr(ctx.settings, 'storefront.whatsapp_number'),
+            kakao_channel_url: settingStr(ctx.settings, 'storefront.kakao_channel_url'),
             primary_color: settingStr(ctx.settings, 'storefront.primary_color') || '#059669',
             name: ctx.org.name,
             phone: ctx.org.phone ?? '',

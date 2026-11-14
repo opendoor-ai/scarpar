@@ -18,18 +18,16 @@ export const dynamic = 'force-dynamic'
 
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
   cod: '착불(현장 결제)',
-  bkash: 'bKash',
-  nagad: 'Nagad',
-  uddoktapay: 'UddoktaPay',
-  sslcommerz: 'SSLCommerz',
+  transfer: '계좌이체',
+  card: '카드',
   bank: '계좌이체',
   cash: '현금',
 }
 
 /** Exclusive: rate% of the pre-tax line. Inclusive: the VAT portion already baked into it. */
-function computeLineVat(lineTotalPaisa: number, mode: string, ratePercent: number): number {
-  if (mode === 'exclusive') return Math.round((lineTotalPaisa * ratePercent) / 100)
-  if (mode === 'inclusive') return Math.round(lineTotalPaisa - (lineTotalPaisa * 100) / (100 + ratePercent))
+function computeLineVat(lineTotalMinor: number, mode: string, ratePercent: number): number {
+  if (mode === 'exclusive') return Math.round((lineTotalMinor * ratePercent) / 100)
+  if (mode === 'inclusive') return Math.round(lineTotalMinor - (lineTotalMinor * 100) / (100 + ratePercent))
   return 0
 }
 
@@ -56,17 +54,17 @@ export default async function InvoicePage({ params }: PageProps<{ orderId: strin
 
   const taxMode = settingStr(settings, 'tax.mode')
   const vatRate = settingNum(settings, 'tax.vat_rate')
-  const mushakEnabled = settingBool(settings, 'tax.mushak_enabled')
+  const vatInvoiceEnabled = settingBool(settings, 'tax.vat_invoice_enabled')
   const invoiceTemplate = settingStr(settings, 'printing.invoice_template')
   const footerText = settingStr(settings, 'printing.footer_text')
-  const isMushak = invoiceTemplate === 'a4_mushak' && mushakEnabled
+  const isVatInvoice = invoiceTemplate === 'a4_vat' && vatInvoiceEnabled
 
   const taxRows =
     taxMode !== 'none' && order.tax_amount > 0
       ? [
           {
             label: `부가세 (${vatRate}%)${taxMode === 'inclusive' ? ' 포함' : ''}`,
-            amountPaisa: order.tax_amount,
+            amountMinor: order.tax_amount,
           },
         ]
       : []
@@ -74,7 +72,7 @@ export default async function InvoicePage({ params }: PageProps<{ orderId: strin
   const balanceDue = Math.max(order.total - order.advance_paid, 0)
 
   let hsCodeByProduct: Record<string, string> = {}
-  if (isMushak) {
+  if (isVatInvoice) {
     const productIds = Array.from(
       new Set(items.map((item) => item.product_id).filter((id): id is string => Boolean(id))),
     )
@@ -99,15 +97,15 @@ export default async function InvoicePage({ params }: PageProps<{ orderId: strin
                 Phone: {org.phone}
               </>
             ) : null}
-            {mushakEnabled && org.bin_number ? (
+            {vatInvoiceEnabled && org.bin_number ? (
               <>
                 <br />
-                Seller BIN: {org.bin_number}
+                공급자 사업자등록번호: {org.bin_number}
               </>
             ) : null}
           </address>
         </div>
-        <div className="receipt-title">{isMushak ? 'Mushak-6.3 Tax Invoice' : '거래명세서'}</div>
+        <div className="receipt-title">{isVatInvoice ? '거래명세서 (부가세 포함)' : '거래명세서'}</div>
       </header>
 
       <div className="receipt-meta">
@@ -126,10 +124,10 @@ export default async function InvoicePage({ params }: PageProps<{ orderId: strin
           {order.customer_phone}
           <br />
           {formatAddress(order.address)}
-          {isMushak ? (
+          {isVatInvoice ? (
             <>
               <br />
-              Buyer BIN: —
+              공급받는자 사업자등록번호: —
             </>
           ) : null}
         </address>
@@ -139,16 +137,16 @@ export default async function InvoicePage({ params }: PageProps<{ orderId: strin
         <thead>
           <tr>
             <th>품목</th>
-            {isMushak ? <th>HS 코드</th> : null}
+            {isVatInvoice ? <th>HS 코드</th> : null}
             <th className="num">수량</th>
             <th className="num">단가</th>
-            {isMushak ? <th className="num">VAT</th> : null}
+            {isVatInvoice ? <th className="num">VAT</th> : null}
             <th className="num">금액</th>
           </tr>
         </thead>
         <tbody>
           {items.map((item) => {
-            const lineVat = isMushak ? computeLineVat(item.line_total, taxMode, vatRate) : 0
+            const lineVat = isVatInvoice ? computeLineVat(item.line_total, taxMode, vatRate) : 0
             return (
               <tr key={item.id}>
                 <td>
@@ -160,12 +158,12 @@ export default async function InvoicePage({ params }: PageProps<{ orderId: strin
                     </>
                   ) : null}
                 </td>
-                {isMushak ? (
+                {isVatInvoice ? (
                   <td>{item.product_id ? (hsCodeByProduct[item.product_id] ?? '—') : '—'}</td>
                 ) : null}
                 <td className="num">{item.qty}</td>
                 <td className="num">{formatMoney(item.unit_price)}</td>
-                {isMushak ? <td className="num">{formatMoney(lineVat)}</td> : null}
+                {isVatInvoice ? <td className="num">{formatMoney(lineVat)}</td> : null}
                 <td className="num">{formatMoney(item.line_total)}</td>
               </tr>
             )
@@ -174,22 +172,22 @@ export default async function InvoicePage({ params }: PageProps<{ orderId: strin
       </table>
 
       <ReceiptTotals
-        subtotalPaisa={order.subtotal}
-        discountPaisa={order.discount_amount}
+        subtotalMinor={order.subtotal}
+        discountMinor={order.discount_amount}
         discountCode={order.discount_code}
-        deliveryChargePaisa={order.delivery_charge}
+        deliveryChargeMinor={order.delivery_charge}
         taxRows={taxRows}
-        totalPaisa={order.total}
-        advancePaidPaisa={order.advance_paid}
+        totalMinor={order.total}
+        advancePaidMinor={order.advance_paid}
       />
 
       {order.payment_method === 'cod' && balanceDue > 0 ? (
         <div style={{ marginTop: 8, marginLeft: 'auto', width: '60mm' }}>
-          <CodBig amountPaisa={balanceDue} label="받을 때 결제할 금액" />
+          <CodBig amountMinor={balanceDue} label="받을 때 결제할 금액" />
         </div>
       ) : null}
 
-      <AmountWords paisa={order.total} />
+      <AmountWords minor={order.total} />
 
       <footer className="receipt-footer">
         <div>

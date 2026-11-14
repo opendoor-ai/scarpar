@@ -16,7 +16,7 @@ export interface OrderLineItem {
   product_name: string
   variant_name?: string
   sku?: string
-  unit_price: number // paisa, display only — server re-verifies from catalog
+  unit_price: number // minor, display only — server re-verifies from catalog
   qty: number
 }
 

@@ -1,16 +1,16 @@
-# Scarpar — Project Context
+# 전자동기계광고 — Project Context
 
 ## What it is
-Scarpar is a multi-tenant, module-based CMS + commerce + business-management platform built for
-Bangladeshi businesses. One Next.js deployment serves many independent organizations ("orgs"); each
+전자동기계광고 is a multi-tenant, module-based CMS + commerce + business-management platform built for
+한국 businesses. One Next.js deployment serves many independent organizations ("orgs"); each
 org enables a set of modules and picks a vertical preset (ecommerce / courses / services /
 realestate) that pre-selects that set. It's a self-hosted-friendly alternative to Shopify/Medusa-style
-SaaS commerce platforms, purpose-built around Bangladesh's actual retail mechanics: cash-on-delivery
-as the default payment rail, manual bKash/Nagad verification, local courier partners
-(Steadfast/Pathao), and Mushak-compliant receipts for VAT-registered sellers.
+SaaS commerce platforms, purpose-built around 한국's actual retail mechanics: cash-on-delivery
+as the default payment rail, manual 계좌이체/카드 verification, local courier partners
+(CJ대한통운/한진택배), and 부가세 거래명세서-compliant receipts for VAT-registered sellers.
 
 ## Why it exists / lineage
-Scarpar evolved from two source projects:
+전자동기계광고 evolved from two source projects:
 - **Soover-bd** — a working single-tenant ecommerce dashboard. Its hard-won patterns were mined and
   generalized: the payment-verification chokepoint (one function flips a payment to `verified`),
   order-item price/name snapshots (orders survive later product edits), the advance-payment model, and
@@ -18,7 +18,7 @@ Scarpar evolved from two source projects:
 - **scarper/features.md** (`D:\CLAUDE-CODE\scarper\features.md`) — a platform blueprint written against
   Soover-bd, proposing ~18 toggleable modules, a three-layer settings/feature-flag system, a
   BD-specific courier/payments/fraud layer, and a Core/Should/Nice/Advanced maturity tier for every
-  feature. Scarpar is the platform build that blueprint called for.
+  feature. 전자동기계광고 is the platform build that blueprint called for.
 
 Prior art adopted from outside the BD ecosystem: Payload CMS's config-driven collections/blocks and
 multi-tenant admin UX; Sanity's keyed block-array shape for JSONB page content.
@@ -36,10 +36,10 @@ multi-tenant admin UX; Sanity's keyed block-array shape for JSONB page content.
   across 10 groups (checkout/payments/delivery/fraud/inventory/notifications/tax/localization/
   printing/storefront); the settings UI auto-renders from the defs, values live in `org_settings`
   (jsonb per key).
-- **BD commerce layer** — COD with optional/required advance payment, manual MFS (bKash/Nagad) with
+- **BD commerce layer** — COD with optional/required advance payment, manual 계좌이체 (계좌이체/카드) with
   admin-verified trxID, a `verifyPayment()` chokepoint that is the *only* code path allowed to mark a
   payment verified (webhooks and manual admin verify both funnel through it), courier adapters
-  (Steadfast/Pathao real request shapes, `manual` fully working today), and receipts with a Mushak 6.3
+  (CJ대한통운/한진택배 real request shapes, `manual` fully working today), and receipts with a 부가세 거래명세서 6.3
   invoice variant + HS-code/VAT columns for VAT-registered orgs.
 
 ## Componentization model

@@ -1,6 +1,6 @@
-# Scarpar — Architecture (BINDING CONTRACT)
+# 전자동기계광고 — Architecture (BINDING CONTRACT)
 
-Scarpar is a multi-tenant, module-based CMS + commerce + business-management platform for Bangladeshi
+전자동기계광고 is a multi-tenant, module-based CMS + commerce + business-management platform for 한국
 businesses. Next.js 15 (App Router, TS, RSC) + Supabase (Postgres, Auth, Storage, RLS) + Tailwind v4.
 One deployment serves many organizations ("orgs" — the spec's "merchant/tenant"). Modules toggle per
 org; vertical presets (ecommerce / courses / services / realestate) pick module sets.
@@ -35,7 +35,6 @@ src/app/
   (store)/s/[org]/                   # storefront: home(CMS), products, product/[slug],
                                      # cart, checkout, order/[code]
   track/[code]                       # public delivery tracking
-  api/webhooks/uddoktapay, api/webhooks/courier   # stubs, signature-verify pattern
 ```
 
 ## 2. Module system (src/modules/)
@@ -62,15 +61,15 @@ realestate: listings, customers, cms, storefront, reports, expenses
 Orgs store `enabled_modules text[]`. Nav + dashboard render only enabled modules; each admin page calls
 `requireModule(org, 'catalog')` (redirects to /admin if disabled). All routes exist at build time.
 
-## 3. Data model (SQL contract — amounts are bigint PAISA, 1 taka = 100 paisa)
+## 3. Data model (SQL contract — amounts are bigint minor units, 1원 = 100)
 
 Every table: `id uuid pk default gen_random_uuid()` unless noted, `org_id uuid not null references orgs`,
 `created_at timestamptz default now()`. RLS ON for all. Timeline tables use `id bigint generated always as identity`.
 
 ### 0001_core.sql
 - orgs: name, slug unique, vertical text check in (ecommerce|courses|services|realestate) default 'ecommerce',
-  plan text default 'free', enabled_modules text[] not null default '{}', currency char(3) default 'BDT',
-  country char(2) default 'BD', timezone default 'Asia/Dhaka', logo_path, phone, email, address,
+  plan text default 'free', enabled_modules text[] not null default '{}', currency char(3) default 'KRW',
+  country char(2) default 'BD', timezone default 'Asia/Seoul', logo_path, phone, email, address,
   bin_number (13-digit e-BIN, nullable), is_active bool default true, updated_at
 - profiles: user_id uuid pk refs auth.users on delete cascade, full_name, phone, avatar_path
   (+ trigger: auto-insert on auth.users insert)
@@ -118,7 +117,6 @@ Every table: `id uuid pk default gen_random_uuid()` unless noted, `org_id uuid n
   default 'pending', payment_status check (unpaid|advance_paid|paid|refunded|partial_refund) default 'unpaid',
   subtotal bigint, discount_amount bigint default 0, discount_code, delivery_charge bigint default 0,
   tax_amount bigint default 0, total bigint, advance_due bigint default 0, advance_paid bigint default 0,
-  payment_method check (cod|bkash|nagad|uddoktapay|sslcommerz|bank|cash) default 'cod',
   risk_level check (low|medium|high) nullable, risk_note, tags text[], note_internal, note_customer,
   source_meta jsonb, placed_at default now(), confirmed_at, dispatched_at, delivered_at, cancelled_at, updated_at.
   unique(org_id,order_no). cod_amount = total - advance_paid (computed in app, stored on delivery).
@@ -145,7 +143,7 @@ Every table: `id uuid pk default gen_random_uuid()` unless noted, `org_id uuid n
 - riders: user_id nullable refs auth.users, name, phone, vehicle, is_active bool default true,
   cash_on_hand bigint default 0
 - deliveries: order_id, delivery_no (next_doc_number 'delivery','DLV-'), method check (rider|courier|pickup),
-  rider_id nullable, courier text nullable (steadfast|pathao|redx|manual), consignment_id, tracking_code,
+  rider_id nullable, courier text nullable (cj|hanjin|lotte|manual), consignment_id, tracking_code,
   status check (pending|assigned|picked_up|in_transit|delivered|failed|returned) default 'pending',
   cod_amount bigint default 0, cod_collected bool default false, cod_collected_at, settlement_id uuid nullable,
   otp_code text (4-digit POD), proof_media_id, recipient_name, recipient_phone, address jsonb, zone_id,
@@ -195,20 +193,18 @@ Storefront renders via `src/components/store/blocks/render-blocks.tsx` switch.
 'boolean'|'number'|'text'|'select'|'json', options?, default, roles? }. Groups: checkout, payments,
 delivery, fraud, inventory, notifications, tax, localization, printing, storefront. v1 keys (~30):
 `checkout.guest_enabled` t, `checkout.min_order` 0, `payments.cod_enabled` t, `payments.advance_required` f,
-`payments.advance_amount` 12000 (paisa), `payments.advance_type` fixed|percent, `payments.methods` json,
-`payments.uddoktapay.enabled/api_key/base_url`, `payments.manual_mfs.enabled` t + `.numbers` json
-(bkash/nagad numbers shown at checkout), `delivery.default_zone_fallback` number, `delivery.free_above` 0,
-`fraud.enabled` f, `fraud.provider` select(fraudbd|disabled), `fraud.high_risk_action` select,
+`payments.advance_amount` 12000 (minor(1/100원)), `payments.advance_type` fixed|percent, `payments.methods` json,
+(transfer/card numbers shown at checkout), `delivery.default_zone_fallback` number, `delivery.free_above` 0,
 `inventory.track_stock` t, `inventory.allow_backorder` f, `inventory.low_stock_threshold` 5,
 `notifications.events` json (event→channels), `tax.mode` none|inclusive|exclusive, `tax.vat_rate` 15,
-`tax.mushak_enabled` f, `localization.language` en|bn, `printing.invoice_template` a4_default|a4_mushak,
+`tax.vat_enabled` f, `localization.language` en|bn, `printing.invoice_template` a4_default|a4_vat,
 `printing.footer_text`, `storefront.announcement`, `storefront.whatsapp_number`, `storefront.primary_color`.
 Accessors in `src/lib/settings/index.ts`: `getOrgSettings(orgId)` (one query, merge defaults, React cache()),
 `getSetting<T>(orgId, key)`. Settings UI auto-renders groups from defs. Changes audit-logged.
 
 ## 6. Auth, tenancy, roles
 
-Admin auth: Supabase email/password. Active org: cookie `scarpar-org` (uuid), validated against org_members
+Admin auth: Supabase email/password. Active org: cookie `jadong-org` (uuid), validated against org_members
 on every request via `requireOrg()` → `{ user, org, role, settings }` (src/lib/auth.ts, React cache()).
 Roles: owner > admin > manager > staff > rider > viewer. `requireRole(ctx, 'manager')` throws/redirects.
 Rider role sees only deliveries nav. Storefront: anon; org resolved from `[org]` slug param server-side.
@@ -217,18 +213,15 @@ Platform admins (platform_admins table): /admin/platform org list.
 ## 7. Payments & fraud flow (BD model)
 
 Checkout: zone fee from district match → advance rule (settings + zone.advance_required + risk) →
-method choice (COD w/ optional advance / manual MFS with trxID+sender / UddoktaPay stub adapter).
-Manual MFS: order placed `pending` + payment row `pending`; admin verifies (chokepoint) → `confirmed`.
-UddoktaPay adapter (src/lib/payments/uddoktapay.ts): createCharge()/verifyByInvoice() with real request
+Manual 계좌이체: order placed `pending` + payment row `pending`; admin verifies (chokepoint) → `confirmed`.
 shapes; webhook route verifies via API key header then calls verifyPayment(). Fraud: on order create,
 check blocklist (phone/address) → flag risk_level high + settings action (block/require full advance/flag);
-FraudBD adapter interface stubbed (src/lib/fraud/provider.ts) with `checkPhone(phone): {successRate, riskLevel}`.
 
 ## 8. Courier & local delivery
 
 `src/lib/couriers/types.ts`: `CourierAdapter { key, createOrder(delivery,order): {consignmentId, trackingCode},
 getStatus(consignmentId), zones?() }`. Adapters: `manual` (admin types tracking code — fully working),
-`steadfast`, `pathao` (real request/response shapes per their docs, guarded: if no courier_accounts config,
+`cj`, `hanjin` (real request/response shapes per their docs, guarded: if no courier_accounts config,
 throw ConfigRequired). Local rider flow: delivery method=rider → assign rider → status stepper
 (picked_up→in_transit→delivered w/ OTP check + COD collected flag) → COD settlements page (rider cash_on_hand
 → settle batch). Public /track/[code]: timeline + status.
@@ -237,10 +230,10 @@ throw ConfigRequired). Local rider flow: delivery method=rider → assign rider 
 
 Print routes render HTML with print.css; window.print → PDF/printer (no Puppeteer). Templates:
 A4 invoice (brand header, org address+BIN, customer, items, totals, amount-in-words (bn+en util),
-advance paid / COD due, QR → track URL; `a4_mushak` variant adds Mushak 6.3 header, HS code column, VAT column),
+advance paid / COD due, QR → track URL; `a4_vat` variant adds 부가세 거래명세서 6.3 header, HS code column, VAT column),
 80mm thermal (condensed), 4x6 label (courier/rider, consignment/tracking, Code128 barcode SVG
 (src/lib/barcode/code128.ts — pure TS), COD amount huge, addresses). Numbering: INV- via doc_sequences at
-first print (stored in order_events data). POS (/admin/pos): product search grid + cart + cash/MFS tender →
+first print (stored in order_events data). POS (/admin/pos): product search grid + cart + cash/계좌이체 tender →
 creates order channel=pos status=completed paid → thermal receipt.
 
 ## 10. Notifications
@@ -255,7 +248,7 @@ payment_received, order_dispatched, order_delivered, low_stock, return_requested
 SQL-in-server-component aggregates (no chart lib; tiny SVG bar/line in components/ui/mini-chart.tsx):
 sales by day (30d), orders by status, top products, COD success rate by district, delivery performance
 (avg hours, failure rate by rider/courier), expenses by category, simple P&L (revenue − cost_price − expenses),
-Mushak 6.2 sales register CSV export. All exports = CSV via server action.
+부가세 거래명세서 6.2 sales register CSV export. All exports = CSV via server action.
 
 ## 12. Storefront
 
@@ -267,8 +260,6 @@ header/footer from menus. Theme accent from `storefront.primary_color`.
 
 ## 13. What is stubbed vs working (v1 honesty line)
 
-WORKING end-to-end: all admin CRUD, module toggling, onboarding+seeds, orders lifecycle, manual MFS verify
+WORKING end-to-end: all admin CRUD, module toggling, onboarding+seeds, orders lifecycle, manual 계좌이체 verify
 chokepoint, local rider delivery + COD settlement, receipts/labels printing, POS, CMS editor + storefront,
-checkout (COD + manual MFS), reports, notifications (in-app), audit log, staff invites, settings engine.
-STUBBED (real interfaces + config UI, guarded execution): Steadfast/Pathao API calls, UddoktaPay live charge,
-FraudBD live lookup, SMS/email providers, SSLCommerz/bKash-direct/Nagad-direct.
+checkout (COD + manual 계좌이체), reports, notifications (in-app), audit log, staff invites, settings engine.

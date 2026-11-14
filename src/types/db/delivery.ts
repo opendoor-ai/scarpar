@@ -1,6 +1,6 @@
 // src/types/db/delivery.ts
 // Delivery, rider, courier, and COD types — mirrors supabase/migrations/0003_delivery_cms_ops.sql.
-// Money columns are bigint paisa in the DB, mapped to TS `number` per docs/conventions.md.
+// Money columns are bigint minor in the DB, mapped to TS `number` per docs/conventions.md.
 
 export interface DeliveryZone {
   id: string
@@ -29,7 +29,7 @@ export interface Rider {
 }
 
 export type DeliveryMethod = 'rider' | 'courier' | 'pickup'
-export type DeliveryCourier = 'steadfast' | 'pathao' | 'redx' | 'manual'
+export type DeliveryCourier = 'cj' | 'hanjin' | 'lotte' | 'manual'
 export type DeliveryStatus =
   | 'pending'
   | 'assigned'

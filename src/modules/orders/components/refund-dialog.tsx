@@ -24,10 +24,8 @@ import { RefundReturnSchema, type RefundReturnInput } from '@/modules/orders/sch
 
 const METHOD_OPTIONS = [
   { value: 'cod', label: '현금' },
-  { value: 'bkash', label: 'bKash' },
-  { value: 'nagad', label: 'Nagad' },
-  { value: 'uddoktapay', label: 'UddoktaPay' },
-  { value: 'sslcommerz', label: 'SSLCommerz' },
+  { value: 'transfer', label: '계좌이체' },
+  { value: 'card', label: '카드' },
   { value: 'bank', label: '계좌이체' },
   { value: 'cash', label: '현금' },
 ]
@@ -51,7 +49,7 @@ function RefundDialog({ returnId }: RefundDialogProps) {
 
   const form = useForm<RefundReturnInput>({
     resolver: zodResolver(RefundReturnSchema),
-    defaultValues: { returnId, refund_amount: '', method: 'bkash', resolution: 'refund', note: '' },
+    defaultValues: { returnId, refund_amount: '', method: 'transfer', resolution: 'refund', note: '' },
   })
 
   async function onSubmit(values: RefundReturnInput) {

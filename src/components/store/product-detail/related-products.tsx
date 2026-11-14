@@ -1,5 +1,6 @@
-// 같은 공급사의 다른 상품 (가로로 넘겨 보기)
+// 함께 구매해 보세요 — 같은 공급사가 등록한 다른 제품을 자동으로 모두 보여줌 (가로로 넘겨 보기)
 
+import { HScroller } from '@/components/platform/h-scroller'
 import { getAnonClient } from '@/lib/supabase/anon'
 import type { Lang } from '@/lib/i18n'
 import type { Product } from '@/types/db'
@@ -31,8 +32,8 @@ export async function RelatedProducts({
     .eq('status', 'active')
     .neq('id', excludeId)
     .order('is_featured', { ascending: false })
-    .order('updated_at', { ascending: false })
-    .limit(12)
+    .order('created_at', { ascending: false })
+    .limit(200)
   const products = (data ?? []) as Row[]
   if (products.length === 0) return null
 
@@ -43,19 +44,20 @@ export async function RelatedProducts({
 
   return (
     <section aria-labelledby="related-title">
-      <h2 id="related-title" className="mb-4 text-center text-lg font-semibold">
-        이 공급사의 다른 제품
+      <h2 id="related-title" className="mb-1 text-center text-lg font-bold sm:text-xl">
+        함께 구매해 보세요
       </h2>
-      <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+      <p className="mb-5 text-center text-xs text-muted-foreground">같은 공급사의 다른 제품 {products.length}개</p>
+      <HScroller label="함께 구매해 보세요">
         {products.map((p) => {
           const card: ProductCardData = { ...p, image: images[p.id] ?? null }
           return (
-            <div key={p.id} className="w-40 shrink-0 snap-start sm:w-44">
+            <div key={p.id} className="w-[45%] shrink-0 snap-start sm:w-[calc((100%-1.5rem)/3)] lg:w-[calc((100%-2.25rem)/4)]">
               <ProductCard orgSlug={orgSlug} product={card} lang={lang} />
             </div>
           )
         })}
-      </div>
+      </HScroller>
     </section>
   )
 }

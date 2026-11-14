@@ -59,6 +59,14 @@ export const bannerItemSchema = z
     ends_on: z.string().refine((v) => v === '' || DATE_RE.test(v), '종료일을 확인하세요'),
     is_active: z.boolean(),
     category_id: z.string().uuid().nullable(),
+    // 분류·검색 허브: 노출할 분류 번호(쉼표), 검색 결과에도 보이기, 검색어
+    target_cate_nos: z
+      .string()
+      .trim()
+      .max(500)
+      .refine((v) => v === '' || /^\d+(\s*,\s*\d+)*$/.test(v), '분류 번호는 숫자를 쉼표로 나눠 적어요 (예: 1, 11, 12)'),
+    show_in_search: z.boolean(),
+    search_keywords: z.string().trim().max(500),
     // 광고 계약 정보 (선택)
     advertiser_org_id: z.string().uuid().nullable(),
     advertiser_name: z.string().trim().max(100),
@@ -128,6 +136,9 @@ export function emptyBanner(sortHint = 0): BannerItem & { _key: string; _sort: n
     ends_on: '',
     is_active: true,
     category_id: null,
+    target_cate_nos: '',
+    show_in_search: false,
+    search_keywords: '',
     advertiser_org_id: null,
     advertiser_name: '',
     payment_status: 'free',

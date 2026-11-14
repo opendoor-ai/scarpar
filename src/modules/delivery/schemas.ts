@@ -1,10 +1,10 @@
 // Zod schemas for the delivery module (docs/conventions.md — Server actions).
-// Money fields (cod_amount, fee, charge) are paisa integers, already converted
-// from the taka-facing form inputs via toPaisa() before the action is called.
+// Money fields (cod_amount, fee, charge) are minor integers, already converted
+// from the won-facing form inputs via toMinor() before the action is called.
 import { z } from 'zod'
 
 export const deliveryMethodSchema = z.enum(['rider', 'courier', 'pickup'])
-export const deliveryCourierSchema = z.enum(['steadfast', 'pathao', 'redx', 'manual'])
+export const deliveryCourierSchema = z.enum(['cj', 'hanjin', 'lotte', 'manual'])
 
 export const deliveryAddressSchema = z.object({
   line1: z.string().trim().min(1, 'Address line is required').max(300),

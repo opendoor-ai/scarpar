@@ -219,6 +219,7 @@ export function BannerEditor({
   orgs,
   categories,
   showCategory,
+  showTargeting = false,
   dragging,
   onChange,
   onDuplicate,
@@ -235,6 +236,8 @@ export function BannerEditor({
   orgs: { id: string; name: string }[]
   categories: { id: string; label: string }[]
   showCategory: boolean
+  /** 분류·검색 허브: 노출 분류 번호·검색 칸 보이기 */
+  showTargeting?: boolean
   dragging: boolean
   onChange: (b: EditableBanner) => void
   onDuplicate: () => void
@@ -406,6 +409,41 @@ export function BannerEditor({
                 ))}
               </select>
             </Row>
+          ) : null}
+
+          {showTargeting ? (
+            <>
+              <Row label="노출 분류">
+                <div className="flex flex-col gap-1">
+                  <Input
+                    value={item.target_cate_nos}
+                    onChange={(e) => set('target_cate_nos', e.target.value)}
+                    placeholder="분류 번호를 쉼표로 (예: 0, 1, 11) — 상품분류 관리의 no.번호"
+                  />
+                  <p className="text-xs text-muted-foreground">적은 번호의 분류 페이지에서만 보여요. 0 = 전체 카테고리(전체 제품). 여러 분류는 쉼표로 나눠 적어요.</p>
+                </div>
+              </Row>
+              <Row label="검색 결과">
+                <div className="flex flex-col gap-2">
+                  <label className="inline-flex items-center gap-2 pt-1.5 text-sm">
+                    <input
+                      type="checkbox"
+                      className="accent-primary"
+                      checked={item.show_in_search}
+                      onChange={(e) => set('show_in_search', e.target.checked)}
+                    />
+                    검색 결과에도 보이기
+                  </label>
+                  {item.show_in_search ? (
+                    <Input
+                      value={item.search_keywords}
+                      onChange={(e) => set('search_keywords', e.target.value)}
+                      placeholder="검색어를 쉼표로 (예: 머시닝센터, CNC선반) — 비우면 회사명·제목으로 찾아요"
+                    />
+                  ) : null}
+                </div>
+              </Row>
+            </>
           ) : null}
 
           <Row label="노출기간">

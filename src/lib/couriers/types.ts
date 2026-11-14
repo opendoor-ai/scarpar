@@ -10,9 +10,9 @@ import type { OrgContext } from '@/lib/auth'
 import type { DeliveryCourier } from '@/types/db'
 
 /**
- * Thrown by a real adapter (steadfast/pathao) when the org has no active
+ * Thrown by a real adapter (cj/hanjin) when the org has no active
  * courier_accounts row (or is missing required keys within it), and by
- * getAdapter() for a courier with no adapter implemented (e.g. 'redx').
+ * getAdapter() for a courier with no adapter implemented (e.g. 'lotte').
  * Callers (src/modules/delivery/actions.ts) return `err.message` as the
  * action's error string; the UI surfaces it as a toast with a fallback
  * suggestion to switch to the manual adapter.
@@ -37,7 +37,7 @@ export interface CourierOrderInput {
   recipientPhone: string
   recipientAddress: string
   district?: string | null
-  /** paisa */
+  /** minor */
   codAmount: number
   note?: string | null
   /** manual adapter only — admin-typed tracking code; blank generates a local reference. */
@@ -64,31 +64,4 @@ export interface CourierAdapter {
   createOrder(ctx: OrgContext, input: CourierOrderInput): Promise<CourierOrderResult>
   getStatus(ctx: OrgContext, consignmentId: string): Promise<CourierStatusResult>
   zones?(ctx: OrgContext): Promise<CourierZone[]>
-}
-
-/**
- * Shared config loader for the real adapters. First line of every steadfast/pathao
- * call per docs/architecture.md §8 ("guarded: if no courier_accounts config, throw
- * ConfigRequired"). Reads via the RLS-scoped server client — the caller is already
- * inside a requireOrg()'d server action, so the member's session can read its own
- * org's courier_accounts row directly.
- */
-export async function requireCourierConfig(
-  ctx: OrgContext,
-  courier: Extract<DeliveryCourier, 'steadfast' | 'pathao'>,
-  friendlyName: string,
-): Promise<Record<string, unknown>> {
-  const supabase = await getServerClient()
-  const { data, error } = await supabase
-    .from('courier_accounts')
-    .select('config, is_active')
-    .eq('org_id', ctx.org.id)
-    .eq('courier', courier)
-    .maybeSingle()
-
-  if (error || !data || !data.is_active) {
-    throw new ConfigRequiredError(`Configure ${friendlyName} API keys in courier settings`)
-  }
-
-  return (data.config ?? {}) as Record<string, unknown>
 }

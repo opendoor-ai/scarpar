@@ -20,12 +20,6 @@ export function resolveMenuHref(orgSlug: string, href: string): string {
   return storePath(orgSlug, href)
 }
 
-/** wa.me link from a settings `storefront.whatsapp_number` value (any punctuation/spacing). */
-export function whatsappHref(number: string): string | null {
-  const digits = number.replace(/[^\d]/g, '')
-  return digits ? `https://wa.me/${digits}` : null
-}
-
 /** 상품 상세 주소: `/s/{orgSlug}/products/{상품번호}` (REST 형식, 상품번호는 등록 시 자동 부여) */
 export function productPath(orgSlug: string, productNo: number): string {
   return storePath(orgSlug, `/products/${productNo}`)

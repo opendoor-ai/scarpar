@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { Info } from 'lucide-react'
 
-import { fromPaisa, toPaisa } from '@/lib/money'
+import { fromMinor, toMinor } from '@/lib/money'
 import type { SettingDef } from '@/lib/settings/registry'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,12 +18,12 @@ import {
 } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
-/** Money fields are flagged by "paisa" appearing in the def's label/help, not
+/** Money fields are flagged by "minor" appearing in the def's label/help, not
  *  by a key-name suffix — several v1 keys (checkout.min_order,
- *  delivery.default_zone_fallback, delivery.free_above) are paisa amounts
+ *  delivery.default_zone_fallback, delivery.free_above) are minor amounts
  *  but don't end in "_amount", so a suffix match would under-detect them. */
 function isMoneyField(def: SettingDef): boolean {
-  return def.type === 'number' && (/paisa|\(원\)/i.test(def.label) || /paisa/i.test(def.help ?? ''))
+  return def.type === 'number' && (/minor|\(원\)/i.test(def.label) || /minor/i.test(def.help ?? ''))
 }
 
 interface SettingFieldProps {
@@ -139,7 +139,7 @@ function SettingField({ def, value, disabled, onChange, onValidityChange }: Sett
 
   if (def.type === 'number') {
     const money = isMoneyField(def)
-    const displayValue = money ? fromPaisa(Number(value) || 0) : Number(value) || 0
+    const displayValue = money ? fromMinor(Number(value) || 0) : Number(value) || 0
 
     return (
       <div className="flex items-center justify-between gap-6 border-b py-3 last:border-b-0">
@@ -155,7 +155,7 @@ function SettingField({ def, value, disabled, onChange, onValidityChange }: Sett
             className="text-right tabular-nums"
             onChange={(event) => {
               const raw = event.target.value
-              onChange(def.key, money ? toPaisa(raw) : Number(raw) || 0)
+              onChange(def.key, money ? toMinor(raw) : Number(raw) || 0)
             }}
           />
         </div>

@@ -1,6 +1,7 @@
-# Scarpar
+# 전자동기계광고
 
-Multi-tenant, module-based CMS + commerce + business-management platform for Bangladeshi businesses.
+산업기계·중고기계 공급사와 고객을 연결하는 멀티 공급사 기계 광고 플랫폼 (한국, 원화·한국어 기준).
+문의(전화·문자) 중심이며, 결제·배송 모듈은 남아 있지만 기본 흐름이 아닙니다.
 
 **Stack**: Next.js 15 (App Router, TS, RSC) + Supabase (Postgres, Auth, Storage, RLS) + Tailwind v4.
 
@@ -15,7 +16,7 @@ example), `docs/operations.md` (production runbook), `docs/saas-roadmap.md` (pha
 plan — canonical for billing/plans/domains/platform work), `docs/deployment.md` (Vercel+Supabase).
 
 ## Key invariants
-- Money = bigint paisa everywhere. Format with `formatMoney()` (`src/lib/money.ts`); never float taka.
+- Money = bigint minor units (1원 = 100) everywhere. Format with `formatMoney()` (`src/lib/money.ts`); never float taka.
 - `verifyPayment()` (`src/modules/orders/actions.ts`) is the ONLY path that flips a payment to
   `verified` — webhooks and manual admin verify both call it.
 - `order_items` snapshot product name/price/image at purchase time — never re-join live product data.

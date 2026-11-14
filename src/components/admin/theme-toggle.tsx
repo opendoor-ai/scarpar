@@ -5,7 +5,7 @@ import { Moon, Sun } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 
-const THEME_KEY = 'scarpar-theme'
+const THEME_KEY = 'jadong-theme'
 
 /**
  * No-flash inline theme script. Runs before hydration (rendered by the

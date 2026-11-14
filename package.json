@@ -1,33 +1,19 @@
 {
-  "name": "scarpar",
+  "name": "jadong-machine-ads",
   "version": "0.1.0",
-  "description": "Open-source, multi-tenant, module-based CMS + commerce + business-management platform. Next.js 15 + Supabase. Ecommerce, courses, services, and real-estate verticals from one codebase.",
+  "description": "전자동기계광고 — 산업기계·중고기계 공급사와 고객을 연결하는 기계 광고 플랫폼 (Next.js + Supabase)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sahol3/scarpar.git"
+    "url": "https://github.com/opendoor-ai/scarpar.git"
   },
-  "homepage": "https://github.com/sahol3/scarpar#readme",
-  "bugs": {
-    "url": "https://github.com/sahol3/scarpar/issues"
-  },
+  "homepage": "https://www.jadong.co.kr",
   "keywords": [
+    "기계광고",
+    "중고기계",
+    "산업기계",
     "nextjs",
-    "supabase",
-    "cms",
-    "ecommerce",
-    "multi-tenant",
-    "saas-starter",
-    "saas-template",
-    "typescript",
-    "tailwindcss",
-    "open-source",
-    "postgres",
-    "row-level-security",
-    "pos",
-    "delivery-management",
-    "headless-cms",
-    "react"
+    "supabase"
   ],
   "private": false,
   "scripts": {

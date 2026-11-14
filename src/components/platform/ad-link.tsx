@@ -12,12 +12,14 @@ export function AdLink({
   className,
   children,
   title,
+  style,
 }: {
   bannerId: string
   href: string
   className?: string
   children: React.ReactNode
   title?: string
+  style?: React.CSSProperties
 }) {
   const ref = useRef<HTMLAnchorElement>(null)
   const seen = useRef(false)
@@ -55,6 +57,7 @@ export function AdLink({
       target={external ? '_blank' : undefined}
       rel={external ? 'noopener sponsored' : 'sponsored'}
       className={className}
+      style={style}
       onClick={() => sendAdEvent(bannerId, 'click')}
     >
       {children}

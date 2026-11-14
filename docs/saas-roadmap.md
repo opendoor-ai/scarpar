@@ -1,4 +1,4 @@
-# Scarpar — Template → commercial SaaS conversion plan
+# 전자동기계광고 — Template → commercial SaaS conversion plan
 
 Effort tags: **S** = hours, **M** = 1-3 days, **L** = 1+ week. Each item names the existing hook it
 builds on and the files it touches. Grounded against the code as of 2026-07-12 (see
@@ -39,23 +39,23 @@ anything (confirmed: no `plan` reads outside display in `src/app/(admin)/admin/p
 `orgs-table.tsx`).
 
 1. **[M] Plans/entitlements table.** Add `supabase/migrations/0005_billing.sql`: a `plans` table
-   (`key`, `name`, `price_paisa`, `limits jsonb`, `available_modules text[]`) plus a `feature_flags`
+   (`key`, `name`, `price_minor(1/100원)`, `limits jsonb`, `available_modules text[]`) plus a `feature_flags`
    table shaped like spec §17.1 (`key`, `default_value`, `available_on_plans text[]`). Map flags onto
    the *existing* `enabled_modules text[]` column and `SETTING_DEFS` groups
    (`src/lib/settings/registry.ts`) rather than inventing a parallel config system — a flag either gates
    whether a `ModuleKey` can be enabled for an org, or gates one `SettingDef`. Do not build the spec's
-   full three-layer (plan/tenant/user-rollout) system yet — Scarpar has no per-user rollout use case
+   full three-layer (plan/tenant/user-rollout) system yet — 전자동기계광고 has no per-user rollout use case
    today; two layers (plan, org) is enough.
 2. **[S] `requirePlan()`/`planAllows()` helper.** New `src/lib/billing/entitlements.ts`, mirroring the
    shape of `requireModule()` (`src/lib/auth.ts` pattern) — `requirePlan(ctx, 'growth')` throws/redirects
    the same way `requireRole` does. Call it from the module-enable action (wherever an admin flips
    `enabled_modules` — currently unrestricted) and from onboarding's vertical picker.
-3. **[M] Billing = manual/bKash first.** BD reality check: Stripe is not the first move. Cheapest path
+3. **[M] Billing = manual/계좌이체 first.** BD reality check: Stripe is not the first move. Cheapest path
    that reuses existing machinery — model a platform subscription charge as an `order` against a
    platform-owned org (reuses `orders`, `payments`, `verifyPayment()` chokepoint in
-   `src/modules/orders/actions.ts` — the same manual-MFS-verify flow customers already use), OR a
-   dedicated `platform_invoices` table if overloading `orders` proves awkward. Either way: manual bKash/
-   Nagad verify by a platform admin is the v1 collection mechanism. Stripe/intl is Phase A follow-up, not
+   `src/modules/orders/actions.ts` — the same manual-계좌이체-verify flow customers already use), OR a
+   dedicated `platform_invoices` table if overloading `orders` proves awkward. Either way: manual 계좌이체/
+   카드 verify by a platform admin is the v1 collection mechanism. Stripe/intl is Phase A follow-up, not
    day one.
 4. **[S] Subscription state on `orgs`.** Extend `orgs` (migration 0005): `subscription_status`
    (`trialing|active|past_due|suspended`), `current_period_end`, `plan_key` (replaces the free-text
@@ -106,7 +106,7 @@ things: lists orgs with member/order counts, and toggles `is_active` via `OrgAct
     plan (`plan_key` from Phase A).
 12. **[L] Impersonation with audit trail + banner.** No impersonation exists today. Add a
     platform-admin-only server action that mints a session/cookie scoped to a target org (reuse the
-    `scarpar-org` cookie mechanism in `src/lib/auth.ts` + `middleware.ts`, gated by `is_platform_admin()`
+    `jadong-org` cookie mechanism in `src/lib/auth.ts` + `middleware.ts`, gated by `is_platform_admin()`
     RPC which already exists in `0001_core.sql`), writes an `audit_log` row (existing table, existing
     `audit()` helper per `docs/conventions.md`), and renders a persistent "Impersonating {org}" banner in
     `(admin)/layout.tsx`.
@@ -141,7 +141,7 @@ not built)" — this phase executes that sketch.
     `storefront.logo_media_id` (reuse `media` table) and `storefront.font` (select from a fixed list, not
     arbitrary font upload — keeps the "no Puppeteer/heavy deps" mandate). Both are new `SettingDef`
     entries — no new subsystem, same registry pattern documented in `docs/extending.md`.
-19. **[S] Remove "Powered by Scarpar" per plan.** Whatever footer branding exists in the storefront
+19. **[S] Remove "Powered by 전자동기계광고" per plan.** Whatever footer branding exists in the storefront
     layout — gate its render on `planAllows(org, 'white_label')` (Phase A's helper).
 
 ## PHASE E — Production trust
@@ -151,10 +151,8 @@ oversight — this phase is where that debt gets paid, timed to when it starts m
 rationale above).
 
 20. **[M] Webhook hardening + chokepoint wiring.** Both routes EXIST as guarded stubs
-    (`src/app/api/webhooks/uddoktapay/route.ts` — verifies the `RT-UDDOKTAPAY-API-KEY` header
     against org settings, then logs-and-200s; `src/app/api/webhooks/courier/route.ts` — appends a
     `delivery_events` note but deliberately never mutates status). This item is the hardening pass:
-    wire the UddoktaPay route to `verifyPaymentAction` (the chokepoint — TODO'd inline), add
     per-courier signature/HMAC verification before the courier route is allowed to change
     `deliveries.status`, and add replay-attack + idempotency guards. Overlaps next-steps item 3.4.
 21. **[M] 2FA for owner role.** Supabase Auth supports TOTP MFA natively — enable it in Auth settings,

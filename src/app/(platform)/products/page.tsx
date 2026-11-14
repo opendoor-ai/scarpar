@@ -27,8 +27,9 @@ import { getPrimaryImages } from '@/components/store/get-primary-images'
 import { Pagination } from '@/components/store/pagination'
 import { ProductCard, type ProductCardData } from '@/components/store/product-card'
 import { CategoryPills, ProductSearchBox } from '@/components/store/products-filters'
+import { MembersHub, PremiumHub, SpecialHub } from '@/components/platform/hubs'
 import { BannerCarousel } from '@/modules/ads/components/banner-carousel'
-import { getLiveBanners, getLivePromotedProductIds } from '@/modules/ads/live'
+import { getHubBanners, getLiveBanners, getLivePromotedProductIds } from '@/modules/ads/live'
 
 export const dynamic = 'force-dynamic'
 
@@ -139,6 +140,20 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
         getLivePromotedProductIds(placement, activeCategory ? categoryWithDescendants(allCategories, activeCategory.id) : []),
       ])
     : [[], []]
+  // 분류·검색 허브 (프리미엄·스페셜·멤버스): 지금 보고 있는 분류 번호와 정확히 같은 번호에만 보임
+  // 전체 카테고리(분류를 고르지 않은 전체 제품 화면) = 0번, 검색 화면은 검색어로 고름
+  const hubTarget = query
+    ? { cateNos: [] as number[], query }
+    : { cateNos: [activeCategory ? activeCategory.cate_no : 0], query: '' }
+  const showHubs = page === 1
+  const [premiumHub, specialHub, membersHub] = showHubs
+    ? await Promise.all([
+        getHubBanners('premium_hub', hubTarget),
+        getHubBanners('special_hub', hubTarget),
+        getHubBanners('members_hub', hubTarget),
+      ])
+    : [[], [], []]
+
   let promoted: Row[] = []
   if (promotedIds.length > 0) {
     const { data: promotedData } = await supabase
@@ -200,6 +215,22 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
       </div>
 
       {banners.length > 0 ? <BannerCarousel banners={banners} className="mt-6" /> : null}
+
+      {premiumHub.length > 0 ? (
+        <div className="mt-8">
+          <PremiumHub banners={premiumHub} />
+        </div>
+      ) : null}
+      {specialHub.length > 0 ? (
+        <div className="mt-8">
+          <SpecialHub banners={specialHub} />
+        </div>
+      ) : null}
+      {membersHub.length > 0 ? (
+        <div className="mt-8">
+          <MembersHub banners={membersHub} />
+        </div>
+      ) : null}
 
       {promoted.length > 0 ? (
         <section className="mt-6 rounded-lg border border-amber-200 bg-amber-50/60 p-4 dark:border-amber-500/30 dark:bg-amber-500/5">

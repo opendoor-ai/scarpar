@@ -36,7 +36,7 @@ export type DiscountValidationResult =
 export async function validateDiscountCode(
   orgId: string,
   code: string,
-  subtotalPaisa: number,
+  subtotalMinor: number,
   productIds: string[],
   categoryIds: string[],
 ): Promise<DiscountValidationResult> {
@@ -68,7 +68,7 @@ export async function validateDiscountCode(
     return { ok: false, reason: '사용 횟수가 모두 소진된 할인 코드입니다.' }
   }
 
-  if (discount.min_order > 0 && subtotalPaisa < discount.min_order) {
+  if (discount.min_order > 0 && subtotalMinor < discount.min_order) {
     return { ok: false, reason: `${formatMoney(discount.min_order)} 이상 주문 시 쓸 수 있는 코드입니다.` }
   }
 
@@ -89,11 +89,11 @@ export async function validateDiscountCode(
 
   if (discount.type === 'percent') {
     const percent = discount.value ?? 0
-    amount = Math.round((subtotalPaisa * percent) / 100)
+    amount = Math.round((subtotalMinor * percent) / 100)
     label = `${percent}% 할인`
   } else if (discount.type === 'fixed') {
     const fixed = discount.value ?? 0
-    amount = Math.min(fixed, subtotalPaisa)
+    amount = Math.min(fixed, subtotalMinor)
     label = `${formatMoney(fixed)} 할인`
   } else {
     amount = 0

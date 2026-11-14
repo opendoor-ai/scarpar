@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 interface ExportButtonProps {
-  report: 'sales' | 'products' | 'delivery' | 'mushak'
+  report: 'sales' | 'products' | 'delivery' | 'vat'
   from: string
   to: string
   label?: string

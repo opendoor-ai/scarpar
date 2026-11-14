@@ -6,7 +6,7 @@ import { requireOrg, requireRole } from '@/lib/auth'
 import { requireModule } from '@/lib/modules'
 import { getServerClient } from '@/lib/supabase/server'
 import { audit } from '@/lib/audit'
-import { toPaisa } from '@/lib/money'
+import { toMinor } from '@/lib/money'
 import type { ActionResult } from '@/lib/types'
 import type { AppointmentStatus, Customer, ServiceJob, ServiceJobStatus } from '@/types/db'
 import { createOrderCore } from '@/modules/orders/create-order'
@@ -117,7 +117,7 @@ export async function createJob(input: NewJobValues): Promise<ActionResult<{ id:
       customer_id: resolved.id,
       title: parsed.data.title,
       description: parsed.data.description || null,
-      quote_amount: toPaisa(parsed.data.quote_amount),
+      quote_amount: toMinor(parsed.data.quote_amount),
       scheduled_at: parsed.data.scheduled_at ? new Date(parsed.data.scheduled_at).toISOString() : null,
       address,
       status: 'quoted',
@@ -160,8 +160,8 @@ export async function updateJob(jobId: string, input: JobFormValues): Promise<Ac
     .update({
       title: parsed.data.title,
       description: parsed.data.description || null,
-      quote_amount: toPaisa(parsed.data.quote_amount),
-      final_amount: parsed.data.final_amount ? toPaisa(parsed.data.final_amount) : null,
+      quote_amount: toMinor(parsed.data.quote_amount),
+      final_amount: parsed.data.final_amount ? toMinor(parsed.data.final_amount) : null,
       scheduled_at: parsed.data.scheduled_at ? new Date(parsed.data.scheduled_at).toISOString() : null,
       assigned_to: parsed.data.assigned_to ?? null,
       address,

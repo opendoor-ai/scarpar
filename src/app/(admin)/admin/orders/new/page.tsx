@@ -29,7 +29,7 @@ export default async function NewOrderPage() {
   const defaultAdvance: DefaultAdvance = {
     required: settingBool(ctx.settings, 'payments.advance_required'),
     type: settingStr(ctx.settings, 'payments.advance_type') === 'percent' ? 'percent' : 'fixed',
-    amountPaisa: settingNum(ctx.settings, 'payments.advance_amount'),
+    amountMinor: settingNum(ctx.settings, 'payments.advance_amount'),
   }
 
   return (

@@ -23,7 +23,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
-import { fromPaisa } from '@/lib/money'
+import { fromMinor } from '@/lib/money'
 import { cn } from '@/lib/utils'
 import { createExpenseAction, updateExpenseAction } from '@/modules/expenses/actions'
 import { EXPENSE_CATEGORY_SUGGESTIONS, expenseSchema, type ExpenseFormValues } from '@/modules/expenses/schemas'
@@ -116,7 +116,7 @@ function CategoryField({ value, onChange }: { value: string; onChange: (value: s
 function defaultValues(expense?: ExpenseWithReceipt): ExpenseFormValues {
   return {
     category: expense?.category ?? '',
-    amount: expense ? fromPaisa(expense.amount).toFixed(2) : '',
+    amount: expense ? fromMinor(expense.amount).toFixed(2) : '',
     spent_at: expense?.spent_at ?? format(new Date(), 'yyyy-MM-dd'),
     note: expense?.note ?? '',
     media_id: expense?.media_id ?? null,

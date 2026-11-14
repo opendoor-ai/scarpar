@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 
 import { audit } from '@/lib/audit'
 import { requireOrg, requireRole } from '@/lib/auth'
-import { toPaisa } from '@/lib/money'
+import { toMinor } from '@/lib/money'
 import { getServerClient } from '@/lib/supabase/server'
 import type { ActionResult } from '@/lib/types'
 import type { Expense } from '@/types/db'
@@ -38,7 +38,7 @@ export async function createExpenseAction(input: ExpenseFormValues): Promise<Act
       .insert({
         org_id: ctx.org.id,
         category: parsed.data.category,
-        amount: toPaisa(parsed.data.amount),
+        amount: toMinor(parsed.data.amount),
         spent_at: parsed.data.spent_at,
         note: parsed.data.note || null,
         media_id: parsed.data.media_id || null,
@@ -84,7 +84,7 @@ export async function updateExpenseAction(input: UpdateExpenseInput): Promise<Ac
       .from('expenses')
       .update({
         category: parsed.data.category,
-        amount: toPaisa(parsed.data.amount),
+        amount: toMinor(parsed.data.amount),
         spent_at: parsed.data.spent_at,
         note: parsed.data.note || null,
         media_id: parsed.data.media_id || null,

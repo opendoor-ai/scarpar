@@ -8,7 +8,6 @@ import { AlertCircle, CheckIcon } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { createOrgAction } from '@/lib/actions/onboarding'
@@ -41,7 +40,7 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
       slug: '',
       phone: '',
       vertical: 'ecommerce',
-      seedDemo: true,
+      seedDemo: false,
     },
   })
 
@@ -186,21 +185,6 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
                       })}
                     </div>
                     <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="seedDemo"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center gap-2 space-y-0">
-                    <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                    <FormLabel className="text-xs font-normal">
-                      둘러볼 수 있게 예시 데이터 넣기
-                    </FormLabel>
                   </FormItem>
                 )}
               />

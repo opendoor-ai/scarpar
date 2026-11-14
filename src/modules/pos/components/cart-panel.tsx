@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { EmptyState } from '@/components/ui/empty-state'
 import type { CartLine } from '@/modules/pos/components/pos-terminal'
 
-type TenderMethod = 'cash' | 'bkash' | 'nagad'
+type TenderMethod = 'cash' | 'transfer' | 'card'
 
 interface CartPanelProps {
   cart: CartLine[]
@@ -36,8 +36,8 @@ interface CartPanelProps {
 
 const TENDER_METHODS: { value: TenderMethod; label: string }[] = [
   { value: 'cash', label: '현금' },
-  { value: 'bkash', label: 'bKash' },
-  { value: 'nagad', label: 'Nagad' },
+  { value: 'transfer', label: '계좌이체' },
+  { value: 'card', label: '카드' },
 ]
 
 export function CartPanel({

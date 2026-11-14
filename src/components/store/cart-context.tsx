@@ -9,7 +9,7 @@ export interface CartItem {
   variantId?: string | null
   name: string
   variantName?: string | null
-  unitPrice: number // paisa
+  unitPrice: number // minor
   image?: string | null
   qty: number
 }
@@ -30,7 +30,7 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | null>(null)
 
 function cartStorageKey(orgSlug: string): string {
-  return `scarpar-cart-${orgSlug}`
+  return `jadong-cart-${orgSlug}`
 }
 
 function sameLine(

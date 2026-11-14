@@ -15,6 +15,7 @@ import { getLiveBanners, renderGroupHtml, type LiveBanner } from '@/modules/ads/
 
 const NAV = [
   { label: '등록제품 허브', href: '/products' },
+  { label: '구매문의', href: '/requests' },
   { label: '공급사 미니샵', href: '/suppliers' },
   { label: '광고상품', href: '/advertise' },
   { label: '매거진', href: '/magazine' },

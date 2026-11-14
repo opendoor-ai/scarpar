@@ -1,13 +1,13 @@
 // Zod contracts for the catalog module (docs/conventions.md — Server actions).
 // Two schemas per entity where money is involved: a *FormSchema (client, RHF
-// resolver — money fields are taka strings) and an *ActionSchema (server,
-// validated by actions.ts — money fields are paisa ints). Components convert
-// form values to action input via toPaisa() before calling the server action.
+// resolver — money fields are won strings) and an *ActionSchema (server,
+// validated by actions.ts — money fields are minor ints). Components convert
+// form values to action input via toMinor() before calling the server action.
 
 import { z } from 'zod'
 
 // Unicode-aware slug — mirrors src/lib/utils.ts slugify() output (letters/
-// digits/hyphens; Bengali-safe).
+// digits/hyphens; 한글 허용).
 const SLUG_RE = /^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u
 const MONEY_RE = /^\d+(\.\d{1,2})?$/
 const INT_RE = /^\d+$/
@@ -60,7 +60,7 @@ export const productFormSchema = z.object({
 })
 export type ProductFormValues = z.infer<typeof productFormSchema>
 
-/** Server action schema (createProduct/updateProduct) — money already in paisa. */
+/** Server action schema (createProduct/updateProduct) — money already in minor. */
 export const productActionSchema = z.object({
   name: z.string().trim().min(1).max(200),
   description: z.string().trim().max(5000).nullable(),

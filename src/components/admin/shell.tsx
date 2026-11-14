@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/
 import type { NavItem } from '@/lib/modules'
 import type { Org, Role } from '@/types/db'
 
-const SIDEBAR_COLLAPSE_KEY = 'scarpar-sidebar-collapsed'
+const SIDEBAR_COLLAPSE_KEY = 'jadong-sidebar-collapsed'
 
 interface AdminShellProps {
   org: Org

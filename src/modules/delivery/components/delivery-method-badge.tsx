@@ -4,9 +4,9 @@ import { Badge } from "@/components/ui/badge"
 import type { DeliveryCourier, DeliveryMethod } from "@/types/db"
 
 const COURIER_LABELS: Record<DeliveryCourier, string> = {
-  steadfast: "Steadfast",
-  pathao: "Pathao",
-  redx: "RedX",
+  cj: "CJ대한통운",
+  hanjin: "한진택배",
+  lotte: "롯데택배",
   manual: "직접 배송",
 }
 

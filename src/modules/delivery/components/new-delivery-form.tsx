@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { fromPaisa, toPaisa } from "@/lib/money"
+import { fromMinor, toMinor } from "@/lib/money"
 import type { DeliveryCourier, DeliveryZone, Order, Rider } from "@/types/db"
 import { createDeliveryAction } from "../actions"
 import type { CreateDeliveryInput } from "../schemas"
@@ -26,16 +26,16 @@ const METHODS = [
 
 const COURIERS: { value: DeliveryCourier; label: string }[] = [
   { value: "manual", label: "직접 배송" },
-  { value: "steadfast", label: "Steadfast" },
-  { value: "pathao", label: "Pathao" },
-  { value: "redx", label: "RedX" },
+  { value: "cj", label: "CJ대한통운" },
+  { value: "hanjin", label: "한진택배" },
+  { value: "lotte", label: "롯데택배" },
 ]
 
 const formSchema = z.object({
   method: z.enum(["rider", "courier", "pickup"]),
   zone_id: z.string(),
   rider_id: z.string(),
-  courier: z.enum(["steadfast", "pathao", "redx", "manual"]),
+  courier: z.enum(["cj", "hanjin", "lotte", "manual"]),
   manual_tracking_code: z.string(),
   recipient_name: z.string().trim().min(1, "Recipient name is required"),
   recipient_phone: z.string().trim().min(6, "Recipient phone is required"),
@@ -81,8 +81,8 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
       area: orderAddress.area ?? "",
       district: orderAddress.district ?? "",
       postcode: orderAddress.postcode ?? "",
-      cod_amount: String(fromPaisa(Math.max(0, order.total - order.advance_paid))),
-      fee: String(fromPaisa(defaultZone?.charge ?? 0)),
+      cod_amount: String(fromMinor(Math.max(0, order.total - order.advance_paid))),
+      fee: String(fromMinor(defaultZone?.charge ?? 0)),
       otp_enabled: false,
     },
   })
@@ -92,7 +92,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
 
   function handleZoneChange(zoneId: string) {
     const zone = zones.find((z) => z.id === zoneId)
-    if (zone) form.setValue("fee", String(fromPaisa(zone.charge)))
+    if (zone) form.setValue("fee", String(fromMinor(zone.charge)))
   }
 
   async function onSubmit(values: FormValues) {
@@ -111,8 +111,8 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
         district: values.district,
         postcode: values.postcode || undefined,
       },
-      cod_amount: toPaisa(values.cod_amount),
-      fee: toPaisa(values.fee),
+      cod_amount: toMinor(values.cod_amount),
+      fee: toMinor(values.fee),
       otp_enabled: values.otp_enabled,
     }
 

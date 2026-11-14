@@ -31,7 +31,7 @@ export interface TemplateProduct {
   name: string
   link: string
   image: string | null
-  price: number // paisa
+  price: number // minor
   compare_at_price: number | null
   soldout: boolean
   summary: string | null
@@ -60,8 +60,8 @@ export function isOwnTemplate(template: string | null | undefined): boolean {
 const esc = (v: string) =>
   v.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-const won = (paisa: number | null | undefined) =>
-  paisa && paisa > 0 ? `${Math.round(paisa / 100).toLocaleString('ko-KR')}원` : ''
+const won = (minor: number | null | undefined) =>
+  minor && minor > 0 ? `${Math.round(minor / 100).toLocaleString('ko-KR')}원` : ''
 
 const img = (url: string | null, alt: string) => (url ? `<img src="${esc(url)}" alt="${esc(alt)}" loading="lazy">` : '')
 

@@ -25,7 +25,7 @@ function FinanceTab({ pnl, expensesByCategory, from, to }: FinanceTabProps) {
       <Card>
         <CardHeader className="flex-row items-center justify-between">
           <CardTitle>손익</CardTitle>
-          <ExportButton report="mushak" from={from} to={to} label="Mushak 6.2 내보내기" />
+          <ExportButton report="vat" from={from} to={to} label="부가세 매출 내역 내보내기" />
         </CardHeader>
         <CardContent className="flex flex-col gap-2">
           {rows.map((row) => (

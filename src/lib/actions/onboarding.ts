@@ -3,7 +3,6 @@
 import { audit } from '@/lib/audit'
 import { requireUser, type OrgContext } from '@/lib/auth'
 import { setActiveOrg } from '@/lib/actions/set-org'
-import { seedDemoData } from '@/lib/demo-seed'
 import { provisionOrg } from '@/lib/org-provision'
 import { getAdminClient } from '@/lib/supabase/admin'
 import { getServerClient } from '@/lib/supabase/server'
@@ -25,7 +24,7 @@ export async function createOrgAction(input: CreateOrgInput): Promise<ActionResu
     return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다.' }
   }
 
-  const { name, phone, vertical, seedDemo } = parsed.data
+  const { name, phone, vertical } = parsed.data
   const slug = slugify(parsed.data.slug) || slugify(name)
   if (!slug) {
     return { ok: false, error: '회사(조직) 이름을 정확히 입력하세요.' }
@@ -48,19 +47,9 @@ export async function createOrgAction(input: CreateOrgInput): Promise<ActionResu
     return { ok: false, error: err instanceof Error ? err.message : '조직을 만들지 못했습니다.' }
   }
 
-  if (seedDemo) {
-    try {
-      await seedDemoData(admin, org)
-    } catch (err) {
-      // Demo content is a nice-to-have, not a hard requirement — the org
-      // itself is already created successfully, so this never fails the
-      // whole action.
-      console.error('[createOrgAction] demo seed failed', err)
-    }
-  }
 
   const auditCtx: OrgContext = { user, org, role: 'owner', settings: {} }
-  audit(auditCtx, 'org.created', 'org', org.id, null, { vertical: org.vertical, seedDemo })
+  audit(auditCtx, 'org.created', 'org', org.id, null, { vertical: org.vertical })
 
   await setActiveOrg(org.id)
   return { ok: true }

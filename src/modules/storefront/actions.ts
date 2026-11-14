@@ -408,29 +408,29 @@ export async function placeOrderAction(input: PlaceOrderInput): Promise<ActionRe
     if (data.paymentMethod === 'cod' && !zone.codAvailable) {
       return { ok: false, error: '선택한 지역은 착불 결제를 할 수 없습니다. 다른 결제 방법을 선택하세요.' }
     }
-    if (data.paymentMethod !== 'cod' && !settingBool(settings, 'payments.manual_mfs.enabled')) {
+    if (data.paymentMethod !== 'cod' && !settingBool(settings, 'payments.manual_transfer.enabled')) {
       return { ok: false, error: '이 결제 방법은 사용할 수 없습니다.' }
     }
 
     let paymentRow: {
-      method: 'bkash' | 'nagad'
+      method: 'transfer' | 'card'
       kind: 'advance' | 'full'
       amount: number
       trxId: string
       senderNumber: string
     } | null = null
 
-    if (data.paymentMethod === 'bkash' || data.paymentMethod === 'nagad') {
+    if (data.paymentMethod === 'transfer' || data.paymentMethod === 'card') {
       if (!data.trxId || !data.senderNumber) {
         return { ok: false, error: '거래 번호와 송금한 번호를 입력하세요.' }
       }
       paymentRow = { method: data.paymentMethod, kind: 'full', amount: total, trxId: data.trxId, senderNumber: data.senderNumber }
     } else if (advanceRequired) {
-      if (!data.advanceMfsProvider || !data.trxId || !data.senderNumber) {
+      if (!data.advanceTransferProvider || !data.trxId || !data.senderNumber) {
         return { ok: false, error: '선결제 정보(송금 방법, 거래 번호, 송금한 번호)를 입력하세요.' }
       }
       paymentRow = {
-        method: data.advanceMfsProvider,
+        method: data.advanceTransferProvider,
         kind: 'advance',
         amount: advanceDue,
         trxId: data.trxId,

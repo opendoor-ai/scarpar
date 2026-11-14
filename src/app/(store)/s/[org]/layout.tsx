@@ -14,7 +14,7 @@ import { CartProvider } from '@/components/store/cart-context'
 import { getStoreOrg } from '@/components/store/get-store-org'
 import { StoreFooter } from '@/components/store/store-footer'
 import { StoreHeader } from '@/components/store/store-header'
-import { WhatsappFloat } from '@/components/store/whatsapp-float'
+import { KakaoFloat } from '@/components/store/kakao-float'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,7 +55,7 @@ export default async function StoreLayout({ params, children }: LayoutProps<{ or
   const footerItems = menus.find((m) => m.handle === 'footer')?.items ?? []
 
   const announcement = settingStr(settings, 'storefront.announcement')
-  const whatsappNumber = settingStr(settings, 'storefront.whatsapp_number')
+  const kakaoChannelUrl = settingStr(settings, 'storefront.kakao_channel_url')
   const primaryColor = settingStr(settings, 'storefront.primary_color')
 
   return (
@@ -68,7 +68,7 @@ export default async function StoreLayout({ params, children }: LayoutProps<{ or
         <StoreHeader org={org} menuItems={headerItems} />
         <main className="flex-1">{children}</main>
         <StoreFooter org={org} menuItems={footerItems} />
-        <WhatsappFloat number={whatsappNumber} />
+        <KakaoFloat url={kakaoChannelUrl} />
       </div>
     </CartProvider>
   )

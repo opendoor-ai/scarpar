@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { BD_DISTRICTS, BD_DIVISIONS } from '@/lib/bd'
+import { REGIONS, REGION_GROUPS } from '@/lib/regions'
 import { t, type Lang } from '@/lib/i18n'
 import { formatMoney } from '@/lib/money'
 import { cn } from '@/lib/utils'
@@ -40,9 +40,8 @@ export interface CheckoutSettings {
   orgSlug: string
   lang: Lang
   codEnabled: boolean
-  manualMfsEnabled: boolean
-  mfsNumbers: { bkash: string; nagad: string }
-  uddoktapayEnabled: boolean
+  manualTransferEnabled: boolean
+  transferNumbers: { transfer: string; card: string }
   advanceRequiredSetting: boolean
   advanceAmount: number
   advanceType: string
@@ -52,8 +51,8 @@ export interface CheckoutSettings {
 const checkoutFormSchema = z.object({
   ...contactSchema.shape,
   ...addressSchema.shape,
-  paymentMethod: z.enum(['cod', 'bkash', 'nagad']),
-  advanceMfsProvider: z.enum(['bkash', 'nagad']).optional(),
+  paymentMethod: z.enum(['cod', 'transfer', 'card']),
+  advanceTransferProvider: z.enum(['transfer', 'card']).optional(),
   trxId: z.string().trim().max(64).optional(),
   senderNumber: z.string().trim().max(20).optional(),
   noteCustomer: z.string().trim().max(500).optional(),
@@ -131,8 +130,8 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
       line1: '',
       area: '',
       district: '',
-      paymentMethod: settings.codEnabled ? 'cod' : 'bkash',
-      advanceMfsProvider: undefined,
+      paymentMethod: settings.codEnabled ? 'cod' : 'transfer',
+      advanceTransferProvider: undefined,
       trxId: '',
       senderNumber: '',
       noteCustomer: '',
@@ -203,16 +202,16 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
   async function onSubmit(values: CheckoutFormValues) {
     if (items.length === 0) return
 
-    if ((values.paymentMethod === 'bkash' || values.paymentMethod === 'nagad') && (!values.trxId || !values.senderNumber)) {
+    if ((values.paymentMethod === 'transfer' || values.paymentMethod === 'card') && (!values.trxId || !values.senderNumber)) {
       if (!values.trxId) form.setError('trxId', { message: '거래 번호를 입력하세요' })
       if (!values.senderNumber) form.setError('senderNumber', { message: '송금한 번호를 입력하세요' })
       return
     }
     if (values.paymentMethod === 'cod' && advanceRequired) {
-      if (!values.advanceMfsProvider) form.setError('advanceMfsProvider', { message: '송금 방법을 선택하세요' })
+      if (!values.advanceTransferProvider) form.setError('advanceTransferProvider', { message: '송금 방법을 선택하세요' })
       if (!values.trxId) form.setError('trxId', { message: '거래 번호를 입력하세요' })
       if (!values.senderNumber) form.setError('senderNumber', { message: '송금한 번호를 입력하세요' })
-      if (!values.advanceMfsProvider || !values.trxId || !values.senderNumber) return
+      if (!values.advanceTransferProvider || !values.trxId || !values.senderNumber) return
     }
 
     const payload: PlaceOrderInput = {
@@ -222,7 +221,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
       items: items.map((i) => ({ productId: i.productId, variantId: i.variantId ?? null, qty: i.qty })),
       discountCode: discount ? discountCode.trim() : undefined,
       paymentMethod: values.paymentMethod,
-      advanceMfsProvider: values.advanceMfsProvider,
+      advanceTransferProvider: values.advanceTransferProvider,
       trxId: values.trxId || undefined,
       senderNumber: values.senderNumber || undefined,
       noteCustomer: values.noteCustomer || undefined,
@@ -381,10 +380,10 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {BD_DIVISIONS.map((division) => (
+                        {REGION_GROUPS.map((division) => (
                           <SelectGroup key={division}>
                             <SelectLabel>{division}</SelectLabel>
-                            {BD_DISTRICTS.filter((d) => d.division === division).map((d) => (
+                            {REGIONS.filter((d) => d.division === division).map((d) => (
                               <SelectItem key={d.name} value={d.name}>
                                 {d.name}
                               </SelectItem>
@@ -418,13 +417,13 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                     <div className="flex flex-col gap-3">
                       <p className="text-xs text-muted-foreground">
                         {t('send_money_instructions', lang)}: {formatMoney(advanceDue)} to
-                        {settings.mfsNumbers.bkash ? ` bKash ${settings.mfsNumbers.bkash}` : ''}
-                        {settings.mfsNumbers.bkash && settings.mfsNumbers.nagad ? ' or' : ''}
-                        {settings.mfsNumbers.nagad ? ` Nagad ${settings.mfsNumbers.nagad}` : ''}
+                        {settings.transferNumbers.transfer ? ` 계좌이체 ${settings.transferNumbers.transfer}` : ''}
+                        {settings.transferNumbers.transfer && settings.transferNumbers.card ? ' or' : ''}
+                        {settings.transferNumbers.card ? ` 카드 ${settings.transferNumbers.card}` : ''}
                       </p>
                       <FormField
                         control={form.control}
-                        name="advanceMfsProvider"
+                        name="advanceTransferProvider"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>송금 방법</FormLabel>
@@ -435,8 +434,8 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {settings.mfsNumbers.bkash ? <SelectItem value="bkash">bKash</SelectItem> : null}
-                                {settings.mfsNumbers.nagad ? <SelectItem value="nagad">Nagad</SelectItem> : null}
+                                {settings.transferNumbers.transfer ? <SelectItem value="transfer">계좌이체</SelectItem> : null}
+                                {settings.transferNumbers.card ? <SelectItem value="card">카드</SelectItem> : null}
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -449,36 +448,26 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                 </PaymentOption>
               ) : null}
 
-              {settings.manualMfsEnabled && settings.mfsNumbers.bkash ? (
+              {settings.manualTransferEnabled && settings.transferNumbers.transfer ? (
                 <PaymentOption
-                  label="bKash"
-                  description={`${settings.mfsNumbers.bkash}(으)로 ${formatMoney(total)} 송금`}
-                  selected={paymentMethod === 'bkash'}
-                  onSelect={() => form.setValue('paymentMethod', 'bkash')}
+                  label="계좌이체"
+                  description={`${settings.transferNumbers.transfer}(으)로 ${formatMoney(total)} 송금`}
+                  selected={paymentMethod === 'transfer'}
+                  onSelect={() => form.setValue('paymentMethod', 'transfer')}
                 >
-                  {paymentMethod === 'bkash' ? trxFields() : null}
+                  {paymentMethod === 'transfer' ? trxFields() : null}
                 </PaymentOption>
               ) : null}
 
-              {settings.manualMfsEnabled && settings.mfsNumbers.nagad ? (
+              {settings.manualTransferEnabled && settings.transferNumbers.card ? (
                 <PaymentOption
-                  label="Nagad"
-                  description={`${settings.mfsNumbers.nagad}(으)로 ${formatMoney(total)} 송금`}
-                  selected={paymentMethod === 'nagad'}
-                  onSelect={() => form.setValue('paymentMethod', 'nagad')}
+                  label="카드"
+                  description={`${settings.transferNumbers.card}(으)로 ${formatMoney(total)} 송금`}
+                  selected={paymentMethod === 'card'}
+                  onSelect={() => form.setValue('paymentMethod', 'card')}
                 >
-                  {paymentMethod === 'nagad' ? trxFields() : null}
+                  {paymentMethod === 'card' ? trxFields() : null}
                 </PaymentOption>
-              ) : null}
-
-              {settings.uddoktapayEnabled ? (
-                <PaymentOption
-                  label="온라인 결제 (UddoktaPay)"
-                  description="데모에서는 사용할 수 없습니다 — 다른 방법을 선택하세요"
-                  selected={false}
-                  disabled
-                  onSelect={() => {}}
-                />
               ) : null}
             </div>
           </div>

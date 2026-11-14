@@ -10,8 +10,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { BD_DISTRICTS } from '@/lib/bd'
-import { fromPaisa } from '@/lib/money'
+import { REGIONS } from '@/lib/regions'
+import { fromMinor } from '@/lib/money'
 
 import { updateJob } from '../actions'
 import { jobFormSchema, type JobAddress, type JobDetailRow, type JobFormValues, type TeamMember } from '../schemas'
@@ -36,8 +36,8 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
     defaultValues: {
       title: job.title,
       description: job.description ?? '',
-      quote_amount: String(fromPaisa(job.quote_amount ?? 0)),
-      final_amount: job.final_amount != null ? String(fromPaisa(job.final_amount)) : '',
+      quote_amount: String(fromMinor(job.quote_amount ?? 0)),
+      final_amount: job.final_amount != null ? String(fromMinor(job.final_amount)) : '',
       scheduled_at: toDatetimeLocal(job.scheduled_at),
       assigned_to: job.assigned_to,
       address_line1: address.line1 ?? '',
@@ -155,7 +155,7 @@ function JobDetailForm({ job, teamMembers }: JobDetailFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {BD_DISTRICTS.map((district) => (
+                        {REGIONS.map((district) => (
                           <SelectItem key={district.name} value={district.name}>
                             {district.name}
                           </SelectItem>

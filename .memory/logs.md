@@ -2,7 +2,7 @@
 
 ## Wave 0 — Discovery (parallel scouts)
 - S1 Soover-bd recon: 13-table single-tenant dashboard mapped; reusable patterns extracted
-  (payment chokepoint, order snapshots, districts, ৳120 advance model).
+  (payment chokepoint, order snapshots, districts, ₩120 advance model).
 - S2 Spec read (orchestrator, direct): scarper/features.md → platform blueprint distilled into
   docs/architecture.md.
 - S3 Sanity patterns: block-array JSONB shape, schema-as-code, drafts model → adopted (arch §4).
@@ -32,19 +32,19 @@
   demo seeding. Gap flagged: /reset-password completion route.
 - A4 orders+returns: createOrderCore/applyOrderInventory implemented, 14 actions incl. the
   verifyPayment chokepoint, flow-guarded transitions, returns w/ refund + restock.
-- A5 receipts+POS (20 files): pure-TS Code128 (checksum-verified), A4/Mushak/thermal/label
+- A5 receipts+POS (20 files): pure-TS Code128 (checksum-verified), A4/부가세 거래명세서/thermal/label
   print pages, receipts hub, POS terminal (walk-in sentinel phone, barcode-friendly search).
-- A10 reports+expenses (14 files): 8 aggregate queries, 4 CSV exports incl. Mushak 6.2, P&L.
-- A9 storefront (34 files): 11 block renderers, cart/checkout (COD+advance+MFS), FOUND+FIXED
+- A10 reports+expenses (14 files): 8 aggregate queries, 4 CSV exports incl. 부가세 거래명세서 6.2, P&L.
+- A9 storefront (34 files): 11 block renderers, cart/checkout (COD+advance+계좌이체), FOUND+FIXED
   missing anon RLS on orgs/media via additive 0004 migration.
-- A11 settings/staff/audit/platform: settings UI auto-rendered from registry (paisa-aware),
+- A11 settings/staff/audit/platform: settings UI auto-rendered from registry (minor(1/100원)-aware),
   invite links, sole-owner guards, audit viewer, platform org list.
 - A7 customers/discounts/reviews (30 files): shared validateDiscountCode contract, blocklist
   sync on customer block, moderation queue. Fixed zod .default()+RHF resolver mismatch.
 - A8 cms+media (~35 files): MediaPicker/mediaUrl contract files first, 11-block editor w/
   drafts/publish/revisions, menus, storefront settings page.
 - A3 catalog (14 files): products+variants+images, categories, inventory ledger + adjust dialog.
-- A6 delivery (29 files): courier adapters (manual working; Steadfast/Pathao real shapes,
+- A6 delivery (29 files): courier adapters (manual working; CJ대한통운/한진택배 real shapes,
   config-guarded), rider lifecycle w/ OTP+COD, zones, settlements, public /track (live-verified).
 - A12 verticals (34 files): courses/services/listings CRUD, job→invoice via createOrderCore;
   fixed revalidatePath import bug across all three actions files.
@@ -95,11 +95,8 @@
 - `supabase/seed.sql` added: 01/02/03 concatenated verbatim behind 3 numbered section headers, for
   one-shot pasting into the Supabase SQL editor. Per-file begin/commit blocks preserved as-is.
 - ADDENDUM (mid-pass instruction, architecture.md §7/§8 gap-fill): added the two adapter files
-  architecture.md promised but no slice built — `src/lib/payments/uddoktapay.ts`
   (createCharge/verifyByInvoice, real checkout-v2/verify-payment shapes, ConfigRequiredError reused
-  from lib/couriers/types) and `src/lib/fraud/provider.ts` (FraudProvider contract + fraudbd stub +
   checkCustomerRisk() that never throws) — plus two guarded webhook stubs,
-  `api/webhooks/uddoktapay` (static RT-UDDOKTAPAY-API-KEY header check against org settings, org
   resolved via `?org=` query param, TODO pointing at verifyPaymentAction) and `api/webhooks/courier`
   (looks up delivery by tracking_code, appends a delivery_events row only — deliberately does NOT
   mutate deliveries.status since no per-courier signature verification exists yet). All 4 files
@@ -122,7 +119,7 @@
   collisions, 2 cross-slice contract stubs (create-order, media-picker) both honored.
 
 ## Wave 6 — Post-handback (same session, user follow-up)
-- `scarpar-builder` Claude Code skill written + installed (~/.claude/skills/scarpar-builder/),
+- `jadong-builder` Claude Code skill written + installed (~/.claude/skills/jadong-builder/),
   skill_lint clean. NEW/INTEGRATE/EXTEND/OPERATE modes; repo docs remain the single source of truth.
 - codegraph init completed (exit 0). next-steps.md §6/§7 closed out.
 - SaaS documentation pass: docs/saas-roadmap.md (6 phases A-F, effort-tagged, anchored to existing
@@ -130,10 +127,8 @@
   discipline 0005+, tenant lifecycle incl. precise is_active semantics — app-gate not RLS-boundary,
   backups, incidents), docs/extending.md (repo-local recipes w/ smallest-example pointers), README/
   project-context/next-steps pointers, CLAUDE.md working-guides block.
-- CORRECTION (orchestrator-verified): feature-list.md's "UddoktaPay/FraudBD/webhook routes don't
   exist" section was stale (written mid-build, before Wave 4's addendum created them) and leaked
   into the new roadmap/operations docs. Verified on disk + git ls-files: src/lib/payments/
-  uddoktapay.ts, src/lib/fraud/provider.ts, api/webhooks/{uddoktapay,courier} ALL exist as guarded
   stubs. All three docs corrected to "exists, not yet wired into flows". Lesson recorded: Windows
   Glob false-negatives — always confirm absence via PowerShell/git ls-files before documenting it.
 
@@ -147,7 +142,7 @@
 - License: MIT chosen over copyleft (AGPL) — user's stated goal was max findability/adoption;
   logged as decisions.md #21. LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md added.
 - Brand: `brand/` — black-and-white toggle-grid mark (2x2, diagonal fill — literally "modules you
-  switch on/off," Scarpar's core concept) + wordmark (light/dark SVG pair) + social-preview.png
+  switch on/off," 전자동기계광고's core concept) + wordmark (light/dark SVG pair) + social-preview.png
   (rasterized via sharp-cli, visually verified via Read-as-image before shipping — first draft had
   a text/mark overlap bug, caught and fixed pre-publish).
 - **Git history hygiene**: user asked not to be credited as a contributor. First attempt (orphan
@@ -159,8 +154,8 @@
   Lesson: match the remediation's blast radius to the literal instruction, not the maximal reading.
 - package.json: OSS metadata added (description/keywords/repository/license/homepage/bugs),
   `private: false`.
-- Repo published: `gh repo create sahol3/scarpar --public --push`. Live at
-  github.com/sahol3/scarpar.
+- Repo published: `gh repo create opendoor-ai/scarpar --public --push`. Live at
+  github.com/opendoor-ai/scarpar.
 - SEO/GEO pass via `/marketing-optimization` skill (scoped tightly to a repo-only target, no live
   site — invoked `seo-fundamentals` + `geo-generative-engine-optimization` sub-skill guidance
   directly rather than a full multi-sub-skill audit, since most of the package's scope — CWV, GA4,

@@ -1,4 +1,4 @@
-# Scarpar — Next Steps (ordered)
+# 전자동기계광고 — Next Steps (ordered)
 
 > SaaS/platform work (billing, plans, custom domains, platform ops, production trust) now has its own
 > canonical, phased plan: `docs/saas-roadmap.md`. §1-5 below remain the immediate wiring steps for the
@@ -29,25 +29,20 @@ home page + sample content immediately, scoped to your new org.
 ## 3. Go-live integrations
 Priority order, with the real state of each (see `.memory/feature-list.md` for the full breakdown —
 two of these are NOT simple config fills):
-1. **Steadfast / Pathao courier** — config fill only. Admin → courier settings → enter API keys
-   (Steadfast: `api_key`/`secret_key`; Pathao: OAuth client credentials). The adapters
-   (`src/lib/couriers/steadfast.ts`, `pathao.ts`) already call the real endpoints; they're gated by
+1. **CJ대한통운 / 한진택배 courier** — config fill only. Admin → courier settings → enter API keys
+   (CJ대한통운: `api_key`/`secret_key`; 한진택배: OAuth client credentials). The adapters
+   (`src/lib/couriers/cj.ts`, `hanjin.ts`) already call the real endpoints; they're gated by
    `ConfigRequiredError` until keys exist.
 2. **SMS provider** — pick one from the spec's BD list (`scarper/features.md` §19: BulkSMSBD, AlphaSMS,
    SSL Wireless, etc.) and replace the `console.log` stub in the `sms` channel adapter in
    `src/lib/notify.ts`.
 3. **Email provider** — same file, `email` channel adapter.
-4. **UddoktaPay** — adapter + webhook stub now exist (Wave 4 integration pass): `src/lib/payments/
-   uddoktapay.ts` (`createCharge()`/`verifyByInvoice()`, real checkout-v2/verify-payment shapes,
-   `ConfigRequiredError`-guarded) and `src/app/api/webhooks/uddoktapay/route.ts` (verifies
-   `RT-UDDOKTAPAY-API-KEY` against org settings, org resolved via `?org=` query param — createCharge()
+   (삭제된 결제 연동 관련 메모), org resolved via `?org=` query param — createCharge()
    embeds that into the `webhook_url` it registers). What's still missing: nothing calls
    `createCharge()` from checkout yet, and the webhook route logs-and-200s instead of actually calling
    `verifyPaymentAction` (`src/modules/orders/actions.ts`) — both TODO'd inline. Settings keys and the
    `payment_method` enum value already exist.
-5. **FraudBD** — contract + stub now exist (Wave 4): `src/lib/fraud/provider.ts` exports
    `checkCustomerRisk(orgSettings, phone): Promise<FraudCheckResult | null>` (never throws — logs and
-   returns null on any error/misconfig) wrapping a `FraudProvider` interface; the `fraudbd` adapter
    itself still just throws "not implemented" (no public API docs found to build a real request
    against). Still needed: call `checkCustomerRisk()` from the checkout fraud step in
    `src/modules/storefront/actions.ts` (currently blocklist-only) and map its `riskLevel` to
@@ -76,12 +71,12 @@ In priority order, by leverage vs. effort:
   gates today. Add one before this grows past template stage.
 
 ## 6. Claude Code skill — DONE (2026-07-12, same session)
-`scarpar-builder` installed at `~/.claude/skills/scarpar-builder/` (lint 0 ERROR / 0 WARN). Four
+`jadong-builder` installed at `~/.claude/skills/jadong-builder/` (lint 0 ERROR / 0 WARN). Four
 modes: NEW (clone template), INTEGRATE (copy-in playbook for existing Next.js sites — merge points:
 middleware, root layout, globals tokens, deps, migrations w/ collision check), EXTEND (module /
 CMS-block / vertical / adapter recipes), OPERATE (Supabase wiring + /ship deploy runbook). It
-defers to this repo's docs/ as ground truth. Triggers on "scarpar", new BD-client builds, or any
-session inside a Scarpar-derived repo.
+defers to this repo's docs/ as ground truth. Triggers on new client builds, or any
+session inside a 전자동기계광고 기반 repo.
 
 ## 7. Codegraph — DONE (2026-07-12, same session)
 `codegraph init` ran clean (exit 0); `.codegraph/` exists (gitignored). Use `codegraph explore`

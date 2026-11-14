@@ -6,15 +6,15 @@ import { formatMoney } from '@/lib/money'
 // receipt whenever a COD balance remains.
 
 interface CodBigProps {
-  amountPaisa: number
+  amountMinor: number
   label?: string
 }
 
-export function CodBig({ amountPaisa, label = '받을 금액' }: CodBigProps) {
+export function CodBig({ amountMinor, label = '받을 금액' }: CodBigProps) {
   return (
     <div className="cod-big">
       <div className="cod-big-label">{label}</div>
-      <div className="cod-big-amount">{formatMoney(amountPaisa)}</div>
+      <div className="cod-big-amount">{formatMoney(amountMinor)}</div>
     </div>
   )
 }

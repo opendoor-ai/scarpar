@@ -12,7 +12,7 @@ export const EXPENSE_CATEGORY_SUGGESTIONS = [
   'Other',
 ] as const
 
-function parseAmountTaka(value: string): number {
+function parseAmountWon(value: string): number {
   return Number(value.replace(/,/g, '').trim())
 }
 
@@ -22,7 +22,7 @@ export const expenseSchema = z.object({
     .string()
     .trim()
     .min(1, 'Amount is required')
-    .refine((v) => Number.isFinite(parseAmountTaka(v)) && parseAmountTaka(v) > 0, {
+    .refine((v) => Number.isFinite(parseAmountWon(v)) && parseAmountWon(v) > 0, {
       message: '0보다 큰 금액을 입력하세요',
     }),
   spent_at: z.string().trim().min(1, 'Date is required'),

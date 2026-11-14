@@ -1,4 +1,4 @@
--- 0002_commerce.sql — Scarpar commerce module (docs/architecture.md §3)
+-- 0002_commerce.sql — 전자동기계광고 commerce module (docs/architecture.md §3)
 -- Depends on 0001_core.sql: orgs, media, auth.users, and helper fns
 -- user_org_ids(), is_org_member(org_id), has_org_role(org_id, roles), next_doc_number(...).
 -- Do not recreate any of the above here.
@@ -191,7 +191,6 @@ create table orders (
   advance_due bigint not null default 0,
   advance_paid bigint not null default 0,
   payment_method text not null default 'cod' check (
-    payment_method in ('cod', 'bkash', 'nagad', 'uddoktapay', 'sslcommerz', 'bank', 'cash')
   ),
   risk_level text check (risk_level in ('low', 'medium', 'high')),
   risk_note text,
@@ -246,7 +245,6 @@ create table payments (
   org_id uuid not null references orgs (id) on delete cascade,
   order_id uuid not null references orders (id) on delete cascade,
   method text not null check (
-    method in ('cod', 'bkash', 'nagad', 'uddoktapay', 'sslcommerz', 'bank', 'cash')
   ),
   kind text not null check (kind in ('advance', 'full', 'balance', 'refund')),
   amount bigint not null,

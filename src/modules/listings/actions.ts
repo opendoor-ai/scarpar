@@ -6,7 +6,7 @@ import { requireOrg, requireRole } from '@/lib/auth'
 import { requireModule } from '@/lib/modules'
 import { getServerClient } from '@/lib/supabase/server'
 import { audit } from '@/lib/audit'
-import { toPaisa } from '@/lib/money'
+import { toMinor } from '@/lib/money'
 import { randomKey, slugify } from '@/lib/utils'
 import type { ActionResult } from '@/lib/types'
 import type { InquiryStatus } from '@/types/db'
@@ -77,7 +77,7 @@ export async function createListing(input: NewListingValues): Promise<ActionResu
       slug,
       purpose: parsed.data.purpose,
       property_type: parsed.data.property_type,
-      price: toPaisa(parsed.data.price),
+      price: toMinor(parsed.data.price),
       area_sqft: null,
       beds: null,
       baths: null,
@@ -131,7 +131,7 @@ export async function updateListing(listingId: string, input: ListingFormValues)
       title: parsed.data.title,
       purpose: parsed.data.purpose,
       property_type: parsed.data.property_type,
-      price: toPaisa(parsed.data.price),
+      price: toMinor(parsed.data.price),
       area_sqft: parseOptionalInt(parsed.data.area_sqft),
       beds: parseOptionalInt(parsed.data.beds),
       baths: parseOptionalInt(parsed.data.baths),

@@ -36,8 +36,8 @@ export function randomKey(len = 8): string {
 }
 
 /**
- * Unicode-aware slugify — keeps Bengali (and other non-Latin) letters/digits
- * instead of stripping them, since product/category names may be in Bengali.
+ * Unicode-aware slugify — keeps Korean (and other non-Latin) letters/digits
+ * instead of stripping them, since product/category names may be in Korean.
  */
 export function slugify(text: string): string {
   return text

@@ -30,17 +30,15 @@ const KIND_OPTIONS = [
 
 const METHOD_OPTIONS = [
   { value: 'cod', label: '착불' },
-  { value: 'bkash', label: 'bKash' },
-  { value: 'nagad', label: 'Nagad' },
-  { value: 'uddoktapay', label: 'UddoktaPay' },
-  { value: 'sslcommerz', label: 'SSLCommerz' },
+  { value: 'transfer', label: '계좌이체' },
+  { value: 'card', label: '카드' },
   { value: 'bank', label: '계좌이체' },
   { value: 'cash', label: '현금' },
 ]
 
 const DEFAULT_VALUES = {
   kind: 'advance' as const,
-  method: 'bkash' as const,
+  method: 'transfer' as const,
   amount: '',
   provider_ref: '',
   sender_number: '',

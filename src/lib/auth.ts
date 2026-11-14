@@ -8,7 +8,9 @@ import { getOrgSettings } from '@/lib/settings'
 import type { Org, Role } from '@/types/db'
 
 /** Cookie holding the active org id (docs/architecture.md §6). */
-export const ORG_COOKIE = 'scarpar-org'
+export const ORG_COOKIE = 'jadong-org'
+/** 예전 이름 (원본 프로젝트 시절 저장된 쿠키도 읽음) */
+export const LEGACY_ORG_COOKIE = 'scarpar-org'
 
 export const ROLE_RANK: Record<Role, number> = {
   owner: 6,
@@ -45,7 +47,7 @@ export async function requireUser(): Promise<User> {
 }
 
 /**
- * Reads the scarpar-org cookie, loads the org + the caller's membership role
+ * Reads the jadong-org cookie, loads the org + the caller's membership role
  * + org settings (parallel query set), and returns the full OrgContext.
  * Redirects to /onboarding if the cookie is missing or points at an org the
  * user isn't (or is no longer) a member of.
@@ -54,13 +56,23 @@ export const requireOrg = cache(async (): Promise<OrgContext> => {
   const user = await requireUser()
 
   const cookieStore = await cookies()
-  const orgId = cookieStore.get(ORG_COOKIE)?.value
+  const supabase = await getServerClient()
+  // 선택한 회사: 새 이름 쿠키 → 예전 이름 쿠키 → (둘 다 없으면) 내가 속한 첫 회사
+  let orgId = cookieStore.get(ORG_COOKIE)?.value ?? cookieStore.get(LEGACY_ORG_COOKIE)?.value ?? null
+  if (!orgId) {
+    const { data } = await supabase
+      .from('org_members')
+      .select('org_id, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+    orgId = (data as { org_id: string } | null)?.org_id ?? null
+  }
 
   if (!orgId) {
     redirect('/onboarding')
   }
-
-  const supabase = await getServerClient()
 
   const [orgResult, memberResult, settings] = await Promise.all([
     supabase.from('orgs').select('*').eq('id', orgId).eq('is_active', true).single(),

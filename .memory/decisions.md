@@ -2,18 +2,17 @@
 
 1. **Repo location = D:\CLAUDE-CODE\scarpar** — primary working directory (D:\Projects would prompt on
    every write); follows workspace rule (subproject + CLAUDE.md + codegraph init).
-2. **"Merchant/tenant" (spec) → `orgs`** — Scarpar spans non-commerce verticals (services, realestate),
+2. **"Merchant/tenant" (spec) → `orgs`** — 전자동기계광고 spans non-commerce verticals (services, realestate),
    so the tenant entity is generic. Spec's §17/§D patterns kept verbatim otherwise.
 3. **Ecommerce = flagship complete vertical; courses/services/realestate = thin-but-functional module
    packs** — the base must *support* vertical swapping (module registry + presets prove it); building four
    full verticals would blow the token budget without adding architectural proof.
-4. **Money = bigint paisa everywhere** (spec §22). No float taka math.
+4. **Money = bigint minor(1/100원) everywhere** (spec §22). No float 원 math.
 5. **Printing = HTML + print CSS (browser print → PDF), no Puppeteer/@react-pdf** — zero deps, perfect
-   Bangla rendering via fonts, fits "lightweight admin". Code128 barcode hand-rolled in pure TS; QR via
+   한국어 rendering via fonts, fits "lightweight admin". Code128 barcode hand-rolled in pure TS; QR via
    tiny `qrcode` package. PDF-generation service deferred.
-6. **Courier APIs (Steadfast/Pathao), UddoktaPay live charge, FraudBD, SMS/email providers = real adapter
    interfaces + config UI, stubbed execution** — real shapes from the spec, guarded by per-org config;
-   `manual` courier adapter + manual MFS verification are fully working paths so the system is usable
+   `manual` courier adapter + manual 계좌이체 verification are fully working paths so the system is usable
    day one without any third-party account.
 7. **Inventory = denormalized stock_qty + append-only inventory_movements ledger** — full Magento-style
    reservation model deferred (documented in next-steps); ledger gives auditability now.

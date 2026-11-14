@@ -17,15 +17,14 @@ export default async function CheckoutPage({ params }: PageProps<{ org: string }
   const settings = await getOrgSettings(org.id)
   const lang = settingStr(settings, 'localization.language') as Lang
 
-  const mfsNumbers = getSetting<{ bkash: string; nagad: string }>(settings, 'payments.manual_mfs.numbers')
+  const transferNumbers = getSetting<{ transfer: string; card: string }>(settings, 'payments.manual_transfer.numbers')
 
   const checkoutSettings: CheckoutSettings = {
     orgSlug: org.slug,
     lang,
     codEnabled: settingBool(settings, 'payments.cod_enabled'),
-    manualMfsEnabled: settingBool(settings, 'payments.manual_mfs.enabled'),
-    mfsNumbers: mfsNumbers ?? { bkash: '', nagad: '' },
-    uddoktapayEnabled: settingBool(settings, 'payments.uddoktapay.enabled'),
+    manualTransferEnabled: settingBool(settings, 'payments.manual_transfer.enabled'),
+    transferNumbers: transferNumbers ?? { transfer: '', card: '' },
     advanceRequiredSetting: settingBool(settings, 'payments.advance_required'),
     advanceAmount: settingNum(settings, 'payments.advance_amount'),
     advanceType: settingStr(settings, 'payments.advance_type'),

@@ -1,6 +1,6 @@
 // Zod schemas for the orders + returns slice (docs/conventions.md — Server actions).
-// Money fields that come from a form are collected as taka strings and converted to
-// paisa server-side in actions.ts via src/lib/money.ts toPaisa() — never float math.
+// Money fields that come from a form are collected as won strings and converted to
+// minor server-side in actions.ts via src/lib/money.ts toMinor() — never float math.
 import { z } from 'zod'
 
 export const OrderStatusValues = [
@@ -17,10 +17,8 @@ export const OrderStatusValues = [
 
 export const PaymentMethodValues = [
   'cod',
-  'bkash',
-  'nagad',
-  'uddoktapay',
-  'sslcommerz',
+  'transfer',
+  'card',
   'bank',
   'cash',
 ] as const
@@ -74,7 +72,7 @@ export const OrderLineItemInputSchema = z.object({
   product_name: z.string().trim().min(1).max(300),
   variant_name: z.string().trim().optional(),
   sku: z.string().trim().optional(),
-  // paisa — authoritative only for non-catalog (custom) lines; catalog-linked lines
+  // minor — authoritative only for non-catalog (custom) lines; catalog-linked lines
   // are re-priced server-side from products/product_variants (never trust the client).
   unit_price: z.number().int().nonnegative(),
   qty: z.number().int().positive().max(9999),
@@ -84,7 +82,7 @@ export const CreateManualOrderSchema = z.object({
   customer: OrderCustomerInputSchema,
   address: OrderAddressInputSchema,
   delivery_zone_id: z.string().uuid().optional(),
-  // paisa — only used when no delivery_zone_id (module disabled or no zones configured)
+  // minor — only used when no delivery_zone_id (module disabled or no zones configured)
   manual_delivery_charge: z.number().int().nonnegative().optional(),
   items: z.array(OrderLineItemInputSchema).min(1, '상품을 1개 이상 추가하세요'),
   discount_code: z
@@ -93,7 +91,7 @@ export const CreateManualOrderSchema = z.object({
     .optional()
     .transform((v) => (v ? emptyToUndefined(v) : undefined)),
   payment_method: z.enum(PaymentMethodValues),
-  advance_amount: z.string().trim().optional(), // taka string
+  advance_amount: z.string().trim().optional(), // won string
   note_internal: z
     .string()
     .trim()
@@ -147,7 +145,7 @@ export const RecordPaymentSchema = z.object({
   orderId: z.string().uuid(),
   kind: z.enum(PaymentKindValues),
   method: z.enum(PaymentMethodValues),
-  amount: z.string().trim().min(1, '금액을 입력하세요'), // taka string
+  amount: z.string().trim().min(1, '금액을 입력하세요'), // won string
   provider_ref: z
     .string()
     .trim()
@@ -212,7 +210,7 @@ export type UpdateReturnStatusInput = z.infer<typeof UpdateReturnStatusSchema>
 
 export const RefundReturnSchema = z.object({
   returnId: z.string().uuid(),
-  refund_amount: z.string().trim().min(1, '환불 금액을 입력하세요'), // taka string
+  refund_amount: z.string().trim().min(1, '환불 금액을 입력하세요'), // won string
   method: z.enum(PaymentMethodValues),
   resolution: z.enum(ReturnResolutionValues).default('refund'),
   note: z

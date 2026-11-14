@@ -1,5 +1,5 @@
 /**
- * Scarpar print stylesheets — receipts & labels.
+ * 전자동기계광고 인쇄용 스타일 — receipts & labels.
  *
  * Self-contained: does NOT depend on globals.css tokens/variables. Print routes render
  * outside the admin chrome (docs/conventions.md — "Print pages: bare layout, load
@@ -39,7 +39,7 @@
   margin: 0 auto;
   background: #fff;
   color: #000;
-  font-family: 'Inter', 'Noto Sans Bengali', 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Inter', 'Pretendard', 'Malgun Gothic', 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
   /* Screen-preview-only page-edge hint — a border, not a shadow, to match the admin
      system's "borders over shadows" rule even here. Gone entirely under @media print. */
   border: 1px solid #e4e4e7;
@@ -56,7 +56,7 @@
 }
 
 /* Tracking / consignment codes benefit from unambiguous glyph shapes (0/O, 1/l/I) —
-   scoped narrowly so it never touches Bengali copy elsewhere on the sheet. */
+   scoped narrowly so it never touches Korean copy elsewhere on the sheet. */
 .mono-code {
   font-family: 'Courier New', ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
@@ -105,7 +105,7 @@
 
 /* ============================================================================
    1. A4 invoice — .print-a4
-      Also serves the a4_mushak VAT variant (Mushak 6.3 header + HS-code/VAT columns):
+      Also serves the a4_vat 부가세 거래명세서 (사업자번호 + HS코드·부가세 칸):
       those are markup-level additions on the same header/items/totals structure below,
       no extra classes required.
    ============================================================================ */
@@ -197,7 +197,7 @@
    2. 80mm thermal receipt — .print-thermal (72mm printable width; continuous
       roll, monochrome). Numeric columns use tabular-nums for alignment instead
       of forcing the whole receipt into a monospace face, which would break
-      Bengali glyph shaping; codes that DO want monospace use .mono-code.
+      Korean glyph shaping; codes that DO want monospace use .mono-code.
    ============================================================================ */
 .print-thermal {
   page: thermal-page;

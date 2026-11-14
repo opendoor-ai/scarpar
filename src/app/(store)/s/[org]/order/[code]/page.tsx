@@ -40,9 +40,9 @@ export default async function OrderConfirmationPage({ params }: PageProps<{ org:
 
   const settings = await getOrgSettings(org.id)
   const lang = settingStr(settings, 'localization.language') as Lang
-  const mfsNumbers = getSetting<{ bkash: string; nagad: string }>(settings, 'payments.manual_mfs.numbers') ?? {
-    bkash: '',
-    nagad: '',
+  const transferNumbers = getSetting<{ transfer: string; card: string }>(settings, 'payments.manual_transfer.numbers') ?? {
+    transfer: '',
+    card: '',
   }
 
   // orders carries no public RLS policy at all (architecture §3/§7: order placement is a
@@ -135,9 +135,9 @@ export default async function OrderConfirmationPage({ params }: PageProps<{ org:
             {pendingPayment.kind === 'advance' ? t('advance_payable', lang) : '결제'} 확인 대기 중
           </p>
           <p className="text-amber-800 dark:text-amber-300">
-            {formatMoney(pendingPayment.amount)} · {pendingPayment.method === 'bkash' ? 'bKash' : 'Nagad'}
-            {pendingPayment.method === 'bkash' && mfsNumbers.bkash ? ` (${mfsNumbers.bkash})` : ''}
-            {pendingPayment.method === 'nagad' && mfsNumbers.nagad ? ` (${mfsNumbers.nagad})` : ''}
+            {formatMoney(pendingPayment.amount)} · {pendingPayment.method === 'transfer' ? '계좌이체' : '카드'}
+            {pendingPayment.method === 'transfer' && transferNumbers.transfer ? ` (${transferNumbers.transfer})` : ''}
+            {pendingPayment.method === 'card' && transferNumbers.card ? ` (${transferNumbers.card})` : ''}
             {pendingPayment.provider_ref ? ` — TrxID ${pendingPayment.provider_ref}` : ''}
           </p>
         </div>

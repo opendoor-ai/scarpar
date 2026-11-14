@@ -19,12 +19,12 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { BD_DISTRICTS } from '@/lib/bd'
+import { REGIONS } from '@/lib/regions'
 
 import { createCustomer } from '../actions'
 import { customerFormSchema, type CustomerFormInput } from '../schemas'
 
-const DISTRICT_OPTIONS = BD_DISTRICTS.map((d) => d.name).sort((a, b) => a.localeCompare(b))
+const DISTRICT_OPTIONS = REGIONS.map((d) => d.name).sort((a, b) => a.localeCompare(b))
 
 export function NewCustomerDialog() {
   const router = useRouter()

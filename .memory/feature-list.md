@@ -1,4 +1,4 @@
-# Scarpar — Feature List
+# 전자동기계광고 — Feature List
 
 Grounded directly in the codebase (`src/app/(admin)/admin/*`, `src/modules/*`, `supabase/migrations/*`)
 as of 2026-07-12, not just the architecture spec. Where the code diverges from `docs/architecture.md`,
@@ -13,13 +13,13 @@ this file reports what actually exists.
   delivered→completed, plus cancelled/returned/failed), order-events timeline, returns with
   refund/store-credit/exchange + restock. `createOrderCore` (`src/modules/orders/create-order.ts`) is
   the one shared implementation used by admin orders, POS, and storefront checkout.
-- **POS** (`/admin/pos`) — walk-in terminal: barcode-friendly product search grid, cart, cash/MFS
+- **POS** (`/admin/pos`) — walk-in terminal: barcode-friendly product search grid, cart, cash/계좌이체
   tender → creates a `channel=pos`, `status=completed`, paid order → thermal receipt.
 - **Delivery** (`/admin/deliveries`, `/delivery-zones`, `/riders`, `/cod`) — zones with per-district
   charge, rider lifecycle (assign→picked_up→in_transit→delivered with OTP check + COD-collected
   flag), COD settlements (rider cash-on-hand → batch settle), public `/track/[code]` via the
   `get_tracking()` RPC.
-- **Receipts** (`/admin/receipts`) — A4 invoice, A4+Mushak 6.3 variant (HS code + VAT columns), 80mm
+- **Receipts** (`/admin/receipts`) — A4 invoice, A4+부가세 거래명세서 6.3 variant (HS code + VAT columns), 80mm
   thermal, 4x6 courier label with a hand-rolled pure-TS Code128 barcode + QR-to-tracking-URL. All via
   `window.print()` (no Puppeteer). Doc numbering via the `next_doc_number` RPC.
 - **Customers** (`/admin/customers`, `/blocklist`) — profiles + addresses, blocklist (phone/address/ip)
@@ -40,7 +40,7 @@ this file reports what actually exists.
   float number, accent color).
 - **Reports** (`/admin/reports`) — 8 SQL-in-server-component aggregates (sales by day, orders by
   status, top products, COD success rate by district, delivery performance, expenses by category,
-  simple P&L) + CSV export incl. a Mushak 6.2 sales register.
+  simple P&L) + CSV export incl. a 부가세 거래명세서 6.2 sales register.
 - **Expenses** (`/admin/expenses`) — category + amount + receipt-media tracking.
 
 ## BUILT — always-on core (not gated by `enabled_modules`)
@@ -55,7 +55,7 @@ this file reports what actually exists.
 - **Auth + onboarding** — login/signup/forgot-password/invite-accept, org-creation stepper (vertical
   picker + optional demo-data seeding via `src/lib/demo-seed.ts`).
 - **Public storefront** (`/s/[org]`) — CMS-driven home, PLP (category filter + ILIKE search), PDP
-  (gallery/variants/reviews), localStorage cart, checkout (COD / advance / manual MFS, server-side
+  (gallery/variants/reviews), localStorage cart, checkout (COD / advance / manual 계좌이체, server-side
   price recomputation), order confirmation with track link.
 - **Print routes** (`/print/invoice`, `/print/thermal`, `/print/label`) — bare layout + `print.css` +
   `<PrintButton/>`.
@@ -65,7 +65,7 @@ this file reports what actually exists.
 
 **Real guarded adapters** (real request/response shapes, throw `ConfigRequiredError` until an org fills
 `courier_accounts`, otherwise fully wired):
-- Steadfast (`src/lib/couriers/steadfast.ts`) and Pathao (`src/lib/couriers/pathao.ts`) courier APIs.
+- CJ대한통운 (`src/lib/couriers/cj.ts`) and 한진택배 (`src/lib/couriers/hanjin.ts`) courier APIs.
   The `manual` adapter (admin types in a tracking code) is fully working with no config needed.
 - SMS and email notification channels (`src/lib/notify.ts`) — real `ChannelAdapter` interface, fans out
   per the `notifications.events` setting; v1 driver for both is `console.log` + audit trail (no
@@ -76,15 +76,10 @@ pass built these; an earlier draft of this section — written mid-build, before
 didn't exist and that stale claim briefly leaked into `docs/saas-roadmap.md`/`operations.md`, now
 fixed. Ground truth verified on disk AND in git: `git ls-files 'src/app/api/*' 'src/lib/payments/*'
 'src/lib/fraud/*'`):
-- **UddoktaPay** — `src/lib/payments/uddoktapay.ts` EXISTS: `createCharge()`/`verifyByInvoice()` with
   real checkout-v2/verify-payment request shapes, `ConfigRequiredError`-guarded on the
-  `payments.uddoktapay.*` settings. NOT yet wired: checkout never calls `createCharge()` (the method
   shows a disabled state), and the webhook doesn't call the verify chokepoint (below).
-- **FraudBD** — `src/lib/fraud/provider.ts` EXISTS: `FraudProvider` contract +
-  `checkCustomerRisk(orgSettings, phone)` never-throws helper. The `fraudbd` adapter body itself
   throws "not implemented" (no public API docs to code against), and checkout doesn't call
   `checkCustomerRisk()` yet — live fraud enforcement is blocklist-only (see below).
-- **api/webhooks/uddoktapay** — EXISTS: verifies the `RT-UDDOKTAPAY-API-KEY` header against org
   settings (org via `?org=` query param), 401 on mismatch, logs + 200 on match; TODO'd to call
   `verifyPaymentAction` (the chokepoint) instead of log-and-ack.
 - **api/webhooks/courier** — EXISTS: resolves delivery by `tracking_code`, appends a
@@ -94,7 +89,6 @@ fixed. Ground truth verified on disk AND in git: `git ls-files 'src/app/api/*' '
 **Fraud that IS working today**: on storefront checkout, `src/modules/storefront/actions.ts` (~line
 239, 380) queries `blocklist` by phone/address, sets `risk_level='high'` on a match, and applies the
 org's `fraud.high_risk_action` (block / require_full_advance / flag). This is blocklist-based, not
-FraudBD-based.
 
 ## Known gaps (verified in code, not just carried over from the build log)
 
@@ -110,7 +104,7 @@ FraudBD-based.
 - **Loyalty (points/redemption)** — spec Marketing/Customer Should–Nice tier; v1 ships Core commerce
   only.
 - **Gift cards** — not in spec's Core tier; grouped with promotions, deferred alongside loyalty.
-- **Abandoned-cart recovery** — spec lists a basic abandoned-cart email as *Core*, but Scarpar's cart is
+- **Abandoned-cart recovery** — spec lists a basic abandoned-cart email as *Core*, but 전자동기계광고's cart is
   localStorage-only (decisions #8, Soover-bd pattern), so there's no server-side cart state to trigger
   from. Needs server carts first.
 - **B2B price lists** — spec Orders "Nice" tier (draft/quote, B2B PO); no multi-price-list model exists.
@@ -126,7 +120,7 @@ FraudBD-based.
 - **WhatsApp BSP (Interakt/Wati)** — spec Notifications "Should" tier; only a `storefront.whatsapp_number`
   float-button link exists — no BSP messaging/broadcast integration.
 - **PDF generation service** — spec §18 suggested Puppeteer or `@react-pdf/renderer`; decisions #5
-  chose browser print→PDF instead (zero deps, correct Bangla rendering). A server-side PDF service
+  chose browser print→PDF instead (zero deps, correct 한국어 rendering). A server-side PDF service
   (e.g. for emailed invoices) is deferred, not missing-by-oversight.
 - **Courier auto-pick by region** — spec Fulfillment "Should" tier; v1 courier choice is manual per
   delivery, no `couriers.by_region` rule engine.

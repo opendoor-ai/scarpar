@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MediaPicker } from '@/components/admin/media-picker'
-import { fromPaisa } from '@/lib/money'
+import { fromMinor } from '@/lib/money'
 
 import { updateCourse } from '../actions'
 import { courseFormSchema, type CourseDetailRow, type CourseFormValues } from '../schemas'
@@ -29,7 +29,7 @@ function CourseDetailForm({ course }: CourseDetailFormProps) {
     defaultValues: {
       title: course.title,
       description: course.description ?? '',
-      price: String(fromPaisa(course.price)),
+      price: String(fromMinor(course.price)),
       cover_media_id: course.cover_media_id,
       status: course.status,
     },

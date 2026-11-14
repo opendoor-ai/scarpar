@@ -1,5 +1,5 @@
 // Generic courier status webhook (docs/architecture.md §1/§8 route map —
-// "stubs, signature-verify pattern"). Steadfast/Pathao each have their own
+// "stubs, signature-verify pattern"). CJ대한통운/한진택배 each have their own
 // webhook auth scheme (shared secret / signature header) that isn't specified
 // in docs/architecture.md §8 yet, so this stub intentionally does NOT trust
 // the payload enough to mutate `deliveries.status` — it only appends a

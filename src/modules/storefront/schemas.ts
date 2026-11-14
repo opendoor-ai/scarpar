@@ -59,7 +59,7 @@ export const applyDiscountSchema = z.object({
 })
 export type ApplyDiscountInput = z.infer<typeof applyDiscountSchema>
 
-export const paymentMethodSchema = z.enum(['cod', 'bkash', 'nagad'])
+export const paymentMethodSchema = z.enum(['cod', 'transfer', 'card'])
 
 export const placeOrderSchema = z.object({
   orgSlug: z.string().min(1),
@@ -69,7 +69,7 @@ export const placeOrderSchema = z.object({
   discountCode: optionalTrimmed(64),
   paymentMethod: paymentMethodSchema,
   /** Only used when paymentMethod === 'cod' and an advance is required. */
-  advanceMfsProvider: z.enum(['bkash', 'nagad']).optional(),
+  advanceTransferProvider: z.enum(['transfer', 'card']).optional(),
   trxId: optionalTrimmed(64),
   senderNumber: optionalTrimmed(20),
   noteCustomer: optionalTrimmed(500),

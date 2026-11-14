@@ -1,5 +1,5 @@
 -- =====================================================================
--- Scarpar — 0001_core.sql
+-- 전자동기계광고 — 0001_core.sql
 -- Core multi-tenant contract: orgs, membership, invitations, settings,
 -- audit, notifications, media, doc numbering, platform admins.
 -- Idempotent-where-cheap: safe to paste and re-run in the Supabase SQL
@@ -24,9 +24,9 @@ create table if not exists public.orgs (
                      check (vertical in ('ecommerce','courses','services','realestate')),
   plan             text not null default 'free',
   enabled_modules  text[] not null default '{}'::text[],
-  currency         char(3) not null default 'BDT',
+  currency         char(3) not null default 'KRW',
   country          char(2) not null default 'BD',
-  timezone         text not null default 'Asia/Dhaka',
+  timezone         text not null default 'Asia/Seoul',
   logo_path        text,
   phone            text,
   email            text,

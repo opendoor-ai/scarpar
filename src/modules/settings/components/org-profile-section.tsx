@@ -36,7 +36,7 @@ import { orgProfileSchema, type OrgProfileInput } from '@/modules/settings/schem
 
 const TIMEZONE_OPTIONS = [
   { value: 'Asia/Seoul', label: '서울 (UTC+9)' },
-  { value: 'Asia/Dhaka', label: 'Asia/Dhaka (UTC+6)' },
+  { value: 'Asia/Seoul', label: 'Asia/Seoul (UTC+6)' },
   { value: 'Asia/Kolkata', label: 'Asia/Kolkata (UTC+5:30)' },
   { value: 'UTC', label: 'UTC' },
 ]

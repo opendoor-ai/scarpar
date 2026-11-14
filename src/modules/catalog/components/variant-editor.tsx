@@ -2,8 +2,8 @@
 
 // Controlled list editor for a product's variants (replace-set — saved via
 // the saveVariants action from product-form.tsx, not directly by this
-// component). Money fields are taka strings, converted at the ProductForm
-// submit boundary via fromVariantRow/toVariantRow (fromPaisa/toPaisa).
+// component). Money fields are won strings, converted at the ProductForm
+// submit boundary via fromVariantRow/toVariantRow (fromMinor/toMinor).
 
 import { ChevronDown, ChevronUp, Layers, Plus, Trash2 } from 'lucide-react'
 
@@ -12,7 +12,7 @@ import { Card } from '@/components/ui/card'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { fromPaisa, toPaisa } from '@/lib/money'
+import { fromMinor, toMinor } from '@/lib/money'
 import { randomKey } from '@/lib/utils'
 import type { ProductVariant } from '@/types/db'
 
@@ -24,7 +24,7 @@ export interface VariantRow {
   id?: string
   name: string
   sku: string
-  price: string // taka string, e.g. "1200.50"
+  price: string // won string, e.g. "1200.50"
   compareAtPrice: string
   stockQty: number
   isDefault: boolean
@@ -42,8 +42,8 @@ export function toVariantRow(v: ProductVariant): VariantRow {
     id: v.id,
     name: v.name,
     sku: v.sku ?? '',
-    price: fromPaisa(v.price).toFixed(2),
-    compareAtPrice: v.compare_at_price != null ? fromPaisa(v.compare_at_price).toFixed(2) : '',
+    price: fromMinor(v.price).toFixed(2),
+    compareAtPrice: v.compare_at_price != null ? fromMinor(v.compare_at_price).toFixed(2) : '',
     stockQty: v.stock_qty,
     isDefault: v.is_default,
     optionsText: optionsToText(v.options),
@@ -55,8 +55,8 @@ export function fromVariantRow(row: VariantRow, position: number): VariantInput 
     id: row.id,
     name: row.name.trim(),
     sku: row.sku.trim() ? row.sku.trim() : null,
-    price: toPaisa(row.price || '0'),
-    compare_at_price: row.compareAtPrice.trim() ? toPaisa(row.compareAtPrice) : null,
+    price: toMinor(row.price || '0'),
+    compare_at_price: row.compareAtPrice.trim() ? toMinor(row.compareAtPrice) : null,
     stock_qty: row.stockQty,
     options: row.optionsText.trim() ? { note: row.optionsText.trim() } : {},
     is_default: row.isDefault,

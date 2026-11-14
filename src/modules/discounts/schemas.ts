@@ -16,8 +16,8 @@ export const discountFormSchema = z
       .optional()
       .or(z.literal('')),
     type: z.enum(DISCOUNT_TYPES),
-    // Meaning depends on `type`: percent -> plain 1-100 integer, fixed -> taka
-    // amount (converted to paisa server-side), free_shipping -> unused.
+    // Meaning depends on `type`: percent -> plain 1-100 integer, fixed -> won
+    // amount (converted to minor server-side), free_shipping -> unused.
     value: z.coerce.number().optional(),
     scope: z.enum(DISCOUNT_SCOPES),
     // No `.default()` on the fields below: zodResolver's input/output types
@@ -26,7 +26,7 @@ export const discountFormSchema = z
     // (see discount-form.tsx defaultValues), so plain required types work.
     product_ids: z.array(z.string().uuid()),
     category_ids: z.array(z.string().uuid()),
-    // Taka, converted to paisa server-side. Empty input coerces to 0, which
+    // 원, converted to minor server-side. Empty input coerces to 0, which
     // correctly means "no minimum".
     min_order: z.coerce.number().min(0, 'Cannot be negative'),
     max_uses: z.coerce.number().int().positive('0보다 큰 숫자를 입력하세요').optional(),

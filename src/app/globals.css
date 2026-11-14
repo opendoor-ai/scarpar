@@ -4,7 +4,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /**
- * Scarpar design tokens — shadcn-v4-compatible naming (standard shadcn component source
+ * 전자동기계광고 디자인 값 — shadcn-v4-compatible naming (standard shadcn component source
  * works against these variables unmodified). Canonical source of truth for every color,
  * radius, and type token in the admin + storefront UI.
  *
@@ -26,7 +26,6 @@
 
   /* ---------- Fonts (next/font injects the real stacks on <body>; see layout.tsx) ---------- */
   --font-sans: var(--font-sans);
-  --font-bengali: var(--font-bengali);
 
   /* ---------- Dense-UI type scale — 11/12/13/14/16/20/24, see docs/design-system.md §b ---------- */
   --text-2xs: 0.6875rem;       /* 11px */
@@ -130,7 +129,6 @@
   /* Fallback stacks — next/font (layout.tsx) overrides these on <body> via the SAME
      variable names, so this only matters before hydration / outside body. */
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-bengali: 'Noto Sans Bengali', var(--font-sans);
 
   --background: var(--color-zinc-50);
   --foreground: var(--color-zinc-950);
@@ -272,11 +270,6 @@
 }
 
 @layer utilities {
-  /* Bengali text — swap the family for any block/label rendering Bangla copy */
-  .text-bengali {
-    font-family: var(--font-bengali);
-  }
-
   /* Money/quantity table columns must never use proportional numerals (digits have to
      align vertically). Tailwind already ships this utility core; declared explicitly here
      so it's visible in the token contract and never silently skipped on a data column. */

@@ -11,13 +11,13 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { BD_DISTRICTS } from '@/lib/bd'
+import { REGIONS } from '@/lib/regions'
 import type { CustomerAddress } from '@/types/db'
 
 import { addCustomerAddress, updateCustomerAddress } from '../actions'
 import { addressFormSchema, type AddressFormInput } from '../schemas'
 
-const DISTRICT_OPTIONS = BD_DISTRICTS.map((d) => d.name).sort((a, b) => a.localeCompare(b))
+const DISTRICT_OPTIONS = REGIONS.map((d) => d.name).sort((a, b) => a.localeCompare(b))
 
 const EMPTY_VALUES: AddressFormInput = {
   label: '',

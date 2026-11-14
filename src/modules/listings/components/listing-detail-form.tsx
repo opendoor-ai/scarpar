@@ -12,8 +12,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { BD_DISTRICTS } from '@/lib/bd'
-import { fromPaisa } from '@/lib/money'
+import { REGIONS } from '@/lib/regions'
+import { fromMinor } from '@/lib/money'
 
 import { updateListing } from '../actions'
 import {
@@ -41,7 +41,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
       title: listing.title,
       purpose: listing.purpose,
       property_type: listing.property_type,
-      price: String(fromPaisa(listing.price)),
+      price: String(fromMinor(listing.price)),
       area_sqft: listing.area_sqft !== null ? String(listing.area_sqft) : '',
       beds: listing.beds !== null ? String(listing.beds) : '',
       baths: listing.baths !== null ? String(listing.baths) : '',
@@ -236,7 +236,7 @@ function ListingDetailForm({ listing }: ListingDetailFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {BD_DISTRICTS.map((district) => (
+                        {REGIONS.map((district) => (
                           <SelectItem key={district.name} value={district.name}>
                             {district.name}
                           </SelectItem>

@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 
 import { audit } from '@/lib/audit'
 import { requireOrg, requireRole } from '@/lib/auth'
-import { toPaisa } from '@/lib/money'
+import { toMinor } from '@/lib/money'
 import { getServerClient } from '@/lib/supabase/server'
 import type { ActionResult } from '@/lib/types'
 
@@ -19,7 +19,7 @@ function buildDiscountRow(orgId: string, input: DiscountFormInput) {
     input.type === 'percent'
       ? Math.round(input.value ?? 0)
       : input.type === 'fixed'
-        ? toPaisa(input.value ?? 0)
+        ? toMinor(input.value ?? 0)
         : null
 
   return {
@@ -31,7 +31,7 @@ function buildDiscountRow(orgId: string, input: DiscountFormInput) {
     scope: input.scope,
     product_ids: input.scope === 'products' ? input.product_ids : null,
     category_ids: input.scope === 'categories' ? input.category_ids : null,
-    min_order: toPaisa(input.min_order),
+    min_order: toMinor(input.min_order),
     max_uses: input.max_uses ?? null,
     starts_at: input.starts_at ? new Date(input.starts_at).toISOString() : null,
     expires_at: input.expires_at ? new Date(input.expires_at).toISOString() : null,

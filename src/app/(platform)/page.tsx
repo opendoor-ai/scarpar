@@ -1,6 +1,6 @@
 // 전자동기계광고 메인 화면 (jadong.co.kr 구성)
 // 메인 배너(3장씩) → 카테고리 아이콘 → 스마트 허브 → 추천(AD) 제품 → 와이드 허브 → 파트너 허브 → 플러스 허브
-// → SHORTS → 등록제품 허브 → 블로그와 함께하는 제품 → 현장에서 많이 찾는 제품 → 큰 이미지 광고 → 전체제품 허브
+// → SHORTS → 등록제품 허브 → 블로그와 함께하는 제품 → 구매문의 → 현장에서 많이 찾는 제품 → 큰 이미지 광고 → 전체제품 허브
 // → MAGAZINE → 입점 안내. 광고·콘텐츠가 없는 칸은 보이지 않아요.
 
 import type { Metadata } from 'next'
@@ -26,6 +26,7 @@ import { BannerHtml } from '@/components/platform/banner-html'
 import { HeroSliderB, type HeroSlideB } from '@/components/platform/hero-slider-b'
 import { MainPopup } from '@/components/platform/main-popup'
 import { HScroller } from '@/components/platform/h-scroller'
+import { PartnerHub, PlusHub, SmartHub, WideHub } from '@/components/platform/hubs'
 import { PopularTabs } from '@/components/platform/popular-tabs'
 import { ShortsRow } from '@/components/platform/shorts-row'
 import { Button } from '@/components/ui/button'
@@ -48,6 +49,8 @@ import {
   type LiveBanner,
 } from '@/modules/ads/live'
 import { youtubeId, youtubeThumb } from '@/modules/contents/schemas'
+import { latestPublicRequests } from '@/modules/purchase-requests/data'
+import { RequestStrip } from '@/modules/purchase-requests/components/request-strip'
 
 export const dynamic = 'force-dynamic'
 
@@ -215,13 +218,14 @@ export default async function HomePage() {
   const magazines = contents.filter((c) => c.kind === 'magazine').slice(0, 3)
 
   const specialIds = [...promotedIds, ...((featuredRes.data ?? []) as { id: string }[]).map((r) => r.id)]
-  const [promoted, todayCards, realtimeCards, inquiryCards, specialCards, blogProducts] = await Promise.all([
+  const [promoted, todayCards, realtimeCards, inquiryCards, specialCards, blogProducts, requests] = await Promise.all([
     fetchPlatformCardsByIds(promotedIds),
     fetchPlatformCardsByIds(todayIds),
     fetchPlatformCardsByIds(realtimeIds),
     fetchPlatformCardsByIds(inquiryIds),
     fetchPlatformCardsByIds([...new Set(specialIds)].slice(0, 10)),
     fetchPlatformCardsByIds(blogs.flatMap((b) => (b.product_id ? [b.product_id] : []))),
+    latestPublicRequests(12),
   ])
   const blogProductById = new Map(blogProducts.map((p) => [p.card.id, p]))
 
@@ -276,15 +280,6 @@ export default async function HomePage() {
     renderGroupHtml('auto_scroll', autoScroll),
   ])
 
-  // 파트너 허브: 배너에 연결한 상품(없으면 광고주 공급사의 최신 제품) 3개
-  const partnerProducts = new Map<string, PlatformProductCard[]>()
-  await Promise.all(
-    partner.map(async (b) => {
-      if (b.product_ids.length > 0) partnerProducts.set(b.id, await fetchPlatformCardsByIds(b.product_ids.slice(0, 3)))
-      else if (b.advertiser_org_id)
-        partnerProducts.set(b.id, await fetchLatestPlatformCards(3, b.advertiser_org_id as string))
-    }),
-  )
 
   const shown = visibleCategories(categories)
   const roots = shown.filter((c) => !c.parent_id && c.show_on_main)
@@ -401,36 +396,7 @@ export default async function HomePage() {
         ) : null}
 
         {/* 3. 스마트 허브 — 4칸 카드 */}
-        {tSmart ? (
-          <BannerHtml html={tSmart} />
-        ) : smart.length > 0 ? (
-          <Hub title="스마트 허브" description="지금 주목받는 공급사와 제품을 한눈에 만나보세요.">
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              {smart.slice(0, 8).map((b) => (
-                <AdLink
-                  key={b.id}
-                  bannerId={b.id}
-                  href={b.link_url}
-                  title={b.title}
-                  className="group relative block overflow-hidden rounded-xl bg-muted"
-                >
-                  <AdImage
-                    b={b}
-                    className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <span className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 bg-gradient-to-t from-black/70 to-transparent p-3 pt-10">
-                    {b.subtitle ? (
-                      <span className="line-clamp-1 text-sm font-semibold text-white">{b.subtitle}</span>
-                    ) : null}
-                    <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-black">
-                      홈페이지 바로가기
-                    </span>
-                  </span>
-                </AdLink>
-              ))}
-            </div>
-          </Hub>
-        ) : null}
+        {tSmart ? <BannerHtml html={tSmart} /> : <SmartHub banners={smart} />}
 
         {/* 추천(AD) 제품 — 유료 상단 노출 */}
         {promoted.length > 0 ? (
@@ -442,90 +408,13 @@ export default async function HomePage() {
         ) : null}
 
         {/* 4. 와이드 허브 */}
-        {tWide ? (
-          <BannerHtml html={tWide} />
-        ) : wide.length > 0 ? (
-          <Hub title="와이드 허브" description="공급사와 주요 취급 제품을 하나의 광고로 전달합니다.">
-            <div className="flex flex-col gap-3">
-              {wide.slice(0, 3).map((b) => (
-                <AdLink
-                  key={b.id}
-                  bannerId={b.id}
-                  href={b.link_url}
-                  title={b.title}
-                  className="block overflow-hidden rounded-xl border border-border"
-                >
-                  <AdImage b={b} className="aspect-[3/1] w-full object-cover sm:aspect-[6/1]" />
-                </AdLink>
-              ))}
-            </div>
-          </Hub>
-        ) : null}
+        {tWide ? <BannerHtml html={tWide} /> : <WideHub banners={wide} />}
 
         {/* 5. 파트너 허브 — 공급사 + 대표 제품 */}
-        {tPartner ? (
-          <BannerHtml html={tPartner} />
-        ) : partner.length > 0 ? (
-          <Hub title="파트너 허브" description="파트너의 가치와 트렌드를 깊이 있게 연결합니다.">
-            <div className="grid gap-4 md:grid-cols-2">
-              {partner.slice(0, 8).map((b) => {
-                const items = partnerProducts.get(b.id) ?? []
-                return (
-                  <div key={b.id} className="flex flex-col overflow-hidden rounded-xl border border-border bg-card">
-                    <AdLink bannerId={b.id} href={b.link_url} title={b.title} className="relative block">
-                      <AdImage b={b} className="aspect-[3/2] w-full object-cover" />
-                      {b.subtitle ? (
-                        <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 pt-8 text-sm font-semibold text-white">
-                          {b.subtitle}
-                        </span>
-                      ) : null}
-                    </AdLink>
-                    {items.length > 0 ? (
-                      <div className="grid grid-cols-3 gap-2 p-3">
-                        {items.map((p) => (
-                          <Link
-                            key={p.card.id}
-                            href={`/s/${p.orgSlug}/products/${p.card.product_no}`}
-                            className="flex flex-col gap-1"
-                          >
-                            <span className="aspect-square overflow-hidden rounded-md bg-muted">
-                              {p.card.image ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={p.card.image} alt="" loading="lazy" className="size-full object-cover" />
-                              ) : null}
-                            </span>
-                            <span className="line-clamp-2 text-xs">{p.card.name}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                )
-              })}
-            </div>
-          </Hub>
-        ) : null}
+        {tPartner ? <BannerHtml html={tPartner} /> : <PartnerHub banners={partner} />}
 
         {/* 6. 플러스 허브 — 2칸 */}
-        {tPlus ? (
-          <BannerHtml html={tPlus} />
-        ) : plus.length > 0 ? (
-          <Hub title="플러스 허브" description="전문 분야별 공급사의 제품과 서비스를 소개합니다.">
-            <div className="grid gap-3 sm:grid-cols-2">
-              {plus.slice(0, 6).map((b) => (
-                <AdLink
-                  key={b.id}
-                  bannerId={b.id}
-                  href={b.link_url}
-                  title={b.title}
-                  className="block overflow-hidden rounded-xl border border-border"
-                >
-                  <AdImage b={b} className="aspect-[8/3] w-full object-cover" />
-                </AdLink>
-              ))}
-            </div>
-          </Hub>
-        ) : null}
+        {tPlus ? <BannerHtml html={tPlus} /> : <PlusHub banners={plus} />}
 
         {/* 7. SHORTS */}
         {shorts.length > 0 ? (
@@ -596,6 +485,9 @@ export default async function HomePage() {
             </div>
           </Hub>
         ) : null}
+
+        {/* 구매문의 — 고객이 찾는 제품 */}
+        <RequestStrip items={requests} />
 
         {/* 10. 현장에서 많이 찾는 제품 모음 */}
         <Hub title="현장에서 많이 찾는 제품 모음" description="고객들이 실제로 보고 문의한 기록으로 매일 바뀌어요.">

@@ -2,22 +2,16 @@ import type { DeliveryCourier } from '@/types/db'
 import { ConfigRequiredError } from './types'
 import type { CourierAdapter } from './types'
 import { manualAdapter } from './manual'
-import { steadfastAdapter } from './steadfast'
-import { pathaoAdapter } from './pathao'
 
 export * from './types'
 
 const ADAPTERS: Partial<Record<DeliveryCourier, CourierAdapter>> = {
   manual: manualAdapter,
-  steadfast: steadfastAdapter,
-  pathao: pathaoAdapter,
 }
 
 /**
- * docs/architecture.md §8 — getAdapter(courier). 'redx' has no adapter
- * implemented yet: it throws the same ConfigRequiredError shape as an
- * unconfigured steadfast/pathao account, so callers get one consistent
- * error-handling path (toast + suggest switching to manual).
+ * 택배사 연동. 지금은 모든 택배사를 직접 입력(송장번호 수기 입력) 방식으로 처리해요.
+ * 자동 연동이 없는 택배사는 같은 오류 형식으로 안내합니다.
  */
 export function getAdapter(courier: DeliveryCourier): CourierAdapter {
   const adapter = ADAPTERS[courier]

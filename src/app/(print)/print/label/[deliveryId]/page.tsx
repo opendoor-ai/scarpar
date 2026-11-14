@@ -10,9 +10,9 @@ import type { PageProps } from '@/lib/types'
 export const dynamic = 'force-dynamic'
 
 const COURIER_LABELS: Record<string, string> = {
-  steadfast: 'Steadfast',
-  pathao: 'Pathao',
-  redx: 'RedX',
+  cj: 'CJ대한통운',
+  hanjin: '한진택배',
+  lotte: '롯데택배',
   manual: '직접 배송',
 }
 
@@ -76,7 +76,7 @@ export default async function LabelPage({ params }: PageProps<{ deliveryId: stri
         <div>{formatAddress(address)}</div>
       </div>
 
-      {delivery.cod_amount > 0 ? <CodBig amountPaisa={delivery.cod_amount} label="착불 수금액" /> : null}
+      {delivery.cod_amount > 0 ? <CodBig amountMinor={delivery.cod_amount} label="착불 수금액" /> : null}
 
       <div className="label-meta-row">
         <span>Order {order.order_no}</span>

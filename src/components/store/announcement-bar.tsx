@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 
 function dismissKey(text: string): string {
-  return `scarpar-announcement-dismissed:${text}`
+  return `jadong-announcement-dismissed:${text}`
 }
 
 /** settings.storefront.announcement text — dismissible, remembered for the browser session. */
@@ -32,7 +32,7 @@ export function AnnouncementBar({ text }: { text: string }) {
 
   return (
     <div className="relative flex items-center justify-center bg-primary px-10 py-2 text-center text-xs font-medium text-primary-foreground">
-      <span className="text-bengali">{text}</span>
+      <span>{text}</span>
       <button
         type="button"
         aria-label="공지 닫기"

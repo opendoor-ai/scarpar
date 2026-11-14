@@ -1,4 +1,4 @@
-# Scarpar — Deployment
+# 전자동기계광고 — Deployment
 
 ## Vercel deploy
 1. Import the repo in Vercel (New Project → select this repo).
@@ -8,7 +8,7 @@
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — anon/public key
    - `SUPABASE_SERVICE_ROLE_KEY` — service_role key (server-only secret; bypasses RLS — never expose
      client-side)
-   - `NEXT_PUBLIC_APP_URL` — your production URL (e.g. `https://scarpar.example.com`), used for auth
+   - `NEXT_PUBLIC_APP_URL` — your production URL (e.g. `https://www.jadong.co.kr`), used for auth
      redirects
 3. Build command: default (`next build`). No custom build steps required.
 4. Deploy.

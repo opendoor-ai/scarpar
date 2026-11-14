@@ -1,6 +1,0 @@
-<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Scarpar mark">
-  <rect x="4" y="4" width="42" height="42" rx="9" fill="#ffffff"/>
-  <rect x="54" y="4" width="42" height="42" rx="9" fill="none" stroke="#ffffff" stroke-width="6"/>
-  <rect x="4" y="54" width="42" height="42" rx="9" fill="none" stroke="#ffffff" stroke-width="6"/>
-  <rect x="54" y="54" width="42" height="42" rx="9" fill="#ffffff"/>
-</svg>

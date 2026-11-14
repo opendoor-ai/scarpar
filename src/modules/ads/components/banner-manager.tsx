@@ -461,6 +461,7 @@ function GroupBanners({
                   orgs={orgs}
                   categories={categories}
                   showCategory={group.code === 'category'}
+                  showTargeting={['premium_hub', 'special_hub', 'members_hub'].includes(group.code)}
                   dragging={dragKey === b._key}
                   onHandleDown={() => setHandleKey(b._key)}
                   onChange={(nb) => update(items.map((x) => (x._key === b._key ? nb : x)))}

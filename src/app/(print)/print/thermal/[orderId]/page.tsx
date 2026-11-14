@@ -57,16 +57,16 @@ export default async function ThermalPage({ params }: PageProps<{ orderId: strin
       </div>
 
       <ReceiptTotals
-        subtotalPaisa={order.subtotal}
-        discountPaisa={order.discount_amount}
+        subtotalMinor={order.subtotal}
+        discountMinor={order.discount_amount}
         discountCode={order.discount_code}
-        deliveryChargePaisa={order.delivery_charge}
-        totalPaisa={order.total}
-        advancePaidPaisa={order.advance_paid}
+        deliveryChargeMinor={order.delivery_charge}
+        totalMinor={order.total}
+        advancePaidMinor={order.advance_paid}
       />
 
       {order.payment_method === 'cod' && balanceDue > 0 ? (
-        <CodBig amountPaisa={balanceDue} label="결제할 금액" />
+        <CodBig amountMinor={balanceDue} label="결제할 금액" />
       ) : null}
 
       <QrBlock dataUrl={qrSrc} />

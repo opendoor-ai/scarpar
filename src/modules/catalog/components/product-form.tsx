@@ -26,7 +26,7 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { mediaUrl } from '@/lib/media-url'
-import { fromPaisa, toPaisa } from '@/lib/money'
+import { fromMinor, toMinor } from '@/lib/money'
 import { cn } from '@/lib/utils'
 import type { Product, ProductImage, ProductVariant } from '@/types/db'
 
@@ -102,9 +102,9 @@ function toFormValues(product?: Product): ProductFormValues {
     brand: product.brand ?? '',
     category_id: product.category_id,
     status: product.status,
-    price: String(Math.round(fromPaisa(product.price))),
-    compare_at_price: product.compare_at_price != null ? String(Math.round(fromPaisa(product.compare_at_price))) : '',
-    cost_price: product.cost_price != null ? String(Math.round(fromPaisa(product.cost_price))) : '',
+    price: String(Math.round(fromMinor(product.price))),
+    compare_at_price: product.compare_at_price != null ? String(Math.round(fromMinor(product.compare_at_price))) : '',
+    cost_price: product.cost_price != null ? String(Math.round(fromMinor(product.cost_price))) : '',
     sku: product.sku ?? '',
     barcode: product.barcode ?? '',
     hs_code: product.hs_code ?? '',
@@ -136,9 +136,9 @@ function toActionInput(values: ProductFormValues): ProductActionInput {
     brand: opt(values.brand),
     category_id: values.category_id,
     status: values.status,
-    price: toPaisa(values.price || '0'),
-    compare_at_price: values.compare_at_price?.trim() ? toPaisa(values.compare_at_price) : null,
-    cost_price: values.cost_price?.trim() ? toPaisa(values.cost_price) : null,
+    price: toMinor(values.price || '0'),
+    compare_at_price: values.compare_at_price?.trim() ? toMinor(values.compare_at_price) : null,
+    cost_price: values.cost_price?.trim() ? toMinor(values.cost_price) : null,
     sku: opt(values.sku),
     barcode: opt(values.barcode),
     hs_code: opt(values.hs_code),
@@ -438,10 +438,8 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
         </Section>
 
         {/* 4. 이미지 */}
-        <Section id="images" title="이미지 정보" description="첫 번째 사진이 대표이미지예요. 끌어서 순서를 바꿀 수 있어요.">
-          <div className="p-4">
-            <ImageGallery value={imageRows} onChange={setImageRows} variantOptions={persistedVariantOptions} />
-          </div>
+        <Section id="images" title="이미지 정보">
+          <ImageGallery value={imageRows} onChange={setImageRows} variantOptions={persistedVariantOptions} />
         </Section>
 
         {/* 5. 아이콘 */}
@@ -657,8 +655,8 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
         </section>
 
         {/* 저장 줄 */}
-        <div className="sticky bottom-0 z-20 -mx-1 rounded-t-lg border border-border bg-background/95 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] backdrop-blur">
-          <div className="flex items-center justify-between gap-2 px-4 py-3">
+        <div className="sticky -bottom-5 z-20 -mx-6 -mb-5 border-t border-border bg-background shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+          <div className="flex h-[47px] items-center justify-between gap-2 px-6">
             <div>
               {mode === 'edit' && product ? (
                 <ConfirmDialog

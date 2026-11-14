@@ -238,6 +238,12 @@ async function applyBanners(
       is_active: b.is_active,
       sort_order: i,
       category_id: b.category_id,
+      target_cate_nos: b.target_cate_nos
+        .split(',')
+        .map((v) => Number(v.trim()))
+        .filter((n) => Number.isInteger(n) && n >= 0),
+      show_in_search: b.show_in_search,
+      search_keywords: b.search_keywords || null,
       advertiser_org_id: b.advertiser_org_id,
       advertiser_name: b.advertiser_name || null,
       payment_status: b.payment_status,

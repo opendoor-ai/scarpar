@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
-import { formatMoney, toPaisa } from '@/lib/money'
+import { formatMoney, toMinor } from '@/lib/money'
 import { posCheckoutAction, type PosCheckoutInput } from '@/modules/pos/actions'
 import { ProductGrid } from '@/modules/pos/components/product-grid'
 import { CartPanel } from '@/modules/pos/components/cart-panel'
@@ -48,7 +48,7 @@ export interface CartLine {
   qty: number
 }
 
-type TenderMethod = 'cash' | 'bkash' | 'nagad'
+type TenderMethod = 'cash' | 'transfer' | 'card'
 
 interface PosTerminalProps {
   products: PosProduct[]
@@ -138,9 +138,9 @@ export function PosTerminal({ products, categories }: PosTerminalProps) {
   }
 
   const subtotal = cart.reduce((sum, line) => sum + line.unitPrice * line.qty, 0)
-  const discountAmount = Math.min(toPaisa(discountTaka), subtotal)
+  const discountAmount = Math.min(toMinor(discountTaka), subtotal)
   const total = Math.max(subtotal - discountAmount, 0)
-  const amountReceived = amountReceivedTaka.trim() ? toPaisa(amountReceivedTaka) : undefined
+  const amountReceived = amountReceivedTaka.trim() ? toMinor(amountReceivedTaka) : undefined
   const changeDue =
     tenderMethod === 'cash' && amountReceived !== undefined ? Math.max(amountReceived - total, 0) : 0
 

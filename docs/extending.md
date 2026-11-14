@@ -1,7 +1,7 @@
-# Scarpar — Developer extension guide
+# 전자동기계광고 — Developer extension guide
 
-This is the **repo-local source of truth** for extending Scarpar — the `scarpar-builder` skill
-(`~/.claude/skills/scarpar-builder/`) defers to this file rather than duplicating it. Read
+This is the **repo-local source of truth** for extending 전자동기계광고 — the `jadong-builder` skill
+(`~/.claude/skills/jadong-builder/`) defers to this file rather than duplicating it. Read
 `docs/architecture.md` (binding contract) and `docs/conventions.md` (binding build rules) first; this
 doc is recipes on top of those, not a replacement.
 
@@ -9,7 +9,7 @@ doc is recipes on top of those, not a replacement.
 
 Read in this order for a new dev or a new AI session:
 
-1. **`CLAUDE.md`** (repo root) — the fast-path invariants: money=paisa, `verifyPayment()` chokepoint,
+1. **`CLAUDE.md`** (repo root) — the fast-path invariants: money=minor(1/100원), `verifyPayment()` chokepoint,
    order-item snapshots, the module-add checklist, page/action skeletons.
 2. **`docs/architecture.md`** — the full binding contract: route map (§1), module system (§2), the
    entire SQL schema (§3), CMS block model (§4), settings engine (§5), auth/tenancy (§6), payments/fraud
@@ -111,17 +111,14 @@ new block type, it's generic over the `blocks jsonb` array.
 
 All three follow the same shape: **a typed interface + a guarded adapter that throws
 `ConfigRequiredError` until an org has filled in its config**, per `.memory/decisions.md` #6. This is
-what lets the system ship "usable day one" (the `manual` courier / manual-MFS-verify paths) while real
+what lets the system ship "usable day one" (the `manual` courier / manual-계좌이체-verify paths) while real
 integrations are config-gated, not code-gated.
 
 - **Courier adapter.** Interface: `src/lib/couriers/types.ts` (`CourierAdapter { key, createOrder(),
   getStatus(), zones?() }`). **Smallest example to copy: `src/lib/couriers/manual.ts`** (no config, no
-  `ConfigRequiredError` — the trivial case) for the interface shape; **`steadfast.ts`** for a real
+  `ConfigRequiredError` — the trivial case) for the interface shape; **`cj.ts`** for a real
   config-gated example (reads `courier_accounts.config`, throws `ConfigRequiredError` if `!is_active`).
   Register in `src/lib/couriers/index.ts`.
-- **Payment provider.** `src/lib/payments/uddoktapay.ts` is the only one built (`createCharge()`/
-  `verifyByInvoice()`, real UddoktaPay checkout-v2/verify-payment request shapes, `ConfigRequiredError`-
-  guarded) — copy its shape for a new provider (e.g. SSLCommerz). Any new payment path must still funnel
   through `verifyPayment()` (`src/modules/orders/actions.ts`) to actually mark a payment verified — never
   write directly to `payments.status`.
 - **SMS / email channel.** `src/lib/notify.ts` — `ChannelAdapter = (orgId, event, payload) =>
@@ -146,7 +143,6 @@ Single touchpoint, auto-wired everywhere else:
 4. Changes are audit-logged automatically by the settings save action — no extra `audit()` call needed
    in your feature code.
 5. `roles` (optional) restricts who can view/edit the key in the UI (e.g. API keys default to
-   `['owner','admin']` — see `payments.uddoktapay.api_key` for the pattern). Omit it for anything any
    admin-side role should see.
 
 ## Recipe: add a dashboard widget

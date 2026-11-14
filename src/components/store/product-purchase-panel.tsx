@@ -59,7 +59,7 @@ export function ProductPurchasePanel({
       image,
       qty,
     })
-    toast.success(lang === 'bn' ? 'কার্টে যোগ করা হয়েছে' : lang === 'en' ? 'Added to cart' : '장바구니에 담았습니다')
+    toast.success(lang === 'en' ? 'Added to cart' : '장바구니에 담았습니다')
   }
 
   return (

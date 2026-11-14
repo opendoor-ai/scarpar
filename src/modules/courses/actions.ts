@@ -6,7 +6,7 @@ import { requireOrg, requireRole } from '@/lib/auth'
 import { requireModule } from '@/lib/modules'
 import { getServerClient } from '@/lib/supabase/server'
 import { audit } from '@/lib/audit'
-import { toPaisa } from '@/lib/money'
+import { toMinor } from '@/lib/money'
 import { randomKey, slugify } from '@/lib/utils'
 import type { ActionResult } from '@/lib/types'
 import type { Customer } from '@/types/db'
@@ -70,7 +70,7 @@ export async function createCourse(input: CourseFormValues): Promise<ActionResul
       title: parsed.data.title,
       slug,
       description: parsed.data.description || null,
-      price: toPaisa(parsed.data.price),
+      price: toMinor(parsed.data.price),
       cover_media_id: parsed.data.cover_media_id ?? null,
       status: parsed.data.status,
     })
@@ -111,7 +111,7 @@ export async function updateCourse(courseId: string, input: CourseFormValues): P
     .update({
       title: parsed.data.title,
       description: parsed.data.description || null,
-      price: toPaisa(parsed.data.price),
+      price: toMinor(parsed.data.price),
       cover_media_id: parsed.data.cover_media_id ?? null,
       status: parsed.data.status,
       updated_at: new Date().toISOString(),
