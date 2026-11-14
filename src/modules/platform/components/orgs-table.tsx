@@ -8,6 +8,10 @@ import { Badge } from '@/components/ui/badge'
 import { DataTable } from '@/components/ui/data-table'
 import { EmptyState } from '@/components/ui/empty-state'
 import { OrgActiveSwitch } from './org-active-switch'
+import { VERTICAL_PRESETS } from '@/modules/verticals'
+import type { Vertical } from '@/types/db'
+
+const PLAN_LABEL: Record<string, string> = { free: '무료', basic: '기본', premium: '프리미엄' }
 
 export interface PlatformOrgRow {
   id: string
@@ -41,15 +45,13 @@ function OrgsTable({ orgs }: { orgs: PlatformOrgRow[] }) {
       accessorKey: 'vertical',
       header: '사업 유형',
       cell: ({ row }) => (
-        <Badge variant="outline" className="capitalize">
-          {row.original.vertical}
-        </Badge>
+        <Badge variant="outline">{VERTICAL_PRESETS[row.original.vertical as Vertical]?.name ?? row.original.vertical}</Badge>
       ),
     },
     {
       accessorKey: 'plan',
       header: '요금제',
-      cell: ({ row }) => <span className="capitalize">{row.original.plan}</span>,
+      cell: ({ row }) => <span>{PLAN_LABEL[row.original.plan] ?? row.original.plan}</span>,
     },
     {
       accessorKey: 'membersCount',

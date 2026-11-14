@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { ChevronDown, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
+import { SITE_NAME } from '@/lib/site'
 import { getIcon } from '@/lib/icon-map'
 import { MODULES } from '@/modules/registry'
 import type { NavItem } from '@/lib/modules'
@@ -77,11 +78,11 @@ export function Sidebar({ org, orgs, nav, collapsed = false, onNavigate, onToggl
       >
         {collapsed ? (
           <span className="flex size-7 items-center justify-center rounded-md bg-primary text-[13px] font-bold text-primary-foreground">
-            S
+            전
           </span>
         ) : (
           <span className="text-[15px] font-semibold tracking-tight text-sidebar-foreground">
-            Scarpar
+            {SITE_NAME}
           </span>
         )}
       </div>

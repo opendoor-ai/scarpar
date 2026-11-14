@@ -9,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { PageHeader } from '@/components/ui/page-header'
 import { StatCard } from '@/components/ui/stat-card'
 import { OrgsTable, type PlatformOrgRow } from '@/modules/platform/components/orgs-table'
+import { ApplicationsReview, type ApplicationRow } from '@/modules/supplier-applications/components/applications-review'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,6 +57,15 @@ export default async function PlatformPage() {
 
   const activeCount = orgs.filter((org) => org.is_active).length
 
+  // 공급사 입점 신청 (최근 200건)
+  const { data: applicationRows, error: applicationsError } = await admin
+    .from('supplier_applications')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(200)
+  if (applicationsError) console.error('[platform] applications read failed:', applicationsError.message)
+  const applications = (applicationRows ?? []) as ApplicationRow[]
+
   return (
     <div>
       <PageHeader title="플랫폼 관리" description="전체 공급사(조직)를 한눈에 관리합니다." />
@@ -70,6 +80,8 @@ export default async function PlatformPage() {
           <StatCard label="전체 조직" value={orgs.length} icon={Building2} />
           <StatCard label="활성 조직" value={activeCount} icon={CheckCircle2} />
         </div>
+
+        <ApplicationsReview applications={applications} />
 
         <OrgsTable orgs={orgRows} />
       </div>

@@ -4,36 +4,18 @@ import { audit } from '@/lib/audit'
 import { requireUser, type OrgContext } from '@/lib/auth'
 import { setActiveOrg } from '@/lib/actions/set-org'
 import { seedDemoData } from '@/lib/demo-seed'
-import { SETTING_DEFS } from '@/lib/settings/registry'
+import { provisionOrg } from '@/lib/org-provision'
 import { getAdminClient } from '@/lib/supabase/admin'
+import { getServerClient } from '@/lib/supabase/server'
 import type { ActionResult } from '@/lib/types'
 import { slugify } from '@/lib/utils'
-import { VERTICAL_PRESETS } from '@/modules/verticals'
-import type { Json, Org } from '@/types/db'
+import type { Org } from '@/types/db'
 
 import { createOrgSchema, type CreateOrgInput } from './onboarding-schemas'
 
-/** doc_sequences seed rows (docs/architecture.md §3 / §9). */
-const DOC_SEQUENCES: { doc_type: string; prefix: string }[] = [
-  { doc_type: 'order', prefix: 'SCR-' },
-  { doc_type: 'invoice', prefix: 'INV-' },
-  { doc_type: 'delivery', prefix: 'DLV-' },
-  { doc_type: 'return', prefix: 'RET-' },
-  { doc_type: 'job', prefix: 'JOB-' },
-]
-
 /**
- * Creates a new org for the current user (owner membership + doc numbering +
- * default settings + optional demo data), then activates it.
- *
- * Uses the admin (service-role) client throughout, not just for the org row:
- * supabase/migrations/0001_core.sql's org_members RLS policy has no "insert
- * your own first membership" carve-out (a brand-new org has no members yet,
- * so has_org_role() can't pass) — the migration's own comment says this
- * bootstrap sequence is expected to run "in the same service-role
- * transaction". This action is that transaction (best-effort: Supabase JS has
- * no cross-call transaction, so failures after the org row exists return an
- * error but do not roll back earlier inserts).
+ * 플랫폼 관리자(전자동)가 공급사(조직)를 직접 만들 때 쓰는 기능.
+ * 일반회원은 "공급사 입점 신청"(supplier-application)을 이용하고, 승인되면 자동으로 만들어집니다.
  */
 export async function createOrgAction(input: CreateOrgInput): Promise<ActionResult> {
   const user = await requireUser()
@@ -49,59 +31,19 @@ export async function createOrgAction(input: CreateOrgInput): Promise<ActionResu
     return { ok: false, error: '회사(조직) 이름을 정확히 입력하세요.' }
   }
 
+  // 직접 생성은 플랫폼 관리자만 (일반회원은 입점 신청 → 승인)
+  const supabase = await getServerClient()
+  const { data: isPlatformAdmin } = await supabase.rpc('is_platform_admin')
+  if (!isPlatformAdmin) {
+    return { ok: false, error: '공급사는 입점 신청 후 승인을 받아 만들어집니다.' }
+  }
+
   const admin = getAdminClient()
   let org: Org
-
   try {
-    const { data: taken } = await admin.from('orgs').select('id').eq('slug', slug).maybeSingle()
-    if (taken) {
-      return { ok: false, error: '이미 사용 중인 주소입니다. 다른 주소를 입력하세요.' }
-    }
-
-    const { data: orgRow, error: orgError } = await admin
-      .from('orgs')
-      .insert({
-        name,
-        slug,
-        vertical,
-        phone,
-        currency: 'KRW',
-        timezone: 'Asia/Seoul',
-        enabled_modules: VERTICAL_PRESETS[vertical].modules,
-      })
-      .select('*')
-      .single()
-
-    if (orgError || !orgRow) {
-      return { ok: false, error: orgError?.message ?? '조직을 만들지 못했습니다.' }
-    }
-    org = orgRow as Org
-
-    const { error: memberError } = await admin
-      .from('org_members')
-      .insert({ org_id: org.id, user_id: user.id, role: 'owner' })
-    if (memberError) {
-      return { ok: false, error: memberError.message }
-    }
-
-    const { error: seqError } = await admin
-      .from('doc_sequences')
-      .insert(DOC_SEQUENCES.map((seq) => ({ org_id: org.id, ...seq })))
-    if (seqError) {
-      return { ok: false, error: seqError.message }
-    }
-
-    const { error: settingsError } = await admin.from('org_settings').insert(
-      SETTING_DEFS.map((def) => ({
-        org_id: org.id,
-        key: def.key,
-        value: def.default as Json,
-        updated_by: user.id,
-      })),
-    )
-    if (settingsError) {
-      return { ok: false, error: settingsError.message }
-    }
+    const result = await provisionOrg({ name, slug, vertical, phone }, user.id)
+    if (!result.ok) return { ok: false, error: result.error }
+    org = result.org
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : '조직을 만들지 못했습니다.' }
   }

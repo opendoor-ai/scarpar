@@ -14,7 +14,7 @@ import { AcceptInviteButton } from '../../_components/accept-invite-button'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = { title: '조직 초대 — Scarpar' }
+export const metadata: Metadata = { title: '조직 초대 — 전자동기계광고' }
 
 function InvalidInviteCard({ title }: { title: string }) {
   return (

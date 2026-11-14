@@ -55,6 +55,16 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   const nav = buildNav(ctx.org)
 
+  // 플랫폼 관리자(전자동)에게만 "플랫폼 관리" 메뉴 표시 (입점 신청 심사 등)
+  try {
+    const { data: isPlatformAdmin } = await supabase.rpc('is_platform_admin')
+    if (isPlatformAdmin) {
+      nav.core.splice(1, 0, { label: '플랫폼 관리', href: '/admin/platform', icon: 'Building2' })
+    }
+  } catch {
+    // 확인 실패 시 메뉴만 숨김
+  }
+
   return (
     <AdminShell
       org={ctx.org}

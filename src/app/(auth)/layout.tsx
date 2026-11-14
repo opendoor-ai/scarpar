@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { SITE_NAME } from '@/lib/site'
 import type { ReactNode } from 'react'
 
 /**
@@ -11,10 +12,10 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-8 bg-muted px-4 py-12">
       <Link
-        href="/login"
+        href="/products"
         className="text-xl font-semibold tracking-tight text-foreground"
       >
-        Scarpar
+        {SITE_NAME}
       </Link>
       <div className="w-full max-w-sm">{children}</div>
     </div>

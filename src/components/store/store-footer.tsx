@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { SITE_NAME } from '@/lib/site'
 
 import type { MenuItem } from '@/types/db'
 
@@ -39,7 +40,9 @@ export function StoreFooter({
         </div>
 
         <div className="text-2xs border-t border-border pt-4 text-muted-foreground">
-          Powered by <span className="font-medium">Scarpar</span>
+          <Link href="/products" className="hover:text-foreground">
+            {SITE_NAME}에서 더 많은 산업기계 보기
+          </Link>
         </div>
       </div>
     </footer>
