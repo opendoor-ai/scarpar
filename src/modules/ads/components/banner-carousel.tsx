@@ -8,24 +8,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 import type { LiveBanner } from '../live'
+import { sendAdEvent } from '../track'
 
-function sendAdEvent(bannerId: string, type: 'impression' | 'click') {
-  try {
-    const body = JSON.stringify({ bannerId, type })
-    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      navigator.sendBeacon('/api/ads/event', new Blob([body], { type: 'application/json' }))
-      return
-    }
-    void fetch('/api/ads/event', {
-      method: 'POST',
-      body,
-      headers: { 'Content-Type': 'application/json' },
-      keepalive: true,
-    })
-  } catch {
-    // 기록 실패는 무시
-  }
-}
 
 /**
  * track: 광고 배너(banner_ads)만 노출·클릭을 기록. 공급사 미니샵 배너는 false.

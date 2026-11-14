@@ -18,6 +18,7 @@ export const categorySettingsSchema = z.object({
   is_visible: z.boolean(),
   show_on_main: z.boolean(),
   top_image: z.string().trim().max(1000),
+  icon_image: z.string().trim().max(1000),
   product_sort: z.enum(PRODUCT_SORTS),
   seo_title: z.string().trim().max(120),
   seo_description: z.string().trim().max(300),

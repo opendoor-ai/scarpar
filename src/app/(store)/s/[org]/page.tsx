@@ -1,25 +1,22 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Phone } from 'lucide-react'
 
 import { type Lang } from '@/lib/i18n'
 import { getOrgSettings, settingStr } from '@/lib/settings'
 import { getAnonClient } from '@/lib/supabase/anon'
 import type { PageProps } from '@/lib/types'
-import type { CmsPage, Product } from '@/types/db'
+import type { CmsBlock, CmsPage } from '@/types/db'
 
 import { RenderBlocks } from '@/components/store/blocks/render-blocks'
-import { getPrimaryImages } from '@/components/store/get-primary-images'
 import { getStoreOrg } from '@/components/store/get-store-org'
-import { ProductCard, type ProductCardData } from '@/components/store/product-card'
+import { storePath } from '@/components/store/store-links'
+import { formatKrPhone, phoneDigits } from '@/lib/phone'
 import { mediaUrl } from '@/lib/media-url'
 import { BannerCarousel } from '@/modules/ads/components/banner-carousel'
 import type { LiveBanner } from '@/modules/ads/live'
 
 export const dynamic = 'force-dynamic'
-
-type FeaturedProductRow = Pick<
-  Product,
-  'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
->
 
 export default async function StoreHomePage({ params }: PageProps<{ org: string }>) {
   const { org: orgSlug } = await params
@@ -80,44 +77,61 @@ export default async function StoreHomePage({ params }: PageProps<{ org: string 
     )
   }
 
-  // No published home page yet — tasteful default hero + featured products fallback.
-  const { data: featuredRows } = await supabase
-    .from('products')
-    .select('id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder')
-    .eq('org_id', org.id)
-    .eq('status', 'active')
-    .eq('is_featured', true)
-    .order('position', { ascending: true })
-    .limit(8)
-
-  const featured = (featuredRows ?? []) as FeaturedProductRow[]
-  const images = await getPrimaryImages(
-    org.id,
-    featured.map((p) => p.id),
-  )
+  // 아직 게시한 홈 페이지가 없으면: 기본 미니샵 첫 화면 (대표 이미지/배너 → 추천·최신 제품 → 회사 소개 → 전화 문의)
+  const digits = org.phone ? phoneDigits(org.phone) : ''
+  const keywords = org.item_keywords ?? []
+  const defaultBlocks: CmsBlock[] = [
+    { _key: 'featured', _type: 'productGrid', title: '추천 제품', mode: 'featured', limit: 8 },
+    { _key: 'latest', _type: 'productGrid', title: '최신 등록 제품', mode: 'latest', limit: 12 },
+    { _key: 'intro', _type: 'companyIntro', heading: `${org.name} 소개`, body: '', stats: [], showContact: true },
+    {
+      _key: 'cta',
+      _type: 'inquiryCta',
+      heading: '필요한 기계, 전화 한 통으로 상담하세요',
+      body: '제품 사양·가격·납기 모두 친절하게 안내해 드립니다.',
+      showSms: true,
+    },
+  ]
 
   return (
     <>
       {bannerSection ?? (
-        <section className="flex min-h-[380px] w-full items-center justify-center bg-muted sm:min-h-[440px]">
-          <div className="mx-auto flex max-w-2xl flex-col items-center gap-3 px-6 text-center">
-            <h1 className="text-2xl font-semibold sm:text-3xl">{org.name}에 오신 것을 환영합니다</h1>
-            <p className="max-w-lg text-sm text-muted-foreground">아래에서 최신 제품을 확인하세요.</p>
+        <section className="border-b border-border bg-gradient-to-b from-primary/10 to-background">
+          <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-4 py-12 sm:px-6 sm:py-16">
+            <h1 className="text-2xl font-bold sm:text-4xl">{org.name}</h1>
+            {keywords.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {keywords.slice(0, 8).map((k) => (
+                  <span key={k} className="rounded-full border border-border bg-background px-3 py-1 text-xs">
+                    {k}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+            <p className="text-sm text-muted-foreground sm:text-base">
+              산업기계·중고기계 제품을 확인하고 바로 전화·문자로 문의하세요.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href={storePath(org.slug, '/products')}
+                className="inline-flex h-10 items-center rounded-md bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                전체 제품 보기
+              </Link>
+              {digits ? (
+                <a
+                  href={`tel:${digits}`}
+                  className="inline-flex h-10 items-center gap-1.5 rounded-md border border-border bg-background px-5 text-sm font-semibold hover:bg-accent"
+                >
+                  <Phone className="size-4" />
+                  {formatKrPhone(org.phone as string)}
+                </a>
+              ) : null}
+            </div>
           </div>
         </section>
       )}
-
-      {featured.length > 0 ? (
-        <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-          <h2 className="mb-5 text-lg font-semibold">추천 제품</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {featured.map((p) => {
-              const card: ProductCardData = { ...p, image: images[p.id] ?? null }
-              return <ProductCard key={p.id} orgSlug={org.slug} product={card} lang={lang} />
-            })}
-          </div>
-        </section>
-      ) : null}
+      <RenderBlocks blocks={defaultBlocks} ctx={{ org, lang }} />
     </>
   )
 }

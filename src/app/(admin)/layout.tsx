@@ -64,6 +64,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         0,
         { label: '플랫폼 관리', href: '/admin/platform', icon: 'Building2' },
         { label: '광고 관리', href: '/admin/ads', icon: 'Megaphone' },
+        { label: '콘텐츠 관리', href: '/admin/contents', icon: 'LayoutTemplate' },
+        { label: '사이트 설정', href: '/admin/site', icon: 'Settings' },
       )
     }
   } catch {

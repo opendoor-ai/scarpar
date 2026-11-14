@@ -76,6 +76,7 @@ export async function saveCategoryAction(
     is_visible: d.is_visible,
     show_on_main: d.show_on_main,
     top_image: d.top_image || null,
+    icon_image: d.icon_image || null,
     product_sort: d.product_sort,
     seo_title: d.seo_title || null,
     seo_description: d.seo_description || null,

@@ -23,6 +23,7 @@ export interface PlatformCategory {
   is_visible: boolean
   show_on_main: boolean
   top_image: string | null
+  icon_image: string | null
   product_sort: CategoryProductSort
   seo_title: string | null
   seo_description: string | null
@@ -44,6 +45,7 @@ export function normalizeCategory(r: RawCategory): PlatformCategory {
     is_visible: r.is_visible ?? true,
     show_on_main: r.show_on_main ?? true,
     top_image: r.top_image ?? null,
+    icon_image: r.icon_image ?? null,
     product_sort: r.product_sort ?? 'latest',
     seo_title: r.seo_title ?? null,
     seo_description: r.seo_description ?? null,

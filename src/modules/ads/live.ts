@@ -4,28 +4,33 @@
 import { mediaUrl } from '@/lib/media-url'
 import { getAdminClient } from '@/lib/supabase/admin'
 
+import type { BannerPlacement } from './schemas'
+
 export interface LiveBanner {
   id: string
   title: string
   link_url: string
   image_pc: string
   image_mobile: string
+  subtitle?: string | null
+  phone?: string | null
+  advertiser_org_id?: string | null
 }
 
 /** placement: main(전체 제품 첫 화면) 또는 category(카테고리 페이지, categoryIds 중 하나에 걸린 배너) */
-export async function getLiveBanners(placement: 'main' | 'category', categoryIds: string[] = []): Promise<LiveBanner[]> {
+export async function getLiveBanners(placement: BannerPlacement, categoryIds: string[] = []): Promise<LiveBanner[]> {
   try {
     const now = new Date().toISOString()
     let q = getAdminClient()
       .from('banner_ads')
-      .select('id, title, link_url, image_pc, image_mobile, sort_order')
+      .select('*')
       .eq('placement', placement)
       .eq('is_active', true)
       .lte('starts_at', now)
       .gt('ends_at', now)
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: true })
-      .limit(10)
+      .limit(20)
     if (placement === 'category') {
       if (categoryIds.length === 0) return []
       q = q.in('category_id', categoryIds)
@@ -35,15 +40,26 @@ export async function getLiveBanners(placement: 'main' | 'category', categoryIds
       console.error('[ads] banners read failed:', error.message)
       return []
     }
-    return ((data ?? []) as { id: string; title: string; link_url: string; image_pc: string; image_mobile: string | null }[]).map(
-      (b) => ({
-        id: b.id,
-        title: b.title,
-        link_url: b.link_url,
-        image_pc: mediaUrl(b.image_pc),
-        image_mobile: mediaUrl(b.image_mobile || b.image_pc),
-      }),
-    )
+    type Row = {
+      id: string
+      title: string
+      link_url: string
+      image_pc: string
+      image_mobile: string | null
+      subtitle?: string | null
+      phone?: string | null
+      advertiser_org_id: string | null
+    }
+    return ((data ?? []) as Row[]).map((b) => ({
+      id: b.id,
+      title: b.title,
+      link_url: b.link_url,
+      image_pc: mediaUrl(b.image_pc),
+      image_mobile: mediaUrl(b.image_mobile || b.image_pc),
+      subtitle: b.subtitle ?? null,
+      phone: b.phone ?? null,
+      advertiser_org_id: b.advertiser_org_id,
+    }))
   } catch (err) {
     console.error('[ads] banners failed', err)
     return []

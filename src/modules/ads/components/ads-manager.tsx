@@ -23,7 +23,17 @@ import { mediaUrl } from '@/lib/media-url'
 import { cn } from '@/lib/utils'
 
 import { deleteBannerAction, deletePromotionAction, saveBannerAction, savePromotionAction } from '../actions'
-import { PAYMENT_LABEL, PAYMENT_STATUS, PLACEMENT_LABEL, toKstDate, type BannerInput, type PromotionInput } from '../schemas'
+import {
+  BANNER_PLACEMENT_INFO,
+  BANNER_PLACEMENTS,
+  PAYMENT_LABEL,
+  PAYMENT_STATUS,
+  PLACEMENT_LABEL,
+  toKstDate,
+  type BannerInput,
+  type BannerPlacement,
+  type PromotionInput,
+} from '../schemas'
 
 type Placement = 'main' | 'category'
 type Payment = (typeof PAYMENT_STATUS)[number]
@@ -36,8 +46,10 @@ export interface BannerRow {
   link_url: string
   image_pc: string
   image_mobile: string | null
-  placement: Placement
+  placement: BannerPlacement
   category_id: string | null
+  subtitle?: string | null
+  phone?: string | null
   starts_at: string
   ends_at: string
   sort_order: number
@@ -211,7 +223,7 @@ function BannersTab({
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">
-                      {PLACEMENT_LABEL[b.placement]}
+                      {BANNER_PLACEMENT_INFO[b.placement]?.label ?? b.placement}
                       {b.placement === 'category' && b.category_id ? (
                         <div className="text-xs text-muted-foreground">{categoryName.get(b.category_id) ?? '삭제된 카테고리'}</div>
                       ) : null}
@@ -297,6 +309,8 @@ function BannerDialog({
     image_mobile: banner?.image_mobile ?? '',
     placement: banner?.placement ?? 'main',
     category_id: banner?.category_id ?? null,
+    subtitle: banner?.subtitle ?? '',
+    phone: banner?.phone ?? '',
     starts_on: banner ? toKstDate(banner.starts_at) : today,
     ends_on: banner ? toKstDate(banner.ends_at) : addDays(today, 29),
     sort_order: banner?.sort_order ?? 0,
@@ -369,14 +383,26 @@ function BannerDialog({
               placeholder="예: OO공구상사"
             />
           </Field>
-          <Field label="노출 위치">
+          <Field label="배너 위 글자 (선택)" hint="메인 배너·스마트 허브에 보여요. 예: 신성인프라 · 중고 머시닝센터 전문">
+            <Input value={form.subtitle ?? ''} onChange={(e) => set('subtitle', e.target.value)} />
+          </Field>
+          <Field label="배너 위 전화번호 (선택)" hint="메인 배너에 전화번호를 함께 보여줘요.">
+            <Input value={form.phone ?? ''} onChange={(e) => set('phone', e.target.value)} placeholder="010-0000-0000" />
+          </Field>
+          <Field
+            label="노출 위치"
+            hint={`${BANNER_PLACEMENT_INFO[form.placement].hint} 권장 크기 ${BANNER_PLACEMENT_INFO[form.placement].size}`}
+          >
             <select
               className={selectClass}
               value={form.placement}
-              onChange={(e) => set('placement', e.target.value as Placement)}
+              onChange={(e) => set('placement', e.target.value as BannerPlacement)}
             >
-              <option value="main">{PLACEMENT_LABEL.main}</option>
-              <option value="category">{PLACEMENT_LABEL.category}</option>
+              {BANNER_PLACEMENTS.map((p) => (
+                <option key={p} value={p}>
+                  {BANNER_PLACEMENT_INFO[p].label}
+                </option>
+              ))}
             </select>
           </Field>
           <Field label="카테고리" hint={form.placement === 'category' ? '1차 카테고리를 고르면 그 아래 2차 페이지에도 보여요' : undefined}>

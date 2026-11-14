@@ -468,6 +468,7 @@ function CategoryDetail({
     is_visible: category?.is_visible ?? true,
     show_on_main: category?.show_on_main ?? true,
     top_image: category?.top_image ?? '',
+    icon_image: category?.icon_image ?? '',
     product_sort: category?.product_sort ?? 'latest',
     seo_title: category?.seo_title ?? '',
     seo_description: category?.seo_description ?? '',
@@ -627,6 +628,14 @@ function CategoryDetail({
             onChange={(m) => set('top_image', m?.path ?? '')}
           />
         </Row2>
+        {!formParent ? (
+          <Row2 label="메인 아이콘 이미지" hint="메인 화면 동그라미 카테고리 아이콘이에요. 정사각형 200×200 권장. 비우면 기본 그림이 보여요.">
+            <MediaPicker
+              value={form.icon_image ? { id: '', path: form.icon_image } : null}
+              onChange={(m) => set('icon_image', m?.path ?? '')}
+            />
+          </Row2>
+        ) : null}
       </Section>
 
       <Section title="검색엔진 최적화 (SEO)">

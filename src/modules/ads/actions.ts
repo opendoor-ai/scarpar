@@ -9,7 +9,7 @@ import { getAdminClient } from '@/lib/supabase/admin'
 import type { ActionResult } from '@/lib/types'
 
 import {
-  MAX_BANNERS_PER_SLOT,
+  BANNER_PLACEMENT_INFO,
   MAX_PROMOTIONS_MAIN,
   MAX_PROMOTIONS_PER_CATEGORY,
   bannerSchema,
@@ -55,10 +55,11 @@ export async function saveBannerAction(id: string | null, input: BannerInput): P
     q = category_id ? q.eq('category_id', category_id) : q.is('category_id', null)
     if (id) q = q.neq('id', id)
     const { count } = await q
-    if ((count ?? 0) >= MAX_BANNERS_PER_SLOT) {
+    const max = BANNER_PLACEMENT_INFO[d.placement].max
+    if ((count ?? 0) >= max) {
       return {
         ok: false,
-        error: `이 자리는 해당 기간에 이미 배너가 ${MAX_BANNERS_PER_SLOT}개 예약돼 있어요. 기간을 바꾸거나 다른 배너를 멈춰 주세요.`,
+        error: `이 자리는 해당 기간에 이미 배너가 ${max}개 예약돼 있어요. 기간을 바꾸거나 다른 배너를 멈춰 주세요.`,
       }
     }
   }
@@ -70,6 +71,8 @@ export async function saveBannerAction(id: string | null, input: BannerInput): P
     link_url: d.link_url,
     image_pc: d.image_pc,
     image_mobile: d.image_mobile || null,
+    subtitle: d.subtitle || null,
+    phone: d.phone || null,
     placement: d.placement,
     category_id,
     starts_at,

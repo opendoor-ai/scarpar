@@ -10,8 +10,32 @@ export const PAYMENT_LABEL: Record<(typeof PAYMENT_STATUS)[number], string> = {
 }
 export const PLACEMENT_LABEL = { main: '전체 제품 첫 화면', category: '카테고리 페이지' } as const
 
+/** 배너 광고 자리 (메인 화면 위에서부터 순서) */
+export const BANNER_PLACEMENTS = [
+  'main',
+  'smart',
+  'wide',
+  'partner',
+  'plus',
+  'image',
+  'wing_left',
+  'wing_right',
+  'category',
+] as const
+export type BannerPlacement = (typeof BANNER_PLACEMENTS)[number]
+export const BANNER_PLACEMENT_INFO: Record<BannerPlacement, { label: string; size: string; max: number; hint: string }> = {
+  main: { label: '메인 배너 (맨 위 슬라이드)', size: '800×600 (4:3)', max: 12, hint: '3장씩 나란히 넘어가요. 회사명·전화번호가 이미지 위에 표시돼요.' },
+  smart: { label: '스마트 허브 (4칸 카드)', size: '600×600 (정사각형)', max: 8, hint: '"홈페이지 바로가기" 버튼이 붙은 공급사 카드예요.' },
+  wide: { label: '와이드 허브 (가로 띠)', size: '1200×200', max: 3, hint: '화면 너비 전체를 쓰는 가로 광고예요.' },
+  partner: { label: '파트너 허브 (공급사+제품)', size: '600×400', max: 8, hint: '광고주 공급사를 고르면 그 공급사의 최신 제품 3개가 함께 보여요.' },
+  plus: { label: '플러스 허브 (2칸 가로)', size: '800×300', max: 6, hint: '두 칸씩 나란히 보이는 가로 광고예요.' },
+  image: { label: '큰 이미지 광고 (세로)', size: '1000×1000 이상 (세로로 긴 이미지 가능)', max: 6, hint: '공급사 홍보 이미지를 크게 보여줘요.' },
+  wing_left: { label: '왼쪽 날개 배너', size: '160×600', max: 4, hint: '넓은 PC 화면 왼쪽에 붙어 따라다녀요. (휴대폰에선 안 보여요)' },
+  wing_right: { label: '오른쪽 날개 배너', size: '160×600', max: 4, hint: '넓은 PC 화면 오른쪽에 붙어 따라다녀요. (휴대폰에선 안 보여요)' },
+  category: { label: '카테고리 페이지 배너', size: '1200×300', max: 5, hint: '고른 카테고리(와 그 2차) 제품 목록 위에 보여요.' },
+}
+
 /** 같은 자리·같은 기간에 함께 걸 수 있는 최대 개수 */
-export const MAX_BANNERS_PER_SLOT = 5
 export const MAX_PROMOTIONS_MAIN = 8
 export const MAX_PROMOTIONS_PER_CATEGORY = 4
 
@@ -33,8 +57,10 @@ export const bannerSchema = z
       .refine((v) => v.startsWith('/') || /^https?:\/\//i.test(v), '/s/... 또는 https:// 로 시작하는 주소를 입력하세요'),
     image_pc: z.string().trim().min(1, 'PC 이미지를 선택하세요').max(1000),
     image_mobile: z.string().trim().max(1000).optional(),
-    placement: z.enum(['main', 'category']),
+    placement: z.enum(BANNER_PLACEMENTS),
     category_id: z.string().uuid().nullable(),
+    subtitle: z.string().trim().max(100).optional(),
+    phone: z.string().trim().max(30).optional(),
     ...period,
     sort_order: z.coerce.number().int().min(0).max(999),
     is_active: z.boolean(),
