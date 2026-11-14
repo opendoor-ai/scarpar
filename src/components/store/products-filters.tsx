@@ -2,14 +2,14 @@ import Link from 'next/link'
 
 import { t, type Lang } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
-import type { Category } from '@/types/db'
+import { categoryKey, type PlatformCategory } from '@/lib/platform-categories'
 
 import { storePath } from './store-links'
 
 /** basePath를 주면 그 주소(예: 통합 검색 '/products')를, 없으면 공급사 미니샵 목록 주소를 씁니다. */
 function productsHref(orgSlug: string, opts: { category?: string; query?: string; basePath?: string }): string {
   const params = new URLSearchParams()
-  if (opts.category) params.set('category', opts.category)
+  if (opts.category) params.set('cate_no', opts.category)
   if (opts.query) params.set('q', opts.query)
   const qs = params.toString()
   const base = opts.basePath ?? storePath(orgSlug, '/products')
@@ -36,7 +36,7 @@ export function CategoryPills({
   basePath,
 }: {
   orgSlug: string
-  categories: Pick<Category, 'id' | 'name' | 'slug' | 'parent_id'>[]
+  categories: Pick<PlatformCategory, 'id' | 'name' | 'slug' | 'parent_id' | 'cate_no'>[]
   activeSlug?: string
   query?: string
   lang?: Lang
@@ -47,7 +47,7 @@ export function CategoryPills({
   const ids = new Set(categories.map((c) => c.id))
   // 부모가 없거나(1차) 부모를 찾을 수 없는 카테고리는 1차로 취급
   const roots = categories.filter((c) => !c.parent_id || !ids.has(c.parent_id))
-  const active = activeSlug ? categories.find((c) => c.slug === activeSlug) : undefined
+  const active = activeSlug ? categories.find((c) => categoryKey(c) === activeSlug) : undefined
   const activeRoot = active
     ? roots.find((r) => r.id === active.id) ?? roots.find((r) => r.id === active.parent_id)
     : undefined
@@ -62,7 +62,7 @@ export function CategoryPills({
         {roots.map((c) => (
           <Link
             key={c.id}
-            href={productsHref(orgSlug, { category: c.slug, query, basePath })}
+            href={productsHref(orgSlug, { category: categoryKey(c), query, basePath })}
             className={cn(PILL, activeRoot?.id === c.id ? PILL_ACTIVE : PILL_IDLE)}
           >
             {c.name}
@@ -73,7 +73,7 @@ export function CategoryPills({
       {activeRoot && subs.length > 0 ? (
         <div className="flex gap-2 overflow-x-auto rounded-lg bg-muted/50 p-2 [scrollbar-width:none] sm:flex-wrap [&::-webkit-scrollbar]:hidden">
           <Link
-            href={productsHref(orgSlug, { category: activeRoot.slug, query, basePath })}
+            href={productsHref(orgSlug, { category: categoryKey(activeRoot), query, basePath })}
             className={cn(PILL, active?.id === activeRoot.id ? 'border-foreground bg-background' : 'border-transparent hover:bg-background')}
           >
             {activeRoot.name} 전체
@@ -81,7 +81,7 @@ export function CategoryPills({
           {subs.map((c) => (
             <Link
               key={c.id}
-              href={productsHref(orgSlug, { category: c.slug, query, basePath })}
+              href={productsHref(orgSlug, { category: categoryKey(c), query, basePath })}
               className={cn(PILL, active?.id === c.id ? 'border-foreground bg-background' : 'border-transparent hover:bg-background')}
             >
               {c.name}
@@ -110,7 +110,7 @@ export function ProductSearchBox({
 }) {
   return (
     <form action={basePath ?? storePath(orgSlug, '/products')} method="GET" className="relative w-full sm:w-72">
-      {category ? <input type="hidden" name="category" value={category} /> : null}
+      {category ? <input type="hidden" name="cate_no" value={category} /> : null}
       <input
         type="search"
         name="q"

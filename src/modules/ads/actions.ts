@@ -4,9 +4,8 @@
 
 import { revalidatePath } from 'next/cache'
 
-import { requireUser } from '@/lib/auth'
+import { requirePlatformAdmin } from '@/lib/platform-admin'
 import { getAdminClient } from '@/lib/supabase/admin'
-import { getServerClient } from '@/lib/supabase/server'
 import type { ActionResult } from '@/lib/types'
 
 import {
@@ -21,13 +20,6 @@ import {
   type PromotionInput,
 } from './schemas'
 
-async function requirePlatformAdmin() {
-  const user = await requireUser()
-  const supabase = await getServerClient()
-  const { data } = await supabase.rpc('is_platform_admin')
-  if (!data) throw new Error('플랫폼 관리자만 할 수 있어요.')
-  return user
-}
 
 function refresh() {
   revalidatePath('/admin/ads')

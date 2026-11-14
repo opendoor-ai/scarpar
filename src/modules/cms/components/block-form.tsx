@@ -13,6 +13,8 @@ import { ContactForm } from './blocks/contact-form'
 import { ListingsGridForm } from './blocks/listings-grid-form'
 import { CoursesGridForm } from './blocks/courses-grid-form'
 import { HtmlForm } from './blocks/html-form'
+import { CompanyIntroForm } from './blocks/company-intro-form'
+import { InquiryCtaForm } from './blocks/inquiry-cta-form'
 
 interface BlockFormProps {
   block: CmsBlock
@@ -46,6 +48,10 @@ function BlockForm({ block, categories, onChange }: BlockFormProps) {
       return <CoursesGridForm block={block} onChange={onChange} />
     case 'html':
       return <HtmlForm block={block} onChange={onChange} />
+    case 'companyIntro':
+      return <CompanyIntroForm block={block} onChange={onChange} />
+    case 'inquiryCta':
+      return <InquiryCtaForm block={block} onChange={onChange} />
     default:
       return null
   }

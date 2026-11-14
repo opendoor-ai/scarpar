@@ -73,6 +73,7 @@ export default async function CmsPageEditorPage({ params }: PageProps<{ id: stri
       key={`${page.id}-${page.updated_at}`}
       page={page as CmsPage}
       orgSlug={ctx.org.slug}
+      orgName={ctx.org.name}
       categories={(categories ?? []) as { id: string; name: string }[]}
       revisions={revisionRows}
     />

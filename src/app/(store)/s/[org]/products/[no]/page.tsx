@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import QRCode from 'qrcode'
 
 import { env } from '@/lib/env'
-import { getPlatformCategories } from '@/lib/platform-categories'
+import { getPlatformCategories, categoryQuery } from '@/lib/platform-categories'
 
 import { type Lang } from '@/lib/i18n'
 import { mediaUrl } from '@/lib/media-url'
@@ -153,13 +153,13 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
   const variants = (variantRows ?? []) as ProductVariant[]
 
   // 카테고리: 상위 카테고리가 있으면 "상위 > 하위" 순서로 보여준다.
-  let categoryTrail: { name: string; slug: string }[] = []
+  let categoryTrail: { name: string; slug: string; query: string }[] = []
   if (product.category_id) {
     const rows = await getPlatformCategories()
     const byId = new Map(rows.map((r) => [r.id, r]))
     let current = byId.get(product.category_id)
     while (current && categoryTrail.length < 5) {
-      categoryTrail = [{ name: current.name, slug: current.slug }, ...categoryTrail]
+      categoryTrail = [{ name: current.name, slug: current.slug, query: categoryQuery(current) }, ...categoryTrail]
       current = current.parent_id ? byId.get(current.parent_id) : undefined
     }
   }
@@ -197,7 +197,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
         productsUrl={`${env.APP_URL}${storePath(org.slug, '/products')}`}
         categoryTrail={categoryTrail.map((c) => ({
           name: c.name,
-          url: `${env.APP_URL}${storePath(org.slug, '/products')}?category=${encodeURIComponent(c.slug)}`,
+          url: `${env.APP_URL}${storePath(org.slug, '/products')}?${c.query}`,
         }))}
       />
       {/* 현재 위치 */}
@@ -216,7 +216,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
           <span key={c.slug} className="flex items-center gap-1">
             <ChevronRight className="size-3" />
             <Link
-              href={`${storePath(org.slug, '/products')}?category=${encodeURIComponent(c.slug)}`}
+              href={`${storePath(org.slug, '/products')}?${c.query}`}
               className={i === categoryTrail.length - 1 ? 'font-semibold text-foreground' : 'hover:text-foreground'}
             >
               {c.name}

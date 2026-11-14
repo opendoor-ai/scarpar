@@ -3,6 +3,8 @@ import type { CmsBlock } from '@/types/db'
 
 import type { StoreOrg } from '../get-store-org'
 import { BannerBlockView } from './banner-block'
+import { CompanyIntroBlockView } from './company-intro-block'
+import { InquiryCtaBlockView } from './inquiry-cta-block'
 import { ContactBlockView } from './contact-block'
 import { CoursesGridBlockView } from './courses-grid-block'
 import { FaqBlockView } from './faq-block'
@@ -54,6 +56,10 @@ function RenderBlock({ block, ctx }: { block: CmsBlock; ctx: BlockRenderContext 
       return <CoursesGridBlockView block={block} ctx={ctx} />
     case 'html':
       return <HtmlBlockView block={block} />
+    case 'companyIntro':
+      return <CompanyIntroBlockView block={block} ctx={ctx} />
+    case 'inquiryCta':
+      return <InquiryCtaBlockView block={block} ctx={ctx} />
     default:
       return null
   }

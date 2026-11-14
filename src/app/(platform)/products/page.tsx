@@ -1,12 +1,22 @@
 // 통합 제품 검색 — 모든 공급사의 공개 상품을 한곳에서 카테고리·검색어로 찾습니다.
-// 주소: /products , /products?category=machine-tools , /products?q=머시닝
+// 주소: /products , /products?cate_no=54 , /products?q=머시닝 (예전 ?category=영문주소 는 번호 주소로 이동)
 
 import type { Metadata } from 'next'
 import { PackageSearch } from 'lucide-react'
 
 import { categoryWithDescendants } from '@/lib/category-tree'
 import { env } from '@/lib/env'
-import { getPlatformCategories } from '@/lib/platform-categories'
+import { permanentRedirect } from 'next/navigation'
+
+import {
+  categoryKey,
+  categoryQuery,
+  categorySortSpec,
+  findCategoryByParam,
+  getPlatformCategories,
+  visibleCategories,
+} from '@/lib/platform-categories'
+import { mediaUrl } from '@/lib/media-url'
 import { SITE_DESCRIPTION, SITE_NAME } from '@/lib/site'
 import { getAnonClient } from '@/lib/supabase/anon'
 import type { PageProps } from '@/lib/types'
@@ -35,7 +45,7 @@ type Row = Pick<
   org: { slug: string; name: string } | { slug: string; name: string }[] | null
 }
 
-type SearchParams = { category?: string; q?: string; page?: string }
+type SearchParams = { cate_no?: string; category?: string; q?: string; page?: string }
 
 /** 검색어에서 검색 문법을 깨는 문자 제거 (쉼표·괄호·% 등) */
 function cleanQuery(q: string | undefined): string {
@@ -43,17 +53,32 @@ function cleanQuery(q: string | undefined): string {
 }
 
 export async function generateMetadata({ searchParams }: PageProps<Record<string, string>, SearchParams>): Promise<Metadata> {
-  const { category, q } = await searchParams
-  const categoryName = category ? (await getPlatformCategories()).find((c) => c.slug === category)?.name : undefined
+  const { cate_no, category, q } = await searchParams
+  const activeCat = findCategoryByParam(await getPlatformCategories(), { cate_no, category })
+  const categoryName = activeCat?.name
   const query = cleanQuery(q)
-  const title = categoryName ? `${categoryName} 제품` : query ? `${query} 검색 결과` : '전체 제품'
-  const description = categoryName
-    ? `${categoryName} 산업기계·중고기계를 공급사별로 비교하고 바로 전화·문자로 문의하세요. ${SITE_NAME}`
-    : SITE_DESCRIPTION
-  const canonical = `${env.APP_URL}${BASE_PATH}${categoryName && category ? `?category=${encodeURIComponent(category)}` : ''}`
+  const title = activeCat?.seo_title
+    ? activeCat.seo_title
+    : categoryName
+      ? `${categoryName} 제품`
+      : query
+        ? `${query} 검색 결과`
+        : '전체 제품'
+  const description = activeCat?.seo_description
+    ? activeCat.seo_description
+    : categoryName
+      ? `${categoryName} 산업기계·중고기계를 공급사별로 비교하고 바로 전화·문자로 문의하세요. ${SITE_NAME}`
+      : SITE_DESCRIPTION
+  const canonical = `${env.APP_URL}${BASE_PATH}${activeCat ? `?${categoryQuery(activeCat)}` : ''}`
   return {
-    title: `${title} · ${SITE_NAME}`,
+    title: activeCat?.seo_title ? { absolute: title } : `${title} · ${SITE_NAME}`,
     description,
+    keywords: activeCat?.seo_keywords
+      ? activeCat.seo_keywords
+          .split(',')
+          .map((k) => k.trim())
+          .filter(Boolean)
+      : undefined,
     alternates: { canonical },
     // 검색 결과 페이지는 검색엔진 색인 대상에서 제외 (중복·빈 페이지 방지)
     robots: query ? { index: false, follow: true } : undefined,
@@ -62,11 +87,19 @@ export async function generateMetadata({ searchParams }: PageProps<Record<string
 }
 
 export default async function PlatformProductsPage({ searchParams }: PageProps<Record<string, string>, SearchParams>) {
-  const { category: categorySlug, q, page: pageParam } = await searchParams
+  const { cate_no, category: legacySlug, q, page: pageParam } = await searchParams
   const query = cleanQuery(q)
 
-  const categories = await getPlatformCategories()
-  const activeCategory = categorySlug ? categories.find((c) => c.slug === categorySlug) : undefined
+  const allCategories = await getPlatformCategories()
+  const categories = visibleCategories(allCategories)
+  const activeCategory = findCategoryByParam(allCategories, { cate_no, category: legacySlug })
+  // 예전 영문 주소(?category=...)로 들어오면 번호 주소로 영구 이동
+  if (legacySlug && !cate_no && activeCategory?.cate_no) {
+    const qs = new URLSearchParams({ cate_no: String(activeCategory.cate_no) })
+    if (q) qs.set('q', q)
+    if (pageParam) qs.set('page', pageParam)
+    permanentRedirect(`${BASE_PATH}?${qs.toString()}`)
+  }
 
   const page = Math.max(1, Number(pageParam) || 1)
   const from = (page - 1) * PAGE_SIZE
@@ -79,14 +112,16 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
     .eq('org.is_active', true)
 
   // 1차 카테고리를 고르면 그 아래 2차 카테고리 상품까지 함께
-  if (activeCategory) request = request.in('category_id', categoryWithDescendants(categories, activeCategory.id))
+  if (activeCategory) request = request.in('category_id', categoryWithDescendants(allCategories, activeCategory.id))
   // 상품명·모델명·제조사에서 찾기
   if (query) request = request.or(`name.ilike.%${query}%,model_name.ilike.%${query}%,brand.ilike.%${query}%`)
 
-  const { data, count, error } = await request
-    .order('is_featured', { ascending: false })
-    .order('updated_at', { ascending: false })
-    .range(from, from + PAGE_SIZE - 1)
+  // 카테고리 페이지: 관리자가 정한 진열 순서 / 전체·검색: 추천 상품 → 최근 수정 순
+  const sort = activeCategory ? categorySortSpec(activeCategory.product_sort) : null
+  const ordered = sort
+    ? request.order(sort.column, { ascending: sort.ascending }).order('created_at', { ascending: false })
+    : request.order('is_featured', { ascending: false }).order('updated_at', { ascending: false })
+  const { data, count, error } = await ordered.range(from, from + PAGE_SIZE - 1)
   if (error) console.error('[platform products] read failed:', error.message)
 
   const rows = (data ?? []) as unknown as Row[]
@@ -101,7 +136,7 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
   const [banners, promotedIds] = showAds
     ? await Promise.all([
         getLiveBanners(placement, bannerCategoryIds),
-        getLivePromotedProductIds(placement, activeCategory ? categoryWithDescendants(categories, activeCategory.id) : []),
+        getLivePromotedProductIds(placement, activeCategory ? categoryWithDescendants(allCategories, activeCategory.id) : []),
       ])
     : [[], []]
   let promoted: Row[] = []
@@ -129,8 +164,19 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      {activeCategory?.top_image && !query ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={mediaUrl(activeCategory.top_image)}
+          alt={activeCategory.name}
+          className="mb-6 aspect-[5/2] w-full rounded-lg border border-border object-cover sm:aspect-[5/1]"
+        />
+      ) : null}
       <div className="mb-6 flex flex-col gap-1">
         <h1 className="text-xl font-bold sm:text-2xl">{heading}</h1>
+        {activeCategory?.description && !query ? (
+          <p className="text-sm whitespace-pre-line text-foreground/80">{activeCategory.description}</p>
+        ) : null}
         <p className="text-sm text-muted-foreground">
           모든 공급사의 산업기계·중고기계 {count ?? 0}개 — 마음에 드는 제품은 공급사에 바로 전화·문자로 문의하세요.
         </p>
@@ -141,14 +187,14 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
           orgSlug=""
           basePath={BASE_PATH}
           categories={categories}
-          activeSlug={activeCategory?.slug}
+          activeSlug={activeCategory ? categoryKey(activeCategory) : undefined}
           query={query || undefined}
         />
         <ProductSearchBox
           orgSlug=""
           basePath={BASE_PATH}
           query={query || undefined}
-          category={activeCategory?.slug}
+          category={activeCategory ? categoryKey(activeCategory) : undefined}
           placeholder="제품명·모델명·제조사 검색"
         />
       </div>
@@ -196,7 +242,7 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
             page={page}
             totalPages={totalPages}
             query={query || undefined}
-            category={activeCategory?.slug}
+            category={activeCategory ? categoryKey(activeCategory) : undefined}
           />
         </>
       )}

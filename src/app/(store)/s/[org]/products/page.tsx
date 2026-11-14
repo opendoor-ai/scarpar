@@ -5,7 +5,15 @@ import { PackageSearch } from 'lucide-react'
 import { env } from '@/lib/env'
 import { type Lang } from '@/lib/i18n'
 import { categoryWithDescendants } from '@/lib/category-tree'
-import { getPlatformCategories } from '@/lib/platform-categories'
+import {
+  categoryKey,
+  categoryQuery,
+  categorySortSpec,
+  findCategoryByParam,
+  getPlatformCategories,
+  visibleCategories,
+  type PlatformCategory,
+} from '@/lib/platform-categories'
 import { getOrgSettings, settingStr } from '@/lib/settings'
 import { getAnonClient } from '@/lib/supabase/anon'
 import type { PageProps } from '@/lib/types'
@@ -31,22 +39,20 @@ type ProductRow = Pick<
 export async function generateMetadata({
   params,
   searchParams,
-}: PageProps<{ org: string }, { category?: string; q?: string; page?: string }>): Promise<Metadata> {
+}: PageProps<{ org: string }, { cate_no?: string; category?: string; q?: string; page?: string }>): Promise<Metadata> {
   const { org: orgSlug } = await params
-  const { category: categorySlug } = await searchParams
+  const { cate_no, category: legacySlug } = await searchParams
   const org = await getStoreOrg(orgSlug)
   if (!org) return {}
 
-  let categoryName: string | null = null
-  if (categorySlug) {
-    categoryName = (await getPlatformCategories()).find((c) => c.slug === categorySlug)?.name ?? null
-  }
+  const activeCat = findCategoryByParam(await getPlatformCategories(), { cate_no, category: legacySlug })
+  const categoryName = activeCat?.name ?? null
 
   const title = categoryName ? `${categoryName} 제품` : '전체 제품'
   const description = categoryName
     ? `${org.name}의 ${categoryName} 제품 목록입니다. 사양 확인과 전화·문자 문의가 가능합니다.`
     : `${org.name}의 전체 제품 목록입니다. 산업기계·중고기계 사양 확인과 전화·문자 문의가 가능합니다.`
-  const canonical = `${env.APP_URL}/s/${org.slug}/products${categoryName && categorySlug ? `?category=${encodeURIComponent(categorySlug)}` : ''}`
+  const canonical = `${env.APP_URL}/s/${org.slug}/products${activeCat ? `?${categoryQuery(activeCat)}` : ''}`
 
   return {
     title,
@@ -59,9 +65,9 @@ export async function generateMetadata({
 export default async function ProductsPage({
   params,
   searchParams,
-}: PageProps<{ org: string }, { category?: string; q?: string; page?: string }>) {
+}: PageProps<{ org: string }, { cate_no?: string; category?: string; q?: string; page?: string }>) {
   const { org: orgSlug } = await params
-  const { category: categorySlug, q, page: pageParam } = await searchParams
+  const { cate_no, category: legacySlug, q, page: pageParam } = await searchParams
 
   const org = await getStoreOrg(orgSlug)
   if (!org) notFound()
@@ -72,8 +78,9 @@ export default async function ProductsPage({
   const supabase = getAnonClient()
 
   // 플랫폼 공통 카테고리 (모든 공급사 공통)
-  const categories: Pick<Category, 'id' | 'name' | 'slug' | 'parent_id'>[] = await getPlatformCategories()
-  const activeCategory = categorySlug ? categories.find((c) => c.slug === categorySlug) : undefined
+  const allCategories = await getPlatformCategories()
+  const categories: PlatformCategory[] = visibleCategories(allCategories)
+  const activeCategory = findCategoryByParam(allCategories, { cate_no, category: legacySlug })
 
   const page = Math.max(1, Number(pageParam) || 1)
   const from = (page - 1) * PAGE_SIZE
@@ -88,10 +95,14 @@ export default async function ProductsPage({
     .eq('status', 'active')
 
   // 1차 카테고리를 고르면 그 아래 2차 카테고리 상품까지 함께 보여줌
-  if (activeCategory) query = query.in('category_id', categoryWithDescendants(categories, activeCategory.id))
+  if (activeCategory) query = query.in('category_id', categoryWithDescendants(allCategories, activeCategory.id))
   if (q) query = query.ilike('name', `%${q}%`)
 
-  const { data, count } = await query.order('position', { ascending: true }).range(from, to)
+  const sort = activeCategory ? categorySortSpec(activeCategory.product_sort) : null
+  const { data, count } = await (sort
+    ? query.order(sort.column, { ascending: sort.ascending }).order('created_at', { ascending: false })
+    : query.order('position', { ascending: true })
+  ).range(from, to)
 
   const products = (data ?? []) as ProductRow[]
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE))
@@ -106,11 +117,11 @@ export default async function ProductsPage({
         <CategoryPills
           orgSlug={org.slug}
           categories={categories}
-          activeSlug={activeCategory?.slug}
+          activeSlug={activeCategory ? categoryKey(activeCategory) : undefined}
           query={q}
           lang={lang}
         />
-        <ProductSearchBox orgSlug={org.slug} query={q} category={activeCategory?.slug} lang={lang} />
+        <ProductSearchBox orgSlug={org.slug} query={q} category={activeCategory ? categoryKey(activeCategory) : undefined} lang={lang} />
       </div>
 
       {products.length === 0 ? (
@@ -129,7 +140,7 @@ export default async function ProductsPage({
               return <ProductCard key={p.id} orgSlug={org.slug} product={card} lang={lang} />
             })}
           </div>
-          <Pagination orgSlug={org.slug} page={page} totalPages={totalPages} query={q} category={activeCategory?.slug} />
+          <Pagination orgSlug={org.slug} page={page} totalPages={totalPages} query={q} category={activeCategory ? categoryKey(activeCategory) : undefined} />
         </>
       )}
     </div>

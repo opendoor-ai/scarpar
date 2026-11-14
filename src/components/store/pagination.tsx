@@ -25,7 +25,7 @@ export function Pagination({
 
   function href(p: number): string {
     const params = new URLSearchParams()
-    if (category) params.set('category', category)
+    if (category) params.set('cate_no', category)
     if (query) params.set('q', query)
     if (p > 1) params.set('page', String(p))
     const qs = params.toString()

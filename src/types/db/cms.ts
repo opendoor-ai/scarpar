@@ -85,7 +85,7 @@ export interface RichTextBlock extends BlockBase {
   html: string
 }
 
-export type ProductGridMode = 'featured' | 'category' | 'manual'
+export type ProductGridMode = 'featured' | 'latest' | 'category' | 'manual'
 
 export interface ProductGridBlock extends BlockBase {
   _type: 'productGrid'
@@ -155,8 +155,32 @@ export interface HtmlBlock extends BlockBase {
   raw: string
 }
 
+/** 회사 소개 (기계 공급사용) — 소개글 + 숫자로 보는 회사 + 연락처 */
+export interface CompanyIntroStat {
+  label: string
+  value: string
+}
+export interface CompanyIntroBlock extends BlockBase {
+  _type: 'companyIntro'
+  heading: string
+  body: string
+  image?: string
+  stats?: CompanyIntroStat[]
+  showContact: boolean
+}
+
+/** 전화·문자 문의 띠 (기계 공급사용) — 미니샵 대표 번호로 바로 연결 */
+export interface InquiryCtaBlock extends BlockBase {
+  _type: 'inquiryCta'
+  heading: string
+  body?: string
+  showSms: boolean
+}
+
 export type CmsBlock =
   | HeroBlock
+  | CompanyIntroBlock
+  | InquiryCtaBlock
   | RichTextBlock
   | ProductGridBlock
   | BannerBlock

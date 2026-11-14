@@ -1,55 +1,63 @@
+// 상품분류 관리 — 모든 공급사가 함께 쓰는 플랫폼 공통 분류 (1차 → 2차)
+// 전자동(플랫폼 관리자)은 추가·수정·삭제·이동, 공급사는 보기만 합니다.
+
 import { PageHeader } from '@/components/ui/page-header'
-import { EmptyState } from '@/components/ui/empty-state'
 import { requireOrg } from '@/lib/auth'
 import { requireModule } from '@/lib/modules'
-import { getServerClient } from '@/lib/supabase/server'
-import { AlertTriangle } from 'lucide-react'
-
-import { CategoryManager, type CategoryRow } from '@/modules/catalog/components/category-manager'
+import { isPlatformAdmin } from '@/lib/platform-admin'
+import { getPlatformOrgId, normalizeCategory, type PlatformCategory } from '@/lib/platform-categories'
+import { getAdminClient } from '@/lib/supabase/admin'
+import { CategoryTreeManager, type CategoryItem } from '@/modules/catalog/components/category-tree-manager'
 
 export const dynamic = 'force-dynamic'
-
-interface RawCategoryRow {
-  id: string
-  name: string
-  slug: string
-  parent_id: string | null
-  sort_order: number
-  products: { count: number }[]
-}
 
 export default async function CategoriesPage() {
   const ctx = await requireOrg()
   requireModule(ctx.org, 'catalog')
 
-  const supabase = await getServerClient()
-  const { data, error } = await supabase
-    .from('categories')
-    .select('id, name, slug, parent_id, sort_order, products(count)')
-    .eq('org_id', ctx.org.id)
-    .order('sort_order', { ascending: true })
+  const [canEdit, platformOrgId] = await Promise.all([isPlatformAdmin(), getPlatformOrgId()])
+  const admin = getAdminClient()
 
-  const raw = (data ?? []) as unknown as RawCategoryRow[]
-  const byId = new Map(raw.map((r) => [r.id, r]))
+  let items: CategoryItem[] = []
+  let needsSql = false
+  if (platformOrgId) {
+    const { data } = await admin
+      .from('categories')
+      .select('*')
+      .eq('org_id', platformOrgId)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true })
+    const rows = ((data ?? []) as Parameters<typeof normalizeCategory>[0][]).map(normalizeCategory)
+    needsSql = (data ?? []).length > 0 && !('is_visible' in ((data ?? [])[0] as object))
 
-  const categories: CategoryRow[] = raw.map((r) => ({
-    id: r.id,
-    name: r.name,
-    slug: r.slug,
-    parentId: r.parent_id,
-    parentName: r.parent_id ? (byId.get(r.parent_id)?.name ?? null) : null,
-    sortOrder: r.sort_order,
-    productCount: r.products?.[0]?.count ?? 0,
-  }))
+    // 분류별 상품 수 (모든 공급사, 보관함 제외) — 공급사는 자기 상품 수만
+    let countQuery = admin.from('products').select('category_id').not('category_id', 'is', null).neq('status', 'archived')
+    if (!canEdit) countQuery = countQuery.eq('org_id', ctx.org.id)
+    const { data: productRows } = await countQuery.limit(50000)
+    const counts = new Map<string, number>()
+    for (const p of (productRows ?? []) as { category_id: string }[]) {
+      counts.set(p.category_id, (counts.get(p.category_id) ?? 0) + 1)
+    }
+    items = rows.map((c: PlatformCategory) => ({ ...c, productCount: counts.get(c.id) ?? 0 }))
+  }
 
   return (
     <div>
-      <PageHeader title="카테고리" description="고객이 종류별로 찾아볼 수 있게 상품을 분류합니다." />
-      {error ? (
-        <EmptyState icon={AlertTriangle} title="카테고리를 불러오지 못했습니다" description={error.message} />
-      ) : (
-        <CategoryManager categories={categories} />
-      )}
+      <PageHeader
+        title="상품분류 관리"
+        description={
+          canEdit
+            ? '모든 공급사가 함께 쓰는 공통 분류입니다. 분류를 추가·수정·삭제하고, 끌어서 순서를 바꿀 수 있어요.'
+            : '전자동이 관리하는 공통 분류입니다. 숫자는 우리 공급사 상품 수예요.'
+        }
+      />
+      {needsSql && canEdit ? (
+        <p className="mb-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          표시 상태·SEO 같은 상세 설정을 저장하려면 Supabase SQL 편집기에서 <code>0015_category_settings.sql</code>을
+          먼저 실행해 주세요.
+        </p>
+      ) : null}
+      <CategoryTreeManager initial={items} canEdit={canEdit} />
     </div>
   )
 }

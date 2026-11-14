@@ -4,7 +4,7 @@ import * as React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { ChevronLeft, ExternalLink } from 'lucide-react'
+import { ChevronLeft, ExternalLink, LayoutTemplate } from 'lucide-react'
 
 import type { CmsBlock, CmsPage } from '@/types/db'
 import { discardDraftAction, publishAction, saveDraftAction, updatePageTitleAction } from '@/modules/cms/actions'
@@ -12,23 +12,42 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { BlockEditor } from './block-editor'
 import { RevisionHistory, type RevisionRow } from './revision-history'
 import type { CategoryOption } from './block-meta'
+import { PAGE_TEMPLATES, type PageTemplate } from './templates'
 
 interface PageEditorProps {
   page: CmsPage
   orgSlug: string
+  orgName: string
   categories: CategoryOption[]
   revisions: RevisionRow[]
 }
 
-function PageEditor({ page, orgSlug, categories, revisions }: PageEditorProps) {
+function PageEditor({ page, orgSlug, orgName, categories, revisions }: PageEditorProps) {
   const router = useRouter()
   const [title, setTitle] = React.useState(page.title)
   const [blocks, setBlocks] = React.useState<CmsBlock[]>(page.draft_blocks ?? page.blocks)
   const [dirty, setDirty] = React.useState(false)
   const [saving, setSaving] = React.useState(false)
+  const [pendingTemplate, setPendingTemplate] = React.useState<PageTemplate | null>(null)
+  const [editorVersion, setEditorVersion] = React.useState(0)
+
+  function applyTemplate(template: PageTemplate) {
+    setBlocks(template.build(orgName))
+    setDirty(true)
+    setEditorVersion((v) => v + 1)
+    toast.success(`'${template.name}' 템플릿을 채웠어요. 글·사진을 바꾼 뒤 임시저장 → 게시하기를 눌러 주세요.`)
+  }
 
   const hasDraft = page.draft_blocks !== null || dirty
   // Best-effort storefront URL — this slice doesn't own the (store) route implementation, so the
@@ -150,7 +169,41 @@ function PageEditor({ page, orgSlug, categories, revisions }: PageEditorProps) {
         </div>
       </div>
 
-      <BlockEditor blocks={blocks} onChange={handleBlocksChange} categories={categories} />
+      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-border px-4 py-3">
+        <span className="text-sm text-muted-foreground">처음이라면 템플릿으로 시작해 보세요.</span>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="button" variant="outline" size="sm">
+              <LayoutTemplate className="size-4" />
+              템플릿 적용
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-80">
+            <DropdownMenuLabel>기계 공급사용 템플릿</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {PAGE_TEMPLATES.map((t) => (
+              <DropdownMenuItem key={t.id} onSelect={() => setPendingTemplate(t)} className="flex-col items-start gap-0.5">
+                <span className="font-medium">{t.name}</span>
+                <span className="text-xs text-muted-foreground">{t.description}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <ConfirmDialog
+        open={pendingTemplate !== null}
+        onOpenChange={(open) => !open && setPendingTemplate(null)}
+        title={`'${pendingTemplate?.name ?? ''}' 템플릿으로 바꿀까요?`}
+        description="지금 편집 중인 블록이 템플릿 구성으로 바뀝니다. 아직 게시한 페이지에는 영향이 없고, 마음에 들지 않으면 '임시저장본 버리기'로 되돌릴 수 있어요."
+        confirmLabel="바꾸기"
+        onConfirm={() => {
+          if (pendingTemplate) applyTemplate(pendingTemplate)
+          setPendingTemplate(null)
+        }}
+      />
+
+      <BlockEditor key={editorVersion} blocks={blocks} onChange={handleBlocksChange} categories={categories} />
 
       <RevisionHistory pageId={page.id} revisions={revisions} />
     </div>

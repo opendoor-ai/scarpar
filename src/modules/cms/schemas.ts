@@ -47,7 +47,7 @@ const productGridBlockSchema = z.object({
   ...blockBase,
   _type: z.literal('productGrid'),
   title: z.string().optional(),
-  mode: z.enum(['featured', 'category', 'manual']),
+  mode: z.enum(['featured', 'latest', 'category', 'manual']),
   categoryId: z.string().nullable().optional(),
   productIds: z.array(z.string()).optional(),
   limit: z.number().int().positive().optional(),
@@ -101,6 +101,24 @@ const coursesGridBlockSchema = z.object({
   limit: z.number().int().positive().optional(),
 })
 
+const companyIntroBlockSchema = z.object({
+  ...blockBase,
+  _type: z.literal('companyIntro'),
+  heading: z.string().max(200),
+  body: z.string().max(5000),
+  image: z.string().optional(),
+  stats: z.array(z.object({ label: z.string().max(40), value: z.string().max(40) })).max(6).optional(),
+  showContact: z.boolean(),
+})
+
+const inquiryCtaBlockSchema = z.object({
+  ...blockBase,
+  _type: z.literal('inquiryCta'),
+  heading: z.string().max(200),
+  body: z.string().max(1000).optional(),
+  showSms: z.boolean(),
+})
+
 const htmlBlockSchema = z.object({
   ...blockBase,
   _type: z.literal('html'),
@@ -119,6 +137,8 @@ export const cmsBlockSchema = z.discriminatedUnion('_type', [
   listingsGridBlockSchema,
   coursesGridBlockSchema,
   htmlBlockSchema,
+  companyIntroBlockSchema,
+  inquiryCtaBlockSchema,
 ])
 
 export const saveDraftSchema = z.object({

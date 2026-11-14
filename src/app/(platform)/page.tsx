@@ -28,7 +28,7 @@ import { ProductCard } from '@/components/store/product-card'
 import { ProductSearchBox } from '@/components/store/products-filters'
 import { env } from '@/lib/env'
 import { formatKrPhone, phoneDigits } from '@/lib/phone'
-import { getPlatformCategories } from '@/lib/platform-categories'
+import { categoryQuery, getPlatformCategories, visibleCategories } from '@/lib/platform-categories'
 import {
   PLATFORM_PRODUCT_COLUMNS,
   toPlatformCards,
@@ -130,9 +130,10 @@ export default async function HomePage() {
     (latestRes.data ?? []) as unknown as PlatformProductRow[],
   )
 
-  const roots = categories.filter((c) => !c.parent_id)
+  const shown = visibleCategories(categories)
+  const roots = shown.filter((c) => !c.parent_id && c.show_on_main)
   const subsByParent = new Map<string, typeof categories>()
-  for (const c of categories) {
+  for (const c of shown) {
     if (!c.parent_id) continue
     subsByParent.set(c.parent_id, [...(subsByParent.get(c.parent_id) ?? []), c])
   }
@@ -170,7 +171,7 @@ export default async function HomePage() {
                 return (
                   <Link
                     key={c.id}
-                    href={`/products?category=${encodeURIComponent(c.slug)}`}
+                    href={`/products?${categoryQuery(c)}`}
                     className="group flex flex-col gap-2 rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/50 hover:bg-primary/5"
                   >
                     <Icon className="size-7 text-primary" />

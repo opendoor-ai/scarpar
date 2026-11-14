@@ -7,8 +7,10 @@ export interface CategoryOption {
 
 export const BLOCK_TYPES: CmsBlock['_type'][] = [
   'hero',
-  'richText',
   'productGrid',
+  'companyIntro',
+  'inquiryCta',
+  'richText',
   'banner',
   'imageWithText',
   'faq',
@@ -21,6 +23,8 @@ export const BLOCK_TYPES: CmsBlock['_type'][] = [
 
 export const BLOCK_LABELS: Record<CmsBlock['_type'], string> = {
   hero: '메인 배너(히어로)',
+  companyIntro: '회사 소개',
+  inquiryCta: '전화·문자 문의',
   richText: '글(텍스트)',
   productGrid: '상품 목록',
   banner: '배너',
@@ -45,7 +49,14 @@ export function blockSummary(block: CmsBlock): string {
     case 'richText':
       return block.html ? stripHtml(block.html).slice(0, 60) : '비어 있음'
     case 'productGrid': {
-      const modeLabel = block.mode === 'featured' ? '추천 상품' : block.mode === 'category' ? '카테고리' : '직접 선택'
+      const modeLabel =
+        block.mode === 'featured'
+          ? '추천 상품'
+          : block.mode === 'latest'
+            ? '최신 등록'
+            : block.mode === 'category'
+              ? '카테고리'
+              : '직접 선택'
       return `${modeLabel}${block.limit ? ` · 최대 ${block.limit}개` : ''}`
     }
     case 'banner':
@@ -64,6 +75,10 @@ export function blockSummary(block: CmsBlock): string {
       return block.limit ? `최대 ${block.limit}개` : '활성 강의 전체'
     case 'html':
       return block.raw ? block.raw.slice(0, 60) : '비어 있음'
+    case 'companyIntro':
+      return block.heading || '회사 소개'
+    case 'inquiryCta':
+      return block.heading || '전화·문자 문의'
     default:
       return ''
   }
@@ -93,5 +108,15 @@ export function createBlock(type: CmsBlock['_type'], key: string): CmsBlock {
       return { _key: key, _type: 'coursesGrid', limit: 6 }
     case 'html':
       return { _key: key, _type: 'html', raw: '' }
+    case 'companyIntro':
+      return { _key: key, _type: 'companyIntro', heading: '회사 소개', body: '', stats: [], showContact: true }
+    case 'inquiryCta':
+      return {
+        _key: key,
+        _type: 'inquiryCta',
+        heading: '필요한 기계, 전화 한 통으로 상담하세요',
+        body: '제품 사양·가격·납기 모두 친절하게 안내해 드립니다.',
+        showSms: true,
+      }
   }
 }

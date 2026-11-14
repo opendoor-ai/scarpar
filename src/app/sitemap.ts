@@ -4,7 +4,7 @@
 import type { MetadataRoute } from 'next'
 
 import { env } from '@/lib/env'
-import { getPlatformCategories } from '@/lib/platform-categories'
+import { categoryQuery, getPlatformCategories, visibleCategories } from '@/lib/platform-categories'
 import { getAnonClient } from '@/lib/supabase/anon'
 
 // 1시간마다 새로 만듦 (상품이 늘어도 자동 반영)
@@ -44,9 +44,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // 통합 제품 검색 + 플랫폼 공통 카테고리 페이지
     entries.push({ url: `${base}/`, changeFrequency: 'daily', priority: 1 })
     entries.push({ url: `${base}/products`, changeFrequency: 'daily', priority: 0.9 })
-    for (const c of await getPlatformCategories()) {
+    for (const c of visibleCategories(await getPlatformCategories())) {
       entries.push({
-        url: `${base}/products?category=${encodeURIComponent(c.slug)}`,
+        url: `${base}/products?${categoryQuery(c)}`,
         changeFrequency: 'daily',
         priority: c.parent_id ? 0.6 : 0.7,
       })

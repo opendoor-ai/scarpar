@@ -76,6 +76,7 @@ function ProductGridForm({ block, categories, onChange }: ProductGridFormProps) 
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="featured">추천 상품</SelectItem>
+            <SelectItem value="latest">최신 등록 상품</SelectItem>
             <SelectItem value="category">특정 카테고리</SelectItem>
             <SelectItem value="manual">직접 고른 상품</SelectItem>
           </SelectContent>
