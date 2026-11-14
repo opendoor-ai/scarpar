@@ -21,7 +21,7 @@ export function BannerCarousel({
   track = true,
   label = true,
 }: {
-  banners: LiveBanner[]
+  banners: Pick<LiveBanner, 'id' | 'title' | 'link_url' | 'image_pc' | 'image_mobile'>[]
   className?: string
   track?: boolean
   label?: boolean

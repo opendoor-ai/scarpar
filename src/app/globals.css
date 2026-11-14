@@ -310,3 +310,9 @@
 @media (max-width: 767px) {
   body:has([data-mobile-inquiry-bar]) { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
 }
+
+/* [메인] 오토 스크롤 배너 — 로고 띠가 천천히 흘러감 (마우스를 올리면 멈춤) */
+@keyframes jadong-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.jadong-marquee { animation: jadong-marquee 40s linear infinite; }
+.jadong-marquee:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .jadong-marquee { animation: none; } }

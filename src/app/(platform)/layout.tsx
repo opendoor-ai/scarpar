@@ -5,10 +5,13 @@ import Link from 'next/link'
 import { ChevronDown, Menu, Search, UserRound } from 'lucide-react'
 
 import { AdLink } from '@/components/platform/ad-link'
+import { BannerHtml } from '@/components/platform/banner-html'
+import { TopBar } from '@/components/platform/top-bar'
+import { inlineHtml } from '@/lib/inline-html'
 import { categoryQuery, getPlatformCategories, visibleCategories } from '@/lib/platform-categories'
 import { SITE_NAME } from '@/lib/site'
 import { getSiteSettings } from '@/lib/site-settings'
-import { getLiveBanners, type LiveBanner } from '@/modules/ads/live'
+import { getLiveBanners, renderGroupHtml, type LiveBanner } from '@/modules/ads/live'
 
 const NAV = [
   { label: '등록제품 허브', href: '/products' },
@@ -30,7 +33,13 @@ function WingBanners({ side, banners }: { side: 'left' | 'right'; banners: LiveB
       aria-label={side === 'left' ? '왼쪽 광고' : '오른쪽 광고'}
     >
       {banners.slice(0, 4).map((b) => (
-        <AdLink key={b.id} bannerId={b.id} href={b.link_url} title={b.title} className="block overflow-hidden rounded-md border border-border">
+        <AdLink
+          key={b.id}
+          bannerId={b.id}
+          href={b.link_url}
+          title={b.title}
+          className="block overflow-hidden rounded-md border border-border"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={b.image_pc} alt={b.title} className="w-full" loading="lazy" />
         </AdLink>
@@ -40,12 +49,21 @@ function WingBanners({ side, banners }: { side: 'left' | 'right'; banners: LiveB
 }
 
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
-  const [settings, categories, wingLeft, wingRight] = await Promise.all([
+  const [settings, categories, wingLeft, wingRight, topBars, logos, menuBanners, quickMenus] = await Promise.all([
     getSiteSettings(),
     getPlatformCategories(),
     getLiveBanners('wing_left'),
     getLiveBanners('wing_right'),
+    getLiveBanners('top_bar'),
+    getLiveBanners('logo'),
+    getLiveBanners('menu_banner'),
+    getLiveBanners('quick_menu'),
   ])
+  const [topBarHtml, quickHtml] = await Promise.all([
+    renderGroupHtml('top_bar', topBars),
+    renderGroupHtml('quick_menu', quickMenus),
+  ])
+  const logo = logos.find((b) => b.image_pc)
   const shown = visibleCategories(categories)
   const roots = shown.filter((c) => !c.parent_id)
   const childrenOf = (id: string) => shown.filter((c) => c.parent_id === id)
@@ -64,8 +82,22 @@ export default async function PlatformLayout({ children }: { children: React.Rea
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      {/* 맨 위 알림 띠 */}
-      {settings.notice_enabled && settings.notice_text ? (
+      {/* 맨 위 띠: 배너 관리 [상단] 탑배너가 있으면 그걸, 없으면 사이트 설정 알림 */}
+      {topBarHtml ? (
+        <BannerHtml html={topBarHtml} />
+      ) : topBars.length > 0 ? (
+        <TopBar
+          items={topBars.map((b) => ({
+            id: b.id,
+            html: inlineHtml(b.texts[0]?.text || b.title),
+            color: b.colors[0] || '',
+            bg: b.colors[1] || '',
+            icon: b.image_pc,
+            link: b.link_url && b.link_url !== '#none' ? b.link_url : '',
+            target: b.link_target,
+          }))}
+        />
+      ) : settings.notice_enabled && settings.notice_text ? (
         <div className="bg-primary text-primary-foreground">
           <div className="mx-auto flex h-9 max-w-6xl items-center justify-center gap-2 px-4 text-xs sm:text-sm">
             <span className="truncate">{settings.notice_text}</span>
@@ -82,7 +114,16 @@ export default async function PlatformLayout({ children }: { children: React.Rea
         {/* 로고 · 검색 · 로그인 */}
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
           <Link href="/" className="shrink-0 text-lg font-extrabold tracking-tight text-primary sm:text-xl">
-            {SITE_NAME}
+            {logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logo.image_pc}
+                alt={logo.title || SITE_NAME}
+                className="h-9 w-auto max-w-[180px] object-contain sm:h-10"
+              />
+            ) : (
+              SITE_NAME
+            )}
           </Link>
           <form action="/products" method="GET" className="relative ml-auto hidden w-full max-w-md md:block">
             <input
@@ -96,11 +137,18 @@ export default async function PlatformLayout({ children }: { children: React.Rea
             </button>
           </form>
           <div className="ml-auto flex items-center gap-1 md:ml-4">
-            <Link href="/products" className="flex flex-col items-center px-2 text-[11px] text-muted-foreground hover:text-foreground md:hidden" aria-label="검색">
+            <Link
+              href="/products"
+              className="flex flex-col items-center px-2 text-[11px] text-muted-foreground hover:text-foreground md:hidden"
+              aria-label="검색"
+            >
               <Search className="size-5" />
               검색
             </Link>
-            <Link href="/login" className="flex flex-col items-center px-2 text-[11px] text-muted-foreground hover:text-foreground">
+            <Link
+              href="/login"
+              className="flex flex-col items-center px-2 text-[11px] text-muted-foreground hover:text-foreground"
+            >
               <UserRound className="size-5" />
               공급사 로그인
             </Link>
@@ -117,30 +165,59 @@ export default async function PlatformLayout({ children }: { children: React.Rea
                 <ChevronDown className="size-3.5" />
               </Link>
               {/* 펼침 메뉴 (PC) */}
-              <div className="invisible absolute top-full left-0 z-40 hidden w-[min(90vw,960px)] grid-cols-4 gap-x-6 gap-y-4 rounded-b-lg border border-border bg-background p-5 opacity-0 shadow-lg transition-opacity group-hover:visible group-hover:opacity-100 md:grid">
-                {roots.map((r) => (
-                  <div key={r.id} className="flex flex-col gap-1">
-                    <Link href={`/products?${categoryQuery(r)}`} className="text-sm font-semibold hover:text-primary">
-                      {r.name}
-                    </Link>
-                    {childrenOf(r.id)
-                      .slice(0, 6)
-                      .map((c) => (
-                        <Link
-                          key={c.id}
-                          href={`/products?${categoryQuery(c)}`}
-                          className="truncate text-xs font-normal text-muted-foreground hover:text-foreground"
-                        >
-                          {c.name}
-                        </Link>
-                      ))}
-                    {childrenOf(r.id).length > 6 ? (
-                      <Link href={`/products?${categoryQuery(r)}`} className="text-xs font-normal text-primary">
-                        더보기 +{childrenOf(r.id).length - 6}
+              <div className="invisible absolute top-full left-0 z-40 hidden w-[min(92vw,1100px)] gap-6 rounded-b-lg border border-border bg-background p-5 opacity-0 shadow-lg transition-opacity group-hover:visible group-hover:opacity-100 md:flex">
+                <div className="grid flex-1 grid-cols-3 gap-x-6 gap-y-4 lg:grid-cols-4">
+                  {roots.map((r) => (
+                    <div key={r.id} className="flex flex-col gap-1">
+                      <Link href={`/products?${categoryQuery(r)}`} className="text-sm font-semibold hover:text-primary">
+                        {r.name}
                       </Link>
-                    ) : null}
+                      {childrenOf(r.id)
+                        .slice(0, 6)
+                        .map((c) => (
+                          <Link
+                            key={c.id}
+                            href={`/products?${categoryQuery(c)}`}
+                            className="truncate text-xs font-normal text-muted-foreground hover:text-foreground"
+                          >
+                            {c.name}
+                          </Link>
+                        ))}
+                      {childrenOf(r.id).length > 6 ? (
+                        <Link href={`/products?${categoryQuery(r)}`} className="text-xs font-normal text-primary">
+                          더보기 +{childrenOf(r.id).length - 6}
+                        </Link>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+                {/* [전체메뉴] 배너 */}
+                {menuBanners.length > 0 ? (
+                  <div className="hidden w-[250px] shrink-0 flex-col gap-3 lg:flex">
+                    {menuBanners.slice(0, 2).map((b) => (
+                      <AdLink
+                        key={b.id}
+                        bannerId={b.id}
+                        href={b.link_url}
+                        title={b.title}
+                        className="group/mb block overflow-hidden rounded-lg border border-border"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={b.image_pc}
+                          alt={b.title}
+                          className="aspect-[25/23] w-full object-cover"
+                          loading="lazy"
+                        />
+                        {b.subtitle ? (
+                          <span className="block truncate px-3 py-2 text-xs font-medium group-hover/mb:text-primary">
+                            {b.subtitle}
+                          </span>
+                        ) : null}
+                      </AdLink>
+                    ))}
                   </div>
-                ))}
+                ) : null}
               </div>
             </div>
             <span className="mx-1 h-4 w-px shrink-0 bg-border" />
@@ -157,6 +234,33 @@ export default async function PlatformLayout({ children }: { children: React.Rea
       <WingBanners side="right" banners={wingRight} />
 
       <main className="flex-1">{children}</main>
+
+      {/* [공통] 퀵메뉴 — 오른쪽 아래 바로가기 */}
+      {quickHtml ? (
+        <BannerHtml html={quickHtml} />
+      ) : quickMenus.length > 0 ? (
+        <nav className="fixed right-3 bottom-20 z-30 flex flex-col gap-2 md:right-5 md:bottom-8" aria-label="바로가기">
+          {quickMenus.slice(0, 6).map((b) => (
+            <AdLink
+              key={b.id}
+              bannerId={b.id}
+              href={b.link_url}
+              title={b.subtitle || b.title}
+              className="group/q relative flex size-12 items-center justify-center rounded-full border border-border bg-background shadow-md transition-transform hover:scale-105"
+            >
+              {b.image_pc ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={b.image_pc} alt={b.subtitle || b.title} className="size-full rounded-full object-cover" />
+              ) : (
+                <span className="text-[10px] font-bold">{(b.subtitle || b.title).slice(0, 2)}</span>
+              )}
+              <span className="pointer-events-none absolute right-14 hidden rounded bg-foreground px-2 py-1 text-xs whitespace-nowrap text-background group-hover/q:block">
+                {b.subtitle || b.title}
+              </span>
+            </AdLink>
+          ))}
+        </nav>
+      ) : null}
 
       <footer className="mt-10 border-t border-border bg-muted/40">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 text-xs text-muted-foreground sm:px-6 md:flex-row md:justify-between">
@@ -183,8 +287,8 @@ export default async function PlatformLayout({ children }: { children: React.Rea
               </p>
             ) : null}
             <p className="leading-relaxed">
-              {SITE_NAME}는 통신판매중개자이며, 개별 거래의 당사자가 아닙니다. 상품 정보, 거래 조건 및 거래에 대한 책임은
-              해당 공급사에 있습니다.
+              {SITE_NAME}는 통신판매중개자이며, 개별 거래의 당사자가 아닙니다. 상품 정보, 거래 조건 및 거래에 대한
+              책임은 해당 공급사에 있습니다.
             </p>
           </div>
           <div className="flex flex-col gap-1 md:text-right">

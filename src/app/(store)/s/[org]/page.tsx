@@ -46,7 +46,7 @@ export default async function StoreHomePage({ params }: PageProps<{ org: string 
       .limit(10),
   ])
   if (bannerError) console.error('[store home] banners read failed:', bannerError.message)
-  const banners: LiveBanner[] = (
+  const banners: Pick<LiveBanner, 'id' | 'title' | 'link_url' | 'image_pc' | 'image_mobile'>[] = (
     (bannerRows ?? []) as {
       id: string
       title: string

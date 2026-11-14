@@ -22,6 +22,8 @@ import {
 } from 'lucide-react'
 
 import { AdLink } from '@/components/platform/ad-link'
+import { BannerHtml } from '@/components/platform/banner-html'
+import { MainPopup } from '@/components/platform/main-popup'
 import { HScroller } from '@/components/platform/h-scroller'
 import { PopularTabs } from '@/components/platform/popular-tabs'
 import { ShortsRow } from '@/components/platform/shorts-row'
@@ -31,15 +33,17 @@ import { env } from '@/lib/env'
 import { mediaUrl } from '@/lib/media-url'
 import { categoryQuery, getPlatformCategories, visibleCategories } from '@/lib/platform-categories'
 import { inquiryTop, realtimeTop, todayTopViewed } from '@/lib/platform-popular'
-import {
-  fetchLatestPlatformCards,
-  fetchPlatformCardsByIds,
-  type PlatformProductCard,
-} from '@/lib/platform-products'
+import { fetchLatestPlatformCards, fetchPlatformCardsByIds, type PlatformProductCard } from '@/lib/platform-products'
 import { SITE_DESCRIPTION, SITE_NAME } from '@/lib/site'
 import { getSiteSettings } from '@/lib/site-settings'
 import { getAnonClient } from '@/lib/supabase/anon'
-import { getLiveBanners, getLivePromotedProductIds, type LiveBanner } from '@/modules/ads/live'
+import {
+  getCustomGroupHtml,
+  getLiveBanners,
+  getLivePromotedProductIds,
+  renderGroupHtml,
+  type LiveBanner,
+} from '@/modules/ads/live'
 import { youtubeId, youtubeThumb } from '@/modules/contents/schemas'
 
 export const dynamic = 'force-dynamic'
@@ -99,7 +103,10 @@ function Hub({
           {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
         </div>
         {href ? (
-          <Link href={href} className="inline-flex shrink-0 items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            href={href}
+            className="inline-flex shrink-0 items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+          >
             {linkLabel ?? '더보기'}
             <ArrowRight className="size-4" />
           </Link>
@@ -144,6 +151,9 @@ export default async function HomePage() {
     partner,
     plus,
     imageAds,
+    popups,
+    autoScroll,
+    customGroups,
     promotedIds,
     latest,
     allLatest,
@@ -161,6 +171,9 @@ export default async function HomePage() {
     getLiveBanners('partner'),
     getLiveBanners('plus'),
     getLiveBanners('image'),
+    getLiveBanners('popup'),
+    getLiveBanners('auto_scroll'),
+    getCustomGroupHtml(),
     getLivePromotedProductIds('main'),
     fetchLatestPlatformCards(16),
     fetchLatestPlatformCards(20),
@@ -207,12 +220,25 @@ export default async function HomePage() {
   ])
   const blogProductById = new Map(blogProducts.map((p) => [p.card.id, p]))
 
-  // 파트너 허브: 광고주 공급사의 최신 제품 3개
+  // 배너 코드(템플릿)가 있는 그룹은 그 코드로 그림
+  const [tMain, tSmart, tWide, tPartner, tPlus, tImage, tAuto] = await Promise.all([
+    renderGroupHtml('main', mainBanners),
+    renderGroupHtml('smart', smart),
+    renderGroupHtml('wide', wide),
+    renderGroupHtml('partner', partner),
+    renderGroupHtml('plus', plus),
+    renderGroupHtml('image', imageAds),
+    renderGroupHtml('auto_scroll', autoScroll),
+  ])
+
+  // 파트너 허브: 배너에 연결한 상품(없으면 광고주 공급사의 최신 제품) 3개
   const partnerProducts = new Map<string, PlatformProductCard[]>()
   await Promise.all(
-    partner
-      .filter((b) => b.advertiser_org_id)
-      .map(async (b) => partnerProducts.set(b.id, await fetchLatestPlatformCards(3, b.advertiser_org_id as string))),
+    partner.map(async (b) => {
+      if (b.product_ids.length > 0) partnerProducts.set(b.id, await fetchPlatformCardsByIds(b.product_ids.slice(0, 3)))
+      else if (b.advertiser_org_id)
+        partnerProducts.set(b.id, await fetchLatestPlatformCards(3, b.advertiser_org_id as string))
+    }),
   )
 
   const shown = visibleCategories(categories)
@@ -220,8 +246,25 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 py-6 sm:px-6">
+      {/* 메인 팝업 */}
+      {popups.some((p) => p.image_pc) ? (
+        <MainPopup
+          items={popups
+            .filter((p) => p.image_pc)
+            .map((p) => ({
+              id: p.id,
+              title: p.title,
+              image: p.image_pc,
+              link: p.link_url && p.link_url !== '#none' ? p.link_url : '',
+              target: p.link_target,
+            }))}
+        />
+      ) : null}
+
       {/* 1. 메인 배너 — 3장씩 */}
-      {mainBanners.length > 0 ? (
+      {tMain ? (
+        <BannerHtml html={tMain} />
+      ) : mainBanners.length > 0 ? (
         <HScroller autoPlayMs={5000} label="메인 배너">
           {mainBanners.map((b) => (
             <AdLink
@@ -231,8 +274,13 @@ export default async function HomePage() {
               title={b.title}
               className="group relative block w-[85%] shrink-0 snap-start overflow-hidden rounded-2xl bg-muted sm:w-[calc((100%-0.75rem)/2)] lg:w-[calc((100%-1.5rem)/3)]"
             >
-              <AdImage b={b} className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              <span className="absolute top-3 left-3 rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white">광고</span>
+              <AdImage
+                b={b}
+                className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <span className="absolute top-3 left-3 rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white">
+                광고
+              </span>
               {b.subtitle || b.phone ? (
                 <span className="absolute inset-x-0 bottom-0 flex flex-col gap-0.5 bg-gradient-to-t from-black/75 to-transparent p-4 pt-10 text-white">
                   {b.subtitle ? <span className="text-base font-bold drop-shadow">{b.subtitle}</span> : null}
@@ -280,8 +328,33 @@ export default async function HomePage() {
         </section>
       ) : null}
 
+      {/* 오토 스크롤 배너 (로고 띠) */}
+      {tAuto ? (
+        <BannerHtml html={tAuto} />
+      ) : autoScroll.some((b) => b.image_pc) ? (
+        <section aria-label="파트너 로고" className="-mx-4 overflow-hidden border-y border-border py-4 sm:mx-0">
+          <div className="jadong-marquee flex w-max items-center gap-10">
+            {[...autoScroll, ...autoScroll]
+              .filter((b) => b.image_pc)
+              .map((b, i) => (
+                <AdLink key={`${b.id}-${i}`} bannerId={b.id} href={b.link_url} title={b.title} className="shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={b.image_pc}
+                    alt={b.title}
+                    className="h-10 w-auto object-contain grayscale transition hover:grayscale-0"
+                    loading="lazy"
+                  />
+                </AdLink>
+              ))}
+          </div>
+        </section>
+      ) : null}
+
       {/* 3. 스마트 허브 — 4칸 카드 */}
-      {smart.length > 0 ? (
+      {tSmart ? (
+        <BannerHtml html={tSmart} />
+      ) : smart.length > 0 ? (
         <Hub title="스마트 허브" description="지금 주목받는 공급사와 제품을 한눈에 만나보세요.">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {smart.slice(0, 8).map((b) => (
@@ -292,10 +365,17 @@ export default async function HomePage() {
                 title={b.title}
                 className="group relative block overflow-hidden rounded-xl bg-muted"
               >
-                <AdImage b={b} className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <AdImage
+                  b={b}
+                  className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
                 <span className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 bg-gradient-to-t from-black/70 to-transparent p-3 pt-10">
-                  {b.subtitle ? <span className="line-clamp-1 text-sm font-semibold text-white">{b.subtitle}</span> : null}
-                  <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-black">홈페이지 바로가기</span>
+                  {b.subtitle ? (
+                    <span className="line-clamp-1 text-sm font-semibold text-white">{b.subtitle}</span>
+                  ) : null}
+                  <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-black">
+                    홈페이지 바로가기
+                  </span>
                 </span>
               </AdLink>
             ))}
@@ -313,7 +393,9 @@ export default async function HomePage() {
       ) : null}
 
       {/* 4. 와이드 허브 */}
-      {wide.length > 0 ? (
+      {tWide ? (
+        <BannerHtml html={tWide} />
+      ) : wide.length > 0 ? (
         <Hub title="와이드 허브" description="공급사와 주요 취급 제품을 하나의 광고로 전달합니다.">
           <div className="flex flex-col gap-3">
             {wide.slice(0, 3).map((b) => (
@@ -332,7 +414,9 @@ export default async function HomePage() {
       ) : null}
 
       {/* 5. 파트너 허브 — 공급사 + 대표 제품 */}
-      {partner.length > 0 ? (
+      {tPartner ? (
+        <BannerHtml html={tPartner} />
+      ) : partner.length > 0 ? (
         <Hub title="파트너 허브" description="파트너의 가치와 트렌드를 깊이 있게 연결합니다.">
           <div className="grid gap-4 md:grid-cols-2">
             {partner.slice(0, 8).map((b) => {
@@ -374,7 +458,9 @@ export default async function HomePage() {
       ) : null}
 
       {/* 6. 플러스 허브 — 2칸 */}
-      {plus.length > 0 ? (
+      {tPlus ? (
+        <BannerHtml html={tPlus} />
+      ) : plus.length > 0 ? (
         <Hub title="플러스 허브" description="전문 분야별 공급사의 제품과 서비스를 소개합니다.">
           <div className="grid gap-3 sm:grid-cols-2">
             {plus.slice(0, 6).map((b) => (
@@ -414,7 +500,10 @@ export default async function HomePage() {
 
       {/* 9. 인기 기계 블로그와 함께하는 제품 */}
       {blogs.length > 0 ? (
-        <Hub title="인기 기계 블로그와 함께하는 제품" description="기계 분야에서 많이 읽히는 블로그 글과 소개된 제품이에요.">
+        <Hub
+          title="인기 기계 블로그와 함께하는 제품"
+          description="기계 분야에서 많이 읽히는 블로그 글과 소개된 제품이에요."
+        >
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {blogs.map((b) => {
               const p = b.product_id ? blogProductById.get(b.product_id) : undefined
@@ -423,7 +512,12 @@ export default async function HomePage() {
                   <a href={b.url ?? '#'} target="_blank" rel="noopener" className="group flex flex-col gap-2 p-4">
                     {b.thumbnail ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={mediaUrl(b.thumbnail)} alt="" loading="lazy" className="aspect-[16/9] w-full rounded-md object-cover" />
+                      <img
+                        src={mediaUrl(b.thumbnail)}
+                        alt=""
+                        loading="lazy"
+                        className="aspect-[16/9] w-full rounded-md object-cover"
+                      />
                     ) : null}
                     <span className="line-clamp-2 font-semibold group-hover:underline">{b.title}</span>
                     {b.summary ? <span className="line-clamp-2 text-sm text-muted-foreground">{b.summary}</span> : null}
@@ -479,8 +573,15 @@ export default async function HomePage() {
         />
       </Hub>
 
+      {/* 직접 만든 배너 그룹 (배너 코드) */}
+      {customGroups.map((g) => (
+        <BannerHtml key={g.code} html={g.html} />
+      ))}
+
       {/* 11. 큰 이미지 광고 */}
-      {imageAds.length > 0 ? (
+      {tImage ? (
+        <BannerHtml html={tImage} />
+      ) : imageAds.length > 0 ? (
         <section aria-label="공급사 광고" className="mx-auto flex w-full max-w-4xl flex-col gap-6">
           {imageAds.slice(0, 6).map((b) => (
             <AdLink
@@ -491,7 +592,9 @@ export default async function HomePage() {
               className="relative block overflow-hidden rounded-xl border border-border"
             >
               <AdImage b={b} className="w-full" />
-              <span className="absolute top-3 left-3 rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white">광고</span>
+              <span className="absolute top-3 left-3 rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white">
+                광고
+              </span>
             </AdLink>
           ))}
         </section>

@@ -26,6 +26,7 @@ import { ProductJsonLd } from '@/components/store/product-detail/product-json-ld
 import { TrackView } from '@/components/store/product-detail/track-view'
 import { SITE_NAME } from '@/lib/site'
 import { ChannelBanners } from '@/components/store/product-detail/channel-banners'
+import { DetailMiniBanners } from '@/components/store/product-detail/detail-mini-banners'
 import { PurchaseGuide } from '@/components/store/product-detail/purchase-guide'
 import { QuestionsSection, getQuestionCount } from '@/components/store/product-detail/questions-section'
 import { getStoreOrg } from '@/components/store/get-store-org'
@@ -258,6 +259,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
           </div>
 
           <ChannelBanners settings={settings} />
+          <DetailMiniBanners />
 
           <InfoTable
             rows={[
