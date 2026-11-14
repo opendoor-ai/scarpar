@@ -203,3 +203,40 @@ export function fillTemplate(template: string, vars: Record<string, string | num
     .replace(/\s{2,}/g, ' ')
     .trim()
 }
+
+// ---------------------------------------------------------------------------
+// 네이버 연관채널 · SNS — 한 줄에 "사용|채널이름|주소" (예전처럼 주소만 적은 줄도 읽어요)
+// ---------------------------------------------------------------------------
+export interface Channel {
+  enabled: boolean
+  label: string
+  url: string
+}
+
+export const PRESET_CHANNELS = ['iOS 앱스토어', '구글 플레이', '인스타그램', '페이스북', '카카오스토리', '유튜브', 'X(트위터)']
+
+export function parseChannels(text: string): Channel[] {
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const parts = line.split('|')
+      if (parts.length >= 3) return { enabled: parts[0] === 'on', label: parts[1], url: parts.slice(2).join('|').trim() }
+      return { enabled: true, label: '', url: line }
+    })
+}
+
+export function serializeChannels(list: Channel[]): string {
+  return list
+    .filter((c) => c.label.trim() || c.url.trim())
+    .map((c) => `${c.enabled ? 'on' : 'off'}|${c.label.replace(/[|\r\n]/g, ' ').trim()}|${c.url.trim()}`)
+    .join('\n')
+}
+
+/** 검색엔진에 알릴 공식 채널 주소 (켜 둔 것만) */
+export function activeChannelUrls(text: string): string[] {
+  return parseChannels(text)
+    .filter((c) => c.enabled && /^https?:\/\//.test(c.url))
+    .map((c) => c.url)
+}

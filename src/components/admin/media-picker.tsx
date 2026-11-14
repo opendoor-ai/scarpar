@@ -27,11 +27,15 @@ interface MediaPickerProps {
   renderTrigger?: (open: () => void, uploading: boolean) => React.ReactNode
   /** 여러 장을 한 번에 고를 수 있게 (사진마다 onChange 호출) */
   multiple?: boolean
+  /** 고를 수 있는 파일 종류 (기본: 일반 사진) — 파비콘은 .ico도 */
+  accept?: string
 }
 
 const MAX_MB = 10
 
-function MediaPicker({ value, onChange, label, renderTrigger, multiple = false }: MediaPickerProps) {
+const DEFAULT_ACCEPT = 'image/png,image/jpeg,image/gif,image/webp,image/svg+xml,image/avif'
+
+function MediaPicker({ value, onChange, label, renderTrigger, multiple = false, accept = DEFAULT_ACCEPT }: MediaPickerProps) {
   const [uploading, setUploading] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
 
@@ -48,7 +52,7 @@ function MediaPicker({ value, onChange, label, renderTrigger, multiple = false }
     const toastId = toast.loading(files.length > 1 ? `사진 ${files.length}장을 올리는 중…` : '사진을 올리는 중…')
     let done = 0
     for (const original of files) {
-      if (!original.type.startsWith('image/')) {
+      if (!original.type.startsWith('image/') && !/\.ico$/i.test(original.name)) {
         toast.error(`${original.name}: 이미지 파일만 올릴 수 있어요.`)
         continue
       }
@@ -84,7 +88,7 @@ function MediaPicker({ value, onChange, label, renderTrigger, multiple = false }
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml,image/avif"
+        accept={accept}
         multiple={multiple}
         className="hidden"
         onChange={handleFiles}

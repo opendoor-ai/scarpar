@@ -46,8 +46,10 @@ export async function uploadMediaAction(formData: FormData): Promise<ActionResul
 
   const supabase = getAdminClient()
 
+  // .ico(파비콘)는 브라우저가 종류를 비워 보낼 때가 있어 직접 정해 줌
+  const contentType = file.type || (ext === 'ico' ? 'image/x-icon' : undefined)
   const { error: uploadError } = await supabase.storage.from(MEDIA_BUCKET).upload(storagePath, file, {
-    contentType: file.type || undefined,
+    contentType,
     upsert: false,
   })
 
@@ -61,7 +63,7 @@ export async function uploadMediaAction(formData: FormData): Promise<ActionResul
       org_id: ctx.org.id,
       path: storagePath,
       name: file.name,
-      mime: file.type || null,
+      mime: contentType || null,
       size: file.size,
       folder,
       created_by: ctx.user.id,

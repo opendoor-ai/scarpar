@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu, Search } from 'lucide-react'
+import { Menu, Monitor, Search, Smartphone } from 'lucide-react'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -57,6 +57,28 @@ export function Topbar({ orgName, user, role, unreadCount, onMenuClick, onSearch
           <Menu className="size-4" />
         </Button>
         <span className="truncate text-sm font-medium text-foreground">{orgName}</span>
+        {/* 사이트 바로 보기: PC 화면(새 탭) · 모바일 화면(휴대폰 크기 창) */}
+        <span className="ml-2 flex items-center gap-0.5 border-l border-border pl-2">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener"
+            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+            title="PC 화면으로 보기"
+            aria-label="PC 화면으로 보기"
+          >
+            <Monitor className="size-4" />
+          </a>
+          <button
+            type="button"
+            onClick={() => window.open('/', 'site-mobile', 'width=420,height=860,menubar=no,toolbar=no,location=no')}
+            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+            title="모바일 화면으로 보기"
+            aria-label="모바일 화면으로 보기"
+          >
+            <Smartphone className="size-4" />
+          </button>
+        </span>
       </div>
 
       <div className="flex items-center gap-1">

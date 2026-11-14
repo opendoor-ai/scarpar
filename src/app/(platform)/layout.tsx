@@ -15,6 +15,7 @@ import { env } from '@/lib/env'
 import { mediaUrl } from '@/lib/media-url'
 import { SITE_NAME } from '@/lib/site'
 import { getSiteConfig } from '@/modules/site-config/get'
+import { activeChannelUrls } from '@/modules/site-config/schemas'
 import { getSiteSettings } from '@/lib/site-settings'
 import { getLiveBanners, renderGroupHtml, type LiveBanner } from '@/modules/ads/live'
 
@@ -89,10 +90,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
 
   // 검색엔진·AI용 회사·사이트 정보 (Organization + WebSite 검색창)
   const base = env.APP_URL.replace(/\/+$/, '')
-  const sameAs = siteConfig.seo.channels
-    .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter((l) => /^https?:\/\//.test(l))
+  const sameAs = activeChannelUrls(siteConfig.seo.channels)
   const orgLd = {
     '@context': 'https://schema.org',
     '@graph': [

@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils'
 
 import { saveSiteSectionAction } from '../actions'
 import { CRAWLERS, SEO_VARIABLES, type SeoSettings } from '../schemas'
+import { ChannelsTable } from './channels-table'
 
 function Card({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) {
   return (
@@ -120,9 +121,40 @@ export function SeoForm({ initial, siteUrl }: { initial: SeoSettings; siteUrl: s
             </Field>
           </Fold>
           <Fold title="파비콘" hint="브라우저 탭·검색 결과에 보이는 작은 아이콘">
-            <Field label="파비콘 이미지" hint="정사각형 PNG 권장 (512×512). 비우면 기본 아이콘이 쓰여요.">
-              <MediaPicker value={v.favicon ? { id: '', path: v.favicon } : null} onChange={(m) => set({ favicon: m?.path ?? '' })} />
-            </Field>
+            <div className="grid gap-4 md:grid-cols-[220px_1fr]">
+              <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border p-4">
+                <MediaPicker
+                  accept="image/x-icon,image/vnd.microsoft.icon,.ico,image/png,image/svg+xml,image/webp"
+                  value={v.favicon ? { id: '', path: v.favicon } : null}
+                  onChange={(m) => set({ favicon: m?.path ?? '' })}
+                />
+                <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
+                  ICO · PNG · SVG 모두 돼요
+                  <br />
+                  권장: 정사각형 PNG 512×512 (또는 ICO)
+                </p>
+              </div>
+              <div className="rounded-lg border border-border p-4 text-sm">
+                <p className="text-muted-foreground">파비콘은 주소창·브라우저 탭·북마크·검색 결과에 보이는 사이트 대표 아이콘이에요.</p>
+                <div className="mt-3 overflow-hidden rounded-t-lg border border-border bg-muted">
+                  <div className="flex items-center gap-1.5 px-3 pt-2">
+                    <span className="size-2.5 rounded-full bg-border" />
+                    <span className="size-2.5 rounded-full bg-border" />
+                    <span className="size-2.5 rounded-full bg-border" />
+                    <span className="ml-3 flex min-w-0 items-center gap-2 rounded-t-md bg-background px-3 py-1.5 text-xs">
+                      {v.favicon ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={mediaUrl(v.favicon)} alt="" className="size-4 object-contain" />
+                      ) : (
+                        <span className="size-4 rounded-sm bg-primary/60" />
+                      )}
+                      <span className="truncate">{v.title || '사이트 이름'}</span>
+                    </span>
+                  </div>
+                  <div className="h-8 bg-background" />
+                </div>
+              </div>
+            </div>
           </Fold>
           <Fold title="SNS 공유 이미지" hint="카카오톡·페이스북·밴드에 링크를 보낼 때 보이는 그림">
             <Field label="공유 이미지" hint="1200×630 권장. 상품 페이지는 상품 대표이미지가 먼저 쓰여요.">
@@ -130,9 +162,7 @@ export function SeoForm({ initial, siteUrl }: { initial: SeoSettings; siteUrl: s
             </Field>
           </Fold>
           <Fold title="네이버 연관채널 · SNS" hint="블로그·유튜브·인스타그램 등 공식 채널 (검색엔진이 같은 회사로 인식)">
-            <Field label="채널 주소" hint="한 줄에 하나씩 적어요. 예) https://blog.naver.com/아이디">
-              <Textarea value={v.channels} onChange={(e) => set({ channels: e.target.value })} rows={4} placeholder={'https://blog.naver.com/...\nhttps://www.youtube.com/@...\nhttps://pf.kakao.com/...'} />
-            </Field>
+            <ChannelsTable value={v.channels} onChange={(channels) => set({ channels })} />
           </Fold>
           <Fold title="검색엔진 서비스 연결" hint="구글 서치콘솔 · 네이버 서치어드바이저 · 빙 · 다음 웹마스터도구">
             <Field label="구글 서치콘솔" hint={<>HTML 태그 방식의 <code>content=&quot;…&quot;</code> 값만 넣어요.</>}>
