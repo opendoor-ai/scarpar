@@ -115,6 +115,9 @@ export async function updateOrgProfileAction(input: OrgProfileInput): Promise<Ac
     email: ctx.org.email,
     address: ctx.org.address,
     bin_number: ctx.org.bin_number,
+    contact_name: ctx.org.contact_name,
+    homepage_url: ctx.org.homepage_url,
+    item_keywords: ctx.org.item_keywords,
     timezone: ctx.org.timezone,
     enabled_modules: ctx.org.enabled_modules,
   }
@@ -124,6 +127,14 @@ export async function updateOrgProfileAction(input: OrgProfileInput): Promise<Ac
     email: data.email || null,
     address: data.address || null,
     bin_number: data.bin_number || null,
+    contact_name: data.contact_name || null,
+    homepage_url: data.homepage_url || null,
+    item_keywords: data.item_keywords
+      ? data.item_keywords
+          .split(',')
+          .map((k) => k.trim().replace(/^#/, ''))
+          .filter(Boolean)
+      : null,
     timezone: data.timezone,
     enabled_modules: data.enabled_modules,
   }

@@ -5,12 +5,12 @@ import { formatMoney, formatPrice } from '@/lib/money'
 import { cn } from '@/lib/utils'
 import type { Product } from '@/types/db'
 
-import { storePath } from './store-links'
+import { productPath } from './store-links'
 
 export interface ProductCardData
   extends Pick<
     Product,
-    'id' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
+    'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
   > {
   image: string | null
 }
@@ -29,7 +29,7 @@ export function ProductCard({
 
   return (
     <Link
-      href={storePath(orgSlug, `/product/${product.slug}`)}
+      href={productPath(orgSlug, product.product_no)}
       className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-foreground/20"
     >
       <div className="relative aspect-square w-full overflow-hidden bg-muted">

@@ -25,6 +25,9 @@ export interface Org {
   email: string | null
   address: string | null
   bin_number: string | null
+  contact_name: string | null
+  homepage_url: string | null
+  item_keywords: string[] | null
   is_active: boolean
   created_at: string
   updated_at: string

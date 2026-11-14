@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic'
 
 type FeaturedProductRow = Pick<
   Product,
-  'id' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
+  'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
 >
 
 export default async function StoreHomePage({ params }: PageProps<{ org: string }>) {
@@ -43,7 +43,7 @@ export default async function StoreHomePage({ params }: PageProps<{ org: string 
   // No published home page yet — tasteful default hero + featured products fallback.
   const { data: featuredRows } = await supabase
     .from('products')
-    .select('id, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder')
+    .select('id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder')
     .eq('org_id', org.id)
     .eq('status', 'active')
     .eq('is_featured', true)

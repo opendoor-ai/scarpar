@@ -8,6 +8,7 @@
 // staff-tier inventory_movements table), so it is gated at 'manager' too
 // for a consistent, friendly failure instead of a raw RLS rejection.
 
+import { sanitizeDetailHtml } from '@/lib/detail-html'
 import { revalidatePath } from 'next/cache'
 import type { ZodError } from 'zod'
 
@@ -64,7 +65,8 @@ export async function createProduct(input: ProductActionInput): Promise<ActionRe
       .insert({
         org_id: ctx.org.id,
         name: data.name,
-        slug: data.slug,
+        // 내부용 주소. 상품 주소는 상품번호(/products/10001)를 쓰므로 저장 직후 번호로 바꿉니다.
+        slug: `new-${crypto.randomUUID()}`,
         description: data.description,
         brand: data.brand,
         category_id: data.category_id,
@@ -82,11 +84,23 @@ export async function createProduct(input: ProductActionInput): Promise<ActionRe
         weight_grams: data.weight_grams,
         tags: data.tags.length ? data.tags : null,
         is_featured: data.is_featured,
+        condition: data.condition,
+        model_name: data.model_name,
+        spec_summary: data.spec_summary,
+        short_description: data.short_description,
+        detail_html: data.detail_html ? sanitizeDetailHtml(data.detail_html) : null,
       })
-      .select('id')
+      .select('id, product_no')
       .single()
 
     if (error || !row) return { ok: false, error: friendlyDbError(error ?? { message: '상품을 등록하지 못했습니다' }, 'product') }
+
+    // 내부 slug를 상품번호로 정리 (실패해도 상품 등록 자체는 성공으로 둠 — 임시 slug도 고유값)
+    await supabase
+      .from('products')
+      .update({ slug: String(row.product_no) })
+      .eq('id', row.id as string)
+      .eq('org_id', ctx.org.id)
 
     audit(ctx, 'create', 'product', row.id as string, undefined, data)
     revalidatePath('/admin/products')
@@ -123,7 +137,6 @@ export async function updateProduct(
       .from('products')
       .update({
         name: data.name,
-        slug: data.slug,
         description: data.description,
         brand: data.brand,
         category_id: data.category_id,
@@ -141,6 +154,11 @@ export async function updateProduct(
         weight_grams: data.weight_grams,
         tags: data.tags.length ? data.tags : null,
         is_featured: data.is_featured,
+        condition: data.condition,
+        model_name: data.model_name,
+        spec_summary: data.spec_summary,
+        short_description: data.short_description,
+        detail_html: data.detail_html ? sanitizeDetailHtml(data.detail_html) : null,
       })
       .eq('id', id)
       .eq('org_id', ctx.org.id)

@@ -14,6 +14,14 @@ function productsHref(orgSlug: string, opts: { category?: string; query?: string
   return storePath(orgSlug, `/products${qs ? `?${qs}` : ''}`)
 }
 
+const PILL = 'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors'
+const PILL_ACTIVE = 'border-primary bg-primary text-primary-foreground'
+const PILL_IDLE = 'border-input hover:bg-accent'
+
+/**
+ * 카테고리 버튼. 1차 카테고리를 한 줄로 보여주고,
+ * 1차(또는 그 아래 2차)를 고른 상태면 바로 아래 줄에 그 1차의 2차 카테고리를 보여줍니다.
+ */
 export function CategoryPills({
   orgSlug,
   categories,
@@ -22,38 +30,58 @@ export function CategoryPills({
   lang = 'ko',
 }: {
   orgSlug: string
-  categories: Pick<Category, 'id' | 'name' | 'slug'>[]
+  categories: Pick<Category, 'id' | 'name' | 'slug' | 'parent_id'>[]
   activeSlug?: string
   query?: string
   lang?: Lang
 }) {
   if (categories.length === 0) return null
 
+  const ids = new Set(categories.map((c) => c.id))
+  // 부모가 없거나(1차) 부모를 찾을 수 없는 카테고리는 1차로 취급
+  const roots = categories.filter((c) => !c.parent_id || !ids.has(c.parent_id))
+  const active = activeSlug ? categories.find((c) => c.slug === activeSlug) : undefined
+  const activeRoot = active
+    ? roots.find((r) => r.id === active.id) ?? roots.find((r) => r.id === active.parent_id)
+    : undefined
+  const subs = activeRoot ? categories.filter((c) => c.parent_id === activeRoot.id) : []
+
   return (
-    <div className="flex flex-wrap gap-2">
-      <Link
-        href={productsHref(orgSlug, { query })}
-        className={cn(
-          'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-          !activeSlug ? 'border-primary bg-primary text-primary-foreground' : 'border-input hover:bg-accent',
-        )}
-      >
-        {t('all_products', lang)}
-      </Link>
-      {categories.map((c) => (
-        <Link
-          key={c.id}
-          href={productsHref(orgSlug, { category: c.slug, query })}
-          className={cn(
-            'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-            activeSlug === c.slug
-              ? 'border-primary bg-primary text-primary-foreground'
-              : 'border-input hover:bg-accent',
-          )}
-        >
-          {c.name}
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-2">
+        <Link href={productsHref(orgSlug, { query })} className={cn(PILL, !activeSlug ? PILL_ACTIVE : PILL_IDLE)}>
+          {t('all_products', lang)}
         </Link>
-      ))}
+        {roots.map((c) => (
+          <Link
+            key={c.id}
+            href={productsHref(orgSlug, { category: c.slug, query })}
+            className={cn(PILL, activeRoot?.id === c.id ? PILL_ACTIVE : PILL_IDLE)}
+          >
+            {c.name}
+          </Link>
+        ))}
+      </div>
+
+      {activeRoot && subs.length > 0 ? (
+        <div className="flex flex-wrap gap-2 rounded-lg bg-muted/50 p-2">
+          <Link
+            href={productsHref(orgSlug, { category: activeRoot.slug, query })}
+            className={cn(PILL, active?.id === activeRoot.id ? 'border-foreground bg-background' : 'border-transparent hover:bg-background')}
+          >
+            {activeRoot.name} 전체
+          </Link>
+          {subs.map((c) => (
+            <Link
+              key={c.id}
+              href={productsHref(orgSlug, { category: c.slug, query })}
+              className={cn(PILL, active?.id === c.id ? 'border-foreground bg-background' : 'border-transparent hover:bg-background')}
+            >
+              {c.name}
+            </Link>
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }

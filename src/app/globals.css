@@ -284,3 +284,24 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+/* 상품 상세 내용(detail_html) 기본 서식 — src/lib/detail-html.ts 에서 허용한 태그만 들어옵니다 */
+.detail-html {
+  font-size: 0.875rem;
+  line-height: 1.75;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.detail-html > * + * { margin-top: 0.75em; }
+.detail-html h2 { font-size: 1.25rem; font-weight: 700; margin-top: 1.5em; }
+.detail-html h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1.25em; }
+.detail-html h4 { font-weight: 600; margin-top: 1em; }
+.detail-html ul { list-style: disc; padding-left: 1.25rem; }
+.detail-html ol { list-style: decimal; padding-left: 1.25rem; }
+.detail-html a { color: var(--primary); text-decoration: underline; }
+.detail-html img { max-width: 100%; height: auto; margin-inline: auto; border-radius: 0.375rem; }
+.detail-html table { width: 100%; border-collapse: collapse; }
+.detail-html th,
+.detail-html td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
+.detail-html th { background: var(--muted); font-weight: 600; width: 30%; }
+.detail-html blockquote { border-left: 4px solid var(--border); padding-left: 0.75rem; color: var(--muted-foreground); }

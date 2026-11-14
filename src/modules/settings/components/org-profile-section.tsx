@@ -50,6 +50,9 @@ function OrgProfileSection({ org }: { org: Org }) {
       email: org.email ?? '',
       address: org.address ?? '',
       bin_number: org.bin_number ?? '',
+      contact_name: org.contact_name ?? '',
+      homepage_url: org.homepage_url ?? '',
+      item_keywords: (org.item_keywords ?? []).join(', '),
       timezone: org.timezone,
       enabled_modules: org.enabled_modules as ModuleKey[],
     },
@@ -122,11 +125,51 @@ function OrgProfileSection({ org }: { org: Org }) {
                   <FormItem>
                     <FormLabel>사업자등록번호</FormLabel>
                     <FormControl>
-                      <Input {...field} value={field.value ?? ''} placeholder="1234567890123" />
+                      <Input {...field} value={field.value ?? ''} placeholder="123-45-67890" />
                     </FormControl>
                     <p className="text-xs text-muted-foreground">
-                      13-digit e-BIN for Mushak invoices
+                      상품 상세페이지 하단 사업자 정보에 쓰입니다
                     </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="contact_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>담당자명</FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value ?? ''} placeholder="예: 대표 홍길동" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="homepage_url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>홈페이지</FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value ?? ''} placeholder="https://" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="item_keywords"
+                render={({ field }) => (
+                  <FormItem className="sm:col-span-2">
+                    <FormLabel>취급품목</FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value ?? ''} placeholder="쉼표로 구분 — 예: 머시닝센터, CNC선반, 중고기계" />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">상품 상세페이지의 공급사 소개 카드에 태그로 표시됩니다</p>
                     <FormMessage />
                   </FormItem>
                 )}

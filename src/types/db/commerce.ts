@@ -62,8 +62,12 @@ export interface Category {
   created_at: string
 }
 
+export type ProductCondition = 'new' | 'used' | 'refurbished'
+
 export interface Product {
   id: string
+  /** 상품코드 — 플랫폼 전체 고유 번호 (0007, 10001부터 자동) */
+  product_no: number
   org_id: string
   name: string
   slug: string
@@ -87,6 +91,12 @@ export interface Product {
   seo: Record<string, unknown> | null
   is_featured: boolean
   position: number
+  condition: ProductCondition | null
+  model_name: string | null
+  spec_summary: string | null
+  short_description: string | null
+  /** 상세 내용 HTML — 저장 전·표시 전 모두 sanitize */
+  detail_html: string | null
   created_at: string
   updated_at: string
 }

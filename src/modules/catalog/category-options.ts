@@ -5,6 +5,7 @@
 export interface CategoryOption {
   id: string
   name: string
+  parentId: string | null
   parentName: string | null
 }
 
@@ -17,6 +18,7 @@ export function toCategoryOptions(
   return rows.map((r) => ({
     id: r.id,
     name: r.name,
+    parentId: r.parent_id && byId.has(r.parent_id) ? r.parent_id : null,
     parentName: r.parent_id ? (byId.get(r.parent_id)?.name ?? null) : null,
   }))
 }

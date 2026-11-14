@@ -82,7 +82,7 @@ export function ProductInquiryActions({
       {canCall ? (
         <>
           {/* 휴대폰 화면 전용 */}
-          <div className="grid grid-cols-2 gap-2 md:hidden">
+          <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-2 border-t border-border bg-background/95 p-3 backdrop-blur md:hidden">
             <Button asChild size="lg" className={canSms ? '' : 'col-span-2'}>
               <a href={`tel:${digits}`}>
                 <Phone className="size-4" />

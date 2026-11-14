@@ -1,3 +1,4 @@
+import { categoryWithDescendants } from '@/lib/category-tree'
 import { getAnonClient } from '@/lib/supabase/anon'
 import type { Product, ProductGridBlock } from '@/types/db'
 
@@ -7,7 +8,7 @@ import type { BlockRenderContext } from './render-blocks'
 
 type GridProductRow = Pick<
   Product,
-  'id' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
+  'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
 >
 
 export async function ProductGridBlockView({ block, ctx }: { block: ProductGridBlock; ctx: BlockRenderContext }) {
@@ -18,14 +19,23 @@ export async function ProductGridBlockView({ block, ctx }: { block: ProductGridB
 
   let query = supabase
     .from('products')
-    .select('id, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder')
+    .select('id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder')
     .eq('org_id', ctx.org.id)
     .eq('status', 'active')
 
   if (block.mode === 'featured') {
     query = query.eq('is_featured', true)
   } else if (block.mode === 'category' && block.categoryId) {
-    query = query.eq('category_id', block.categoryId)
+    // 1차 카테고리면 하위 2차 카테고리 상품까지 포함
+    const { data: categoryRows } = await supabase
+      .from('categories')
+      .select('id, parent_id')
+      .eq('org_id', ctx.org.id)
+    const ids = categoryWithDescendants(
+      (categoryRows ?? []) as { id: string; parent_id: string | null }[],
+      block.categoryId,
+    )
+    query = query.in('category_id', ids)
   } else if (block.mode === 'manual' && block.productIds) {
     query = query.in('id', block.productIds)
   }

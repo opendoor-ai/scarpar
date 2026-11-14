@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { PackageSearch } from 'lucide-react'
 
 import { type Lang } from '@/lib/i18n'
+import { categoryWithDescendants } from '@/lib/category-tree'
 import { getOrgSettings, settingStr } from '@/lib/settings'
 import { getAnonClient } from '@/lib/supabase/anon'
 import type { PageProps } from '@/lib/types'
@@ -20,7 +21,7 @@ const PAGE_SIZE = 24
 
 type ProductRow = Pick<
   Product,
-  'id' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
+  'id' | 'product_no' | 'slug' | 'name' | 'price' | 'compare_at_price' | 'track_stock' | 'stock_qty' | 'allow_backorder'
 >
 
 export default async function ProductsPage({
@@ -40,10 +41,11 @@ export default async function ProductsPage({
 
   const { data: categoryRows } = await supabase
     .from('categories')
-    .select('id, name, slug')
+    .select('id, name, slug, parent_id')
     .eq('org_id', org.id)
     .order('sort_order', { ascending: true })
-  const categories = (categoryRows ?? []) as Pick<Category, 'id' | 'name' | 'slug'>[]
+    .order('created_at', { ascending: true })
+  const categories = (categoryRows ?? []) as Pick<Category, 'id' | 'name' | 'slug' | 'parent_id'>[]
   const activeCategory = categorySlug ? categories.find((c) => c.slug === categorySlug) : undefined
 
   const page = Math.max(1, Number(pageParam) || 1)
@@ -52,13 +54,14 @@ export default async function ProductsPage({
 
   let query = supabase
     .from('products')
-    .select('id, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder', {
+    .select('id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder', {
       count: 'exact',
     })
     .eq('org_id', org.id)
     .eq('status', 'active')
 
-  if (activeCategory) query = query.eq('category_id', activeCategory.id)
+  // 1차 카테고리를 고르면 그 아래 2차 카테고리 상품까지 함께 보여줌
+  if (activeCategory) query = query.in('category_id', categoryWithDescendants(categories, activeCategory.id))
   if (q) query = query.ilike('name', `%${q}%`)
 
   const { data, count } = await query.order('position', { ascending: true }).range(from, to)
@@ -72,7 +75,7 @@ export default async function ProductsPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <CategoryPills
           orgSlug={org.slug}
           categories={categories}

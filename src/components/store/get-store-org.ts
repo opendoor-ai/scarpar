@@ -18,10 +18,13 @@ export interface StoreOrg {
   phone: string | null
   email: string | null
   address: string | null
+  contact_name: string | null
+  homepage_url: string | null
+  item_keywords: string[] | null
 }
 
 const STORE_ORG_COLUMNS =
-  'id, name, slug, vertical, currency, timezone, logo_path, phone, email, address'
+  'id, name, slug, vertical, currency, timezone, logo_path, phone, email, address, contact_name, homepage_url, item_keywords'
 
 /**
  * Resolves an active org by its public slug via the anon client (RLS: `orgs_anon_select_active`,

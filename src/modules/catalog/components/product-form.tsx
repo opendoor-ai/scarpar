@@ -21,12 +21,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { fromPaisa, toPaisa } from '@/lib/money'
-import { slugify } from '@/lib/utils'
 import type { Product, ProductImage, ProductVariant } from '@/types/db'
 
 import { createProduct, deleteProduct, saveImages, saveVariants, updateProduct } from '../actions'
 import { productFormSchema, type ProductActionInput, type ProductFormValues } from '../schemas'
 import { ImageGallery, fromImageRow, toImageRow, type ImageRow } from './image-gallery'
+import { CategoryTwoLevelSelect } from './category-two-level-select'
+import { DetailHtmlEditor } from './detail-html-editor'
 import { VariantEditor, fromVariantRow, newVariantRow, toVariantRow, type VariantRow } from './variant-editor'
 
 import type { CategoryOption } from '../category-options'
@@ -41,13 +42,12 @@ interface ProductFormProps {
   categories: CategoryOption[]
 }
 
-const NONE_CATEGORY = '__none__'
+const NONE_CONDITION = '__none__'
 
 function toFormValues(product?: Product): ProductFormValues {
   if (!product) {
     return {
       name: '',
-      slug: '',
       description: '',
       brand: '',
       category_id: null,
@@ -65,19 +65,23 @@ function toFormValues(product?: Product): ProductFormValues {
       weight_grams: '',
       tags: '',
       is_featured: false,
+      condition: '',
+      model_name: '',
+      spec_summary: '',
+      short_description: '',
+      detail_html: '',
     }
   }
 
   return {
     name: product.name,
-    slug: product.slug,
     description: product.description ?? '',
     brand: product.brand ?? '',
     category_id: product.category_id,
     status: product.status,
-    price: fromPaisa(product.price).toFixed(2),
-    compare_at_price: product.compare_at_price != null ? fromPaisa(product.compare_at_price).toFixed(2) : '',
-    cost_price: product.cost_price != null ? fromPaisa(product.cost_price).toFixed(2) : '',
+    price: String(Math.round(fromPaisa(product.price))),
+    compare_at_price: product.compare_at_price != null ? String(Math.round(fromPaisa(product.compare_at_price))) : '',
+    cost_price: product.cost_price != null ? String(Math.round(fromPaisa(product.cost_price))) : '',
     sku: product.sku ?? '',
     barcode: product.barcode ?? '',
     hs_code: product.hs_code ?? '',
@@ -88,13 +92,17 @@ function toFormValues(product?: Product): ProductFormValues {
     weight_grams: product.weight_grams != null ? String(product.weight_grams) : '',
     tags: (product.tags ?? []).join(', '),
     is_featured: product.is_featured,
+    condition: product.condition ?? '',
+    model_name: product.model_name ?? '',
+    spec_summary: product.spec_summary ?? '',
+    short_description: product.short_description ?? '',
+    detail_html: product.detail_html ?? '',
   }
 }
 
 function toActionInput(values: ProductFormValues): ProductActionInput {
   return {
     name: values.name,
-    slug: values.slug,
     description: values.description?.trim() ? values.description.trim() : null,
     brand: values.brand?.trim() ? values.brand.trim() : null,
     category_id: values.category_id,
@@ -117,13 +125,17 @@ function toActionInput(values: ProductFormValues): ProductActionInput {
           .filter(Boolean)
       : [],
     is_featured: values.is_featured,
+    condition: values.condition ? values.condition : null,
+    model_name: values.model_name?.trim() ? values.model_name.trim() : null,
+    spec_summary: values.spec_summary?.trim() ? values.spec_summary.trim() : null,
+    short_description: values.short_description?.trim() ? values.short_description.trim() : null,
+    detail_html: values.detail_html?.trim() ? values.detail_html.trim() : null,
   }
 }
 
 function ProductForm({ mode, product, variants, images, categories }: ProductFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const [slugTouched, setSlugTouched] = useState(mode === 'edit')
 
   const [variantRows, setVariantRows] = useState<VariantRow[]>(() => (variants ?? []).map(toVariantRow))
   const [hasVariants, setHasVariants] = useState((variants?.length ?? 0) > 0)
@@ -136,12 +148,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
 
   const persistedVariantOptions = variantRows
     .filter((row): row is VariantRow & { id: string } => Boolean(row.id))
-    .map((row) => ({ id: row.id, name: row.name || 'Unnamed' }))
-
-  function handleNameChange(value: string) {
-    form.setValue('name', value)
-    if (!slugTouched) form.setValue('slug', slugify(value), { shouldValidate: true })
-  }
+    .map((row) => ({ id: row.id, name: row.name || '이름 없음' }))
 
   async function onSubmit(values: ProductFormValues) {
     startTransition(async () => {
@@ -213,26 +220,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                     <FormItem>
                       <FormLabel>상품명</FormLabel>
                       <FormControl>
-                        <Input {...field} onChange={(e) => handleNameChange(e.target.value)} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="slug"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>주소(영문)</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          onChange={(e) => {
-                            setSlugTouched(true)
-                            field.onChange(e)
-                          }}
-                        />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -251,7 +239,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-4">
                   <FormField
                     control={form.control}
                     name="brand"
@@ -271,24 +259,11 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>카테고리</FormLabel>
-                        <Select
-                          value={field.value ?? NONE_CATEGORY}
-                          onValueChange={(v) => field.onChange(v === NONE_CATEGORY ? null : v)}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="카테고리 없음" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value={NONE_CATEGORY}>카테고리 없음</SelectItem>
-                            {categories.map((c) => (
-                              <SelectItem key={c.id} value={c.id}>
-                                {c.parentName ? `${c.parentName} / ${c.name}` : c.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <CategoryTwoLevelSelect
+                          categories={categories}
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
                         <FormMessage />
                       </FormItem>
                     )}
@@ -298,11 +273,112 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
             </Card>
 
             <Card className="gap-4 p-4">
+              <CardHeader className="flex-row items-center justify-between p-0">
+                <CardTitle>제품 정보</CardTitle>
+                <span className="text-xs text-muted-foreground">
+                  상품코드{' '}
+                  <span className="font-semibold text-foreground tabular-nums">
+                    {product?.product_no ? `P${product.product_no}` : '저장하면 자동 부여'}
+                  </span>
+                </span>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4 p-0">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="condition"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>상태</FormLabel>
+                        <Select
+                          value={field.value || NONE_CONDITION}
+                          onValueChange={(v) => field.onChange(v === NONE_CONDITION ? '' : v)}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value={NONE_CONDITION}>선택 안 함</SelectItem>
+                            <SelectItem value="new">신품</SelectItem>
+                            <SelectItem value="used">중고</SelectItem>
+                            <SelectItem value="refurbished">리퍼(재생)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="model_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>모델명</FormLabel>
+                        <FormControl>
+                          <Input placeholder="예: VX650" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={form.control}
+                  name="spec_summary"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>제품사양 (한 줄 요약)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="예: X축 650mm, 주축 8,000rpm, 툴 24개" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="short_description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>간략설명</FormLabel>
+                      <FormControl>
+                        <Input placeholder="예: 정밀 가공용 수직 머시닝센터, 실가동 상태 양호" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            <Card className="gap-4 p-4">
               <CardHeader className="p-0">
                 <CardTitle>사진</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <ImageGallery value={imageRows} onChange={setImageRows} variantOptions={persistedVariantOptions} />
+              </CardContent>
+            </Card>
+
+            <Card className="gap-4 p-4">
+              <CardHeader className="p-0">
+                <CardTitle>상세 내용</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <FormField
+                  control={form.control}
+                  name="detail_html"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <DetailHtmlEditor value={field.value ?? ''} onChange={field.onChange} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             </Card>
 

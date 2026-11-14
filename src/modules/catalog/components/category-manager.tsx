@@ -98,8 +98,8 @@ function CategoryManager({ categories }: CategoryManagerProps) {
     router.refresh()
   }
 
-  // Excludes the category being edited so it can't become its own parent.
-  const parentOptions = categories.filter((c) => c.id !== editing?.id)
+  // 1차·2차 두 단계만 쓰도록 상위 후보는 1차(최상위) 카테고리만, 자기 자신은 제외.
+  const parentOptions = categories.filter((c) => !c.parentId && c.id !== editing?.id)
 
   const columns: ColumnDef<CategoryRow>[] = [
     { accessorKey: 'name', header: '이름' },
