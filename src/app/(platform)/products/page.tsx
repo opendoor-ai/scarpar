@@ -17,11 +17,15 @@ import { getPrimaryImages } from '@/components/store/get-primary-images'
 import { Pagination } from '@/components/store/pagination'
 import { ProductCard, type ProductCardData } from '@/components/store/product-card'
 import { CategoryPills, ProductSearchBox } from '@/components/store/products-filters'
+import { BannerCarousel } from '@/modules/ads/components/banner-carousel'
+import { getLiveBanners, getLivePromotedProductIds } from '@/modules/ads/live'
 
 export const dynamic = 'force-dynamic'
 
 const PAGE_SIZE = 24
 const BASE_PATH = '/products'
+const PRODUCT_COLUMNS =
+  'id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder, org_id, org:orgs!inner(slug, name)'
 
 type Row = Pick<
   Product,
@@ -70,10 +74,7 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
   const supabase = getAnonClient()
   let request = supabase
     .from('products')
-    .select(
-      'id, product_no, slug, name, price, compare_at_price, track_stock, stock_qty, allow_backorder, org_id, org:orgs!inner(slug, name)',
-      { count: 'exact' },
-    )
+    .select(PRODUCT_COLUMNS, { count: 'exact' })
     .eq('status', 'active')
     .eq('org.is_active', true)
 
@@ -91,9 +92,36 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
   const rows = (data ?? []) as unknown as Row[]
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE))
 
+  // 광고: 검색 결과가 아닌 첫 페이지에서만 (배너 + 유료 상단 노출)
+  const showAds = !query && page === 1
+  const placement = activeCategory ? 'category' : 'main'
+  const bannerCategoryIds = activeCategory
+    ? [activeCategory.id, ...(activeCategory.parent_id ? [activeCategory.parent_id] : [])]
+    : []
+  const [banners, promotedIds] = showAds
+    ? await Promise.all([
+        getLiveBanners(placement, bannerCategoryIds),
+        getLivePromotedProductIds(placement, activeCategory ? categoryWithDescendants(categories, activeCategory.id) : []),
+      ])
+    : [[], []]
+  let promoted: Row[] = []
+  if (promotedIds.length > 0) {
+    const { data: promotedData } = await supabase
+      .from('products')
+      .select(PRODUCT_COLUMNS)
+      .in('id', promotedIds)
+      .eq('status', 'active')
+      .eq('org.is_active', true)
+    const order = new Map(promotedIds.map((id, i) => [id, i]))
+    promoted = ((promotedData ?? []) as unknown as Row[]).sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0))
+  }
+
   // 대표 사진: 공급사별로 묶어서 가져옴
   const idsByOrg = new Map<string, string[]>()
-  for (const r of rows) idsByOrg.set(r.org_id, [...(idsByOrg.get(r.org_id) ?? []), r.id])
+  for (const r of [...rows, ...promoted]) {
+    const list = idsByOrg.get(r.org_id) ?? []
+    if (!list.includes(r.id)) idsByOrg.set(r.org_id, [...list, r.id])
+  }
   const imageMaps = await Promise.all([...idsByOrg].map(([orgId, ids]) => getPrimaryImages(orgId, ids)))
   const images: Record<string, string | null> = Object.assign({}, ...imageMaps)
 
@@ -124,6 +152,25 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
           placeholder="제품명·모델명·제조사 검색"
         />
       </div>
+
+      {banners.length > 0 ? <BannerCarousel banners={banners} className="mt-6" /> : null}
+
+      {promoted.length > 0 ? (
+        <section className="mt-6 rounded-lg border border-amber-200 bg-amber-50/60 p-4 dark:border-amber-500/30 dark:bg-amber-500/5">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+            <span className="rounded bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">AD</span>
+            추천 광고 제품
+          </h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {promoted.map((r) => {
+              const org = Array.isArray(r.org) ? r.org[0] : r.org
+              if (!org) return null
+              const card: ProductCardData = { ...r, image: images[r.id] ?? null }
+              return <ProductCard key={r.id} orgSlug={org.slug} product={card} supplierName={org.name} />
+            })}
+          </div>
+        </section>
+      ) : null}
 
       {rows.length === 0 ? (
         <div className="py-12">

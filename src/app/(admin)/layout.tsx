@@ -59,7 +59,12 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   try {
     const { data: isPlatformAdmin } = await supabase.rpc('is_platform_admin')
     if (isPlatformAdmin) {
-      nav.core.splice(1, 0, { label: '플랫폼 관리', href: '/admin/platform', icon: 'Building2' })
+      nav.core.splice(
+        1,
+        0,
+        { label: '플랫폼 관리', href: '/admin/platform', icon: 'Building2' },
+        { label: '광고 관리', href: '/admin/ads', icon: 'Megaphone' },
+      )
     }
   } catch {
     // 확인 실패 시 메뉴만 숨김
