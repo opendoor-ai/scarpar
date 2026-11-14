@@ -31,6 +31,7 @@ export function CategoryPills({
   orgSlug,
   categories,
   activeSlug,
+  counts,
   query,
   lang = 'ko',
   basePath,
@@ -38,6 +39,8 @@ export function CategoryPills({
   orgSlug: string
   categories: Pick<PlatformCategory, 'id' | 'name' | 'slug' | 'parent_id' | 'cate_no'>[]
   activeSlug?: string
+  /** 분류 id → 상품 수 (주면 이름 옆에 표시) */
+  counts?: Record<string, number>
   query?: string
   lang?: Lang
   basePath?: string
@@ -66,6 +69,7 @@ export function CategoryPills({
             className={cn(PILL, activeRoot?.id === c.id ? PILL_ACTIVE : PILL_IDLE)}
           >
             {c.name}
+            {counts?.[c.id] ? <span className="ml-1 opacity-70">{counts[c.id]}</span> : null}
           </Link>
         ))}
       </div>
@@ -85,6 +89,7 @@ export function CategoryPills({
               className={cn(PILL, active?.id === c.id ? 'border-foreground bg-background' : 'border-transparent hover:bg-background')}
             >
               {c.name}
+              {counts?.[c.id] ? <span className="ml-1 opacity-70">{counts[c.id]}</span> : null}
             </Link>
           ))}
         </div>

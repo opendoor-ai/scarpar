@@ -11,7 +11,6 @@ import {
   categorySortSpec,
   findCategoryByParam,
   getPlatformCategories,
-  visibleCategories,
   type PlatformCategory,
 } from '@/lib/platform-categories'
 import { getOrgSettings, settingStr } from '@/lib/settings'
@@ -21,6 +20,7 @@ import type { Category, Product } from '@/types/db'
 
 import { EmptyState } from '@/components/ui/empty-state'
 import { getPrimaryImages } from '@/components/store/get-primary-images'
+import { getOrgCategories } from '@/lib/org-categories'
 import { getStoreOrg } from '@/components/store/get-store-org'
 import { Pagination } from '@/components/store/pagination'
 import { ProductCard, type ProductCardData } from '@/components/store/product-card'
@@ -77,9 +77,9 @@ export default async function ProductsPage({
 
   const supabase = getAnonClient()
 
-  // 플랫폼 공통 카테고리 (모든 공급사 공통)
-  const allCategories = await getPlatformCategories()
-  const categories: PlatformCategory[] = visibleCategories(allCategories)
+  // 플랫폼 공통 카테고리 중 이 공급사 제품이 있는 분류만 버튼으로 보여줌
+  const [allCategories, orgCats] = await Promise.all([getPlatformCategories(), getOrgCategories(org.id)])
+  const categories: PlatformCategory[] = orgCats.categories
   const activeCategory = findCategoryByParam(allCategories, { cate_no, category: legacySlug })
 
   const page = Math.max(1, Number(pageParam) || 1)
@@ -118,6 +118,7 @@ export default async function ProductsPage({
           orgSlug={org.slug}
           categories={categories}
           activeSlug={activeCategory ? categoryKey(activeCategory) : undefined}
+          counts={orgCats.counts}
           query={q}
           lang={lang}
         />

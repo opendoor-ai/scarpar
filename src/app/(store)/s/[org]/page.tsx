@@ -10,6 +10,7 @@ import type { CmsBlock, CmsPage } from '@/types/db'
 
 import { RenderBlocks } from '@/components/store/blocks/render-blocks'
 import { getStoreOrg } from '@/components/store/get-store-org'
+import { OrgCategorySection } from '@/components/store/org-category-section'
 import { storePath } from '@/components/store/store-links'
 import { formatKrPhone, phoneDigits } from '@/lib/phone'
 import { mediaUrl } from '@/lib/media-url'
@@ -72,6 +73,7 @@ export default async function StoreHomePage({ params }: PageProps<{ org: string 
     return (
       <>
         {bannerSection}
+        <OrgCategorySection orgId={org.id} orgSlug={org.slug} />
         <RenderBlocks blocks={page.blocks} ctx={{ org, lang }} />
       </>
     )
@@ -131,6 +133,7 @@ export default async function StoreHomePage({ params }: PageProps<{ org: string 
           </div>
         </section>
       )}
+      <OrgCategorySection orgId={org.id} orgSlug={org.slug} />
       <RenderBlocks blocks={defaultBlocks} ctx={{ org, lang }} />
     </>
   )
