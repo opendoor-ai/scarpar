@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { requireOrg } from '@/lib/auth'
 import { getServerClient } from '@/lib/supabase/server'
 import { buildNav } from '@/lib/modules'
+import { getAdminMode, supplierNav } from '@/lib/admin-mode'
 import { AdminShell } from '@/components/admin/shell'
 
 export const dynamic = 'force-dynamic'
@@ -43,6 +44,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       }
     }
     if (activeOrgs.size > 0) orgs = [...activeOrgs.values()]
+    // 메인 관리자가 대신 보고 있는 공급사도 목록에 보이게
+    if (!orgs.some((o) => o.id === ctx.org.id)) orgs = [{ id: ctx.org.id, name: ctx.org.name }, ...orgs]
 
     const fullName = (profileResult.data as { full_name: string | null } | null)?.full_name
     if (fullName) userName = fullName
@@ -53,19 +56,32 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     // rather than taking the whole admin shell down.
   }
 
-  const nav = buildNav(ctx.org)
+  // 메인 관리자(전자동) / 공급사 관리자 — 모드마다 메뉴가 달라요
+  const mode = await getAdminMode(ctx)
+  const nav = mode === 'supplier' ? supplierNav() : buildNav(ctx.org)
+  let platformAdmin = false
 
-  // 플랫폼 관리자(전자동)에게만 "플랫폼 관리" 메뉴 표시 (입점 신청 심사 등)
+  // 메인 관리자 메뉴 (입점 신청 심사, 공급사 관리 등)
   try {
     const { data: isPlatformAdmin } = await supabase.rpc('is_platform_admin')
-    if (isPlatformAdmin) {
+    platformAdmin = Boolean(isPlatformAdmin)
+    if (isPlatformAdmin && mode === 'main') {
       nav.core.splice(
         1,
         0,
         { label: '플랫폼 관리', href: '/admin/platform', icon: 'Building2' },
+        { label: '공급사 관리', href: '/admin/suppliers', icon: 'Store' },
         { label: '광고 관리', href: '/admin/ads', icon: 'Megaphone' },
         { label: '콘텐츠 관리', href: '/admin/contents', icon: 'LayoutTemplate' },
-        { label: '사이트 설정', href: '/admin/site', icon: 'Settings' },
+      )
+      // 사이트 설정 묶음 (카페24 쇼핑몰 설정처럼)
+      nav.main.push(
+        { group: '사이트 설정', label: '내 쇼핑몰 정보', href: '/admin/site', icon: 'Settings' },
+        { group: '사이트 설정', label: '검색엔진 최적화(SEO)', href: '/admin/site/seo', icon: 'Settings' },
+        { group: '사이트 설정', label: '상품검색 설정', href: '/admin/site/search', icon: 'Settings' },
+        { group: '사이트 설정', label: '상품정보표시 설정', href: '/admin/site/display', icon: 'Settings' },
+        { group: '사이트 설정', label: '바로가기 설정', href: '/admin/site/app', icon: 'Settings' },
+        { group: '사이트 설정', label: '도메인 안내', href: '/admin/site/domain', icon: 'Settings' },
       )
     }
   } catch {
@@ -74,6 +90,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <AdminShell
+      mode={mode}
       org={ctx.org}
       role={ctx.role}
       nav={nav}
@@ -81,6 +98,18 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       user={{ name: userName, email: ctx.user.email ?? '' }}
       unreadCount={unreadCount}
     >
+      {(platformAdmin && mode === 'supplier') || !ctx.org.is_active ? (
+        <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-indigo-300 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-950/40 px-4 py-2.5 text-sm">
+          <b className="text-indigo-600">메인 관리자가 보는 중</b>
+          <span>
+            지금 <b>{ctx.org.name}</b>의 공급사 관리자 화면을 대신 보고 있어요.
+            {!ctx.org.is_active ? <b className="ml-1 text-red-600">(운영 중지된 공급사)</b> : null} 여기서 바꾸는 내용은 이 공급사에 바로 반영돼요.
+          </span>
+          <a href="/admin/main?to=/admin/suppliers" className="ml-auto font-semibold text-primary hover:underline">
+            메인 관리자로 돌아가기 →
+          </a>
+        </div>
+      ) : null}
       {children}
     </AdminShell>
   )

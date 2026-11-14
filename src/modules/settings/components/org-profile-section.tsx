@@ -36,8 +36,6 @@ import { orgProfileSchema, type OrgProfileInput } from '@/modules/settings/schem
 
 const TIMEZONE_OPTIONS = [
   { value: 'Asia/Seoul', label: '서울 (UTC+9)' },
-  { value: 'Asia/Seoul', label: 'Asia/Seoul (UTC+6)' },
-  { value: 'Asia/Kolkata', label: 'Asia/Kolkata (UTC+5:30)' },
   { value: 'UTC', label: 'UTC' },
 ]
 
@@ -99,7 +97,7 @@ function OrgProfileSection({ org }: { org: Org }) {
                   <FormItem>
                     <FormLabel>대표 전화</FormLabel>
                     <FormControl>
-                      <Input {...field} value={field.value ?? ''} />
+                      <Input type="tel" {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

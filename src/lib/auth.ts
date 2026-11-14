@@ -26,6 +26,8 @@ export interface OrgContext {
   org: Org
   role: Role
   settings: Record<string, unknown>
+  /** 메인(플랫폼) 관리자가 직원 등록 없이 이 공급사 관리자 화면을 대신 보고 있는지 */
+  viaPlatform?: boolean
 }
 
 /** Current Supabase auth user, or null. React cache()'d per request. */
@@ -75,20 +77,32 @@ export const requireOrg = cache(async (): Promise<OrgContext> => {
   }
 
   const [orgResult, memberResult, settings] = await Promise.all([
-    supabase.from('orgs').select('*').eq('id', orgId).eq('is_active', true).single(),
+    supabase.from('orgs').select('*').eq('id', orgId).single(),
     supabase.from('org_members').select('role').eq('org_id', orgId).eq('user_id', user.id).single(),
     getOrgSettings(orgId),
   ])
 
-  if (orgResult.error || !orgResult.data || memberResult.error || !memberResult.data) {
+  const isMember = !memberResult.error && Boolean(memberResult.data)
+  // 메인(플랫폼) 관리자는 직원이 아니어도, 운영 중지된 공급사라도 들어가서 관리할 수 있음
+  let platformAdmin = false
+  if (!isMember || !(orgResult.data as Org | null)?.is_active) {
+    const { data } = await supabase.rpc('is_platform_admin')
+    platformAdmin = Boolean(data)
+  }
+
+  if (orgResult.error || !orgResult.data || (!isMember && !platformAdmin)) {
+    redirect('/onboarding')
+  }
+  if (!(orgResult.data as Org).is_active && !platformAdmin) {
     redirect('/onboarding')
   }
 
   return {
     user,
     org: orgResult.data as Org,
-    role: (memberResult.data as { role: Role }).role,
+    role: isMember ? (memberResult.data as { role: Role }).role : 'owner',
     settings,
+    viaPlatform: !isMember,
   }
 })
 

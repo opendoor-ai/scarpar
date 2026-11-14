@@ -1,70 +1,56 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+// 공급사 생성 (플랫폼 관리자 전용) — 공급사명 · 공급사 아이디(미니샵 주소) · 대표 전화번호
+// 일반 회원은 "공급사 입점 신청"을 쓰고, 승인되면 자동으로 만들어져요.
+
+import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, CheckIcon } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { createOrgAction } from '@/lib/actions/onboarding'
 import { createOrgSchema, type CreateOrgInput } from '@/lib/actions/onboarding-schemas'
-import { getIcon } from '@/lib/icon-map'
-import { cn, slugify } from '@/lib/utils'
-import { VERTICAL_PRESETS } from '@/modules/verticals'
-import type { Vertical } from '@/types/db'
 
-const VERTICALS = Object.entries(VERTICAL_PRESETS) as [Vertical, (typeof VERTICAL_PRESETS)[Vertical]][]
+/** 공급사 아이디: 영문 소문자·숫자·하이픈만 (한글은 빼고, 공백은 하이픈으로) */
+function toSupplierId(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+/, '')
+    .slice(0, 40)
+}
 
 interface CreateOrgStepperProps {
   heading: string
 }
 
-/**
- * Single RHF instance spanning both steps, fields CSS-hidden (not unmounted)
- * between steps so nothing gets deregistered when stepping back and forth.
- */
 export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
-  const [step, setStep] = useState<1 | 2>(1)
-  const [slugTouched, setSlugTouched] = useState(false)
+  const [idTouched, setIdTouched] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  // 화면 준비(하이드레이션)가 끝나기 전에 입력하면 값이 사라질 수 있어서, 준비될 때까지 잠깐 잠가 둬요
+  const [ready, setReady] = useState(false)
+  useEffect(() => setReady(true), [])
 
   const form = useForm<CreateOrgInput>({
     resolver: zodResolver(createOrgSchema),
-    defaultValues: {
-      name: '',
-      slug: '',
-      phone: '',
-      vertical: 'ecommerce',
-      seedDemo: false,
-    },
+    mode: 'onTouched',
+    defaultValues: { name: '', slug: '', phone: '', vertical: 'ecommerce', seedDemo: false, ownerEmail: '', ownerPassword: '' },
   })
-
-  async function goToStep2(): Promise<void> {
-    const valid = await form.trigger(['name', 'slug', 'phone'])
-    if (valid) setStep(2)
-  }
+  const slug = form.watch('slug')
 
   function onSubmit(values: CreateOrgInput) {
-    // The only <button type="submit"> lives in step 2, but both steps stay
-    // mounted (CSS-hidden) in the same <form>, so pressing Enter on step 1
-    // can still trigger this handler after step-1 fields validate. Treat
-    // that as "advance to step 2", not "create the org".
-    if (step !== 2) {
-      void goToStep2()
-      return
-    }
-
     setFormError(null)
     startTransition(async () => {
       const result = await createOrgAction(values)
-      if (!result.ok) {
-        setFormError(result.error)
-      }
+      if (!result.ok) setFormError(result.error)
     })
   }
 
@@ -72,35 +58,35 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">{heading}</CardTitle>
-        <CardDescription>
-          {step === 1 ? '회사 기본 정보를 입력하세요.' : '사업 유형을 고르면 맞는 기능을 켜 드립니다.'}
-        </CardDescription>
+        <CardDescription>공급사 기본 정보를 입력하세요. 만든 뒤 공급사 관리에서 등급·운영 상태를 바꿀 수 있어요.</CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
-            {formError ? (
-              <Alert variant="destructive">
-                <AlertCircle />
-                <AlertDescription>{formError}</AlertDescription>
-              </Alert>
-            ) : null}
+          <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+            <fieldset disabled={!ready || isPending} className="flex flex-col gap-5">
+              {formError ? (
+                <Alert variant="destructive">
+                  <AlertCircle />
+                  <AlertDescription>{formError}</AlertDescription>
+                </Alert>
+              ) : null}
 
-            <div className={cn('flex flex-col gap-4', step !== 1 && 'hidden')}>
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>회사(조직) 이름</FormLabel>
+                    <FormLabel>공급사명</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="예: 전자동"
+                        placeholder="예: 한일기계"
                         {...field}
                         onChange={(e) => {
                           field.onChange(e)
-                          if (!slugTouched) {
-                            form.setValue('slug', slugify(e.target.value), { shouldValidate: true })
+                          // 이름이 영문이면 아이디를 자동으로 채워 줌 (한글 이름이면 직접 입력)
+                          if (!idTouched) {
+                            const auto = toSupplierId(e.target.value).replace(/^-+|-+$/g, '')
+                            form.setValue('slug', auto, { shouldValidate: form.formState.isSubmitted })
                           }
                         }}
                       />
@@ -115,17 +101,22 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
                 name="slug"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>사이트 주소 (영문)</FormLabel>
+                    <FormLabel>공급사 아이디 (영문)</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="jadong"
+                        placeholder="예: hanil-machine"
+                        autoComplete="off"
                         {...field}
                         onChange={(e) => {
-                          setSlugTouched(true)
-                          field.onChange(slugify(e.target.value))
+                          setIdTouched(true)
+                          field.onChange(toSupplierId(e.target.value))
                         }}
                       />
                     </FormControl>
+                    <FormDescription>
+                      미니샵 주소가 돼요: <b className="text-foreground">/minishop/{slug || '아이디'}</b> · 영문 소문자·숫자·하이픈(-)만 쓸 수
+                      있고, 나중에 바꾸기 어려워요.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -138,66 +129,55 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
                   <FormItem>
                     <FormLabel>대표 전화번호</FormLabel>
                     <FormControl>
-                      <Input placeholder="010-1234-5678" autoComplete="tel" {...field} />
+                      <Input type="tel" placeholder="010-1234-5678" autoComplete="tel" {...field} />
                     </FormControl>
+                    <FormDescription>숫자만 입력해도 하이픈(-)이 자동으로 들어가요.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button type="button" className="mt-2 w-full" onClick={() => void goToStep2()}>
-다음
-              </Button>
-            </div>
-
-            <div className={cn('flex flex-col gap-4', step !== 2 && 'hidden')}>
-              <FormField
-                control={form.control}
-                name="vertical"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="grid grid-cols-2 gap-3">
-                      {VERTICALS.map(([key, preset]) => {
-                        const Icon = getIcon(preset.icon)
-                        const selected = field.value === key
-
-                        return (
-                          <button
-                            key={key}
-                            type="button"
-                            aria-pressed={selected}
-                            onClick={() => field.onChange(key)}
-                            className={cn(
-                              'flex flex-col gap-2 rounded-lg border p-4 text-left transition-colors',
-                              selected ? 'border-primary bg-primary/5' : 'border-border hover:bg-accent',
-                            )}
-                          >
-                            <div className="flex items-center justify-between">
-                              <Icon className="size-5 text-muted-foreground" />
-                              {selected ? <CheckIcon className="size-4 text-primary" /> : null}
-                            </div>
-                            <div className="flex flex-col gap-0.5">
-                              <span className="text-sm font-medium text-foreground">{preset.name}</span>
-                              <span className="text-xs text-muted-foreground">{preset.description}</span>
-                            </div>
-                          </button>
-                        )
-                      })}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex gap-2">
-                <Button type="button" variant="secondary" className="flex-1" onClick={() => setStep(1)}>
-이전
-                </Button>
-                <Button type="submit" className="flex-1" disabled={isPending}>
-                  {isPending ? '만드는 중…' : '조직 만들기'}
-                </Button>
+              <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/40 p-4">
+                <div>
+                  <p className="text-sm font-semibold">공급사 로그인 계정 (선택)</p>
+                  <p className="text-xs text-muted-foreground">
+                    적으면 공급사가 이 이메일로 직접 로그인해서 자기 관리자 화면을 써요. 비워 두면 지금 계정이 대표가 되고, 나중에 공급사 관리 → 로그인 계정에서 추가할 수 있어요.
+                  </p>
+                </div>
+                <FormField
+                  control={form.control}
+                  name="ownerEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>로그인 이메일</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="supplier@example.com" autoComplete="off" className="bg-background" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="ownerPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>초기 비밀번호 (새 계정일 때, 8자 이상)</FormLabel>
+                      <FormControl>
+                        <Input type="password" autoComplete="new-password" className="bg-background" {...field} />
+                      </FormControl>
+                      <FormDescription>이미 가입한 이메일이면 비워 두세요. 그 계정을 공급사 대표로 연결해요.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-            </div>
+
+              <Button type="submit" className="mt-1 w-full" disabled={!ready || isPending}>
+                {isPending ? <Loader2 className="size-4 animate-spin" /> : null}
+                {isPending ? '만드는 중…' : '공급사 생성'}
+              </Button>
+            </fieldset>
           </form>
         </Form>
       </CardContent>

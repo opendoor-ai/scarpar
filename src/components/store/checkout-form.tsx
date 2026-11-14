@@ -273,7 +273,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
             <FormItem>
               <FormLabel>송금한 번호</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="010-1234-5678" />
+                <Input type="tel" {...field} placeholder="010-1234-5678" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -310,7 +310,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                   <FormItem>
                     <FormLabel>{t('phone', lang)}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="010-1234-5678" />
+                      <Input type="tel" {...field} placeholder="010-1234-5678" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

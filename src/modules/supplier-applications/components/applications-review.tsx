@@ -84,7 +84,7 @@ function ApplicationItem({ a }: { a: ApplicationRow }) {
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant={status.variant}>{status.label}</Badge>
         <span className="font-semibold">{a.company_name}</span>
-        <span className="text-muted-foreground">/s/{a.desired_slug}</span>
+        <span className="text-muted-foreground">/minishop/{a.desired_slug}</span>
         <span className="ml-auto text-xs text-muted-foreground">{format(new Date(a.created_at), 'yyyy.MM.dd HH:mm')}</span>
       </div>
 
@@ -170,7 +170,7 @@ function ApplicationItem({ a }: { a: ApplicationRow }) {
                 </Button>
               }
               title={`${a.company_name} 입점을 승인할까요?`}
-              description={`승인하면 공급사 미니샵(/s/${a.desired_slug})과 관리자 화면이 바로 만들어지고, 신청자가 대표 권한을 받습니다.`}
+              description={`승인하면 공급사 미니샵(/minishop/${a.desired_slug})과 관리자 화면이 바로 만들어지고, 신청자가 대표 권한을 받습니다.`}
               confirmLabel="승인"
               onConfirm={async () => {
                 const result = await approveApplicationAction(a.id)

@@ -43,7 +43,7 @@ export async function saveStoreBannerAction(id: string | null, input: StoreBanne
 
   audit(ctx, id ? 'store_banner.updated' : 'store_banner.created', 'store_banner', (data as { id: string }).id, null, row)
   revalidatePath('/admin/banners')
-  revalidatePath(`/s/${ctx.org.slug}`)
+  revalidatePath(`/minishop/${ctx.org.slug}`)
   return { ok: true }
 }
 
@@ -55,6 +55,6 @@ export async function deleteStoreBannerAction(id: string): Promise<ActionResult>
   if (error) return { ok: false, error: error.message }
   audit(ctx, 'store_banner.deleted', 'store_banner', id, null, null)
   revalidatePath('/admin/banners')
-  revalidatePath(`/s/${ctx.org.slug}`)
+  revalidatePath(`/minishop/${ctx.org.slug}`)
   return { ok: true }
 }

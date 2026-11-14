@@ -177,7 +177,7 @@ async function loadTemplateProducts(ids: string[]): Promise<Map<string, Template
     map.set(r.id, {
       no: r.product_no,
       name: r.name,
-      link: `/s/${org.slug}/products/${r.product_no}`,
+      link: `/minishop/${org.slug}/products/${r.product_no}`,
       image: imgs[r.id] ?? null,
       price: Number(r.price ?? 0),
       compare_at_price: r.compare_at_price ? Number(r.compare_at_price) : null,

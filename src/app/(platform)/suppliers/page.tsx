@@ -70,7 +70,7 @@ export default async function SuppliersPage({ searchParams }: { searchParams: Pr
           {orgs.map((o) => (
             <Link
               key={o.id}
-              href={`/s/${o.slug}`}
+              href={`/minishop/${o.slug}`}
               className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/50"
             >
               <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">

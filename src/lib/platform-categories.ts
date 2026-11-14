@@ -85,7 +85,7 @@ export const getPlatformCategories = cache(async (): Promise<PlatformCategory[]>
 })
 
 /** 카테고리 상품 진열 순서 → 정렬 기준 */
-export function categorySortSpec(sort: CategoryProductSort): { column: 'created_at' | 'name' | 'price'; ascending: boolean } {
+export function categorySortSpec(sort: CategoryProductSort): { column: 'created_at' | 'display_at' | 'name' | 'price'; ascending: boolean } {
   switch (sort) {
     case 'oldest':
       return { column: 'created_at', ascending: true }
@@ -96,7 +96,8 @@ export function categorySortSpec(sort: CategoryProductSort): { column: 'created_
     case 'price_desc':
       return { column: 'price', ascending: false }
     default:
-      return { column: 'created_at', ascending: false }
+      // 최신순 = 진열 시각 (새로 등록하거나 점프하면 맨 위)
+      return { column: 'display_at', ascending: false }
   }
 }
 

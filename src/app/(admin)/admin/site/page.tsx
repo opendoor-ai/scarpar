@@ -16,7 +16,7 @@ export default async function SiteSettingsPage() {
   const settings = await getSiteSettings()
   return (
     <div>
-      <PageHeader title="사이트 설정" description="전자동기계광고 사이트 전체에 보이는 알림 띠와 바닥글 정보를 관리합니다." />
+      <PageHeader title="내 쇼핑몰 정보" description="사이트 전체에 보이는 알림 띠, 사업자 정보, 고객센터·개인정보보호책임자 정보를 관리해요." />
       <SiteSettingsForm initial={settings} />
     </div>
   )

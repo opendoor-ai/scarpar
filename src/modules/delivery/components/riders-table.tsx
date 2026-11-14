@@ -102,7 +102,7 @@ function RiderDialog({ rider, trigger }: { rider?: Rider; trigger: React.ReactNo
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <Label>전화번호</Label>
-              <Input value={phone} onChange={(event) => setPhone(event.target.value)} />
+              <Input type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label>운송 수단</Label>

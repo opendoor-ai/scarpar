@@ -9,6 +9,8 @@ export interface NavItem {
   href: string
   icon: string
   moduleKey?: ModuleKey
+  /** 사이드바 묶음 이름 (공급사 메뉴처럼 모듈과 상관없이 묶을 때) */
+  group?: string
 }
 
 /** Enabled modules for an org, in canonical MODULE_LIST order. */

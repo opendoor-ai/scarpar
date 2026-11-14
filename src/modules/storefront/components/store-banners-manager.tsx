@@ -196,7 +196,7 @@ function BannerDialog({
             />
           </Field>
           <div className="sm:col-span-2">
-            <Field label="누르면 이동할 주소 (선택)" hint="예: 우리 상품 /s/우리주소/products/10001 · 비우면 누르지 않는 그림">
+            <Field label="누르면 이동할 주소 (선택)" hint="예: 우리 상품 /minishop/우리아이디/products/10001 · 비우면 누르지 않는 그림">
               <Input value={form.link_url} onChange={(e) => set('link_url', e.target.value)} />
             </Field>
           </div>

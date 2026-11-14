@@ -1,5 +1,6 @@
 'use server'
 
+import { PLATFORM_ORG_SLUG } from '@/lib/site'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
@@ -47,6 +48,10 @@ export async function toggleOrgActiveAction(input: {
 
     if (fetchError || !org) return { ok: false, error: '조직을 찾을 수 없습니다' }
     const orgRow = org as Org
+    // 전자동(플랫폼) 자신은 중지할 수 없음 — 사이트 전체 제품이 숨겨지는 사고 방지
+    if (!parsed.data.isActive && orgRow.slug === PLATFORM_ORG_SLUG) {
+      return { ok: false, error: '전자동(플랫폼) 공급사는 중지할 수 없어요. 사이트 전체 제품이 숨겨져요.' }
+    }
 
     const { error } = await admin
       .from('orgs')

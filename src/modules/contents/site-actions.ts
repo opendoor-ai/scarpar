@@ -17,9 +17,13 @@ export async function saveSiteSettingsAction(input: SiteSettings): Promise<Actio
   }
   const parsed = siteSettingsSchema.safeParse(input)
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값이 올바르지 않습니다' }
-  const { error } = await getAdminClient()
+  // 다른 설정(SEO·검색 등)은 그대로 두고 이 부분만 덮어씀
+  const admin = getAdminClient()
+  const { data: row } = await admin.from('site_settings').select('data').eq('id', 1).maybeSingle()
+  const current = ((row as { data: Record<string, unknown> } | null)?.data ?? {}) as Record<string, unknown>
+  const { error } = await admin
     .from('site_settings')
-    .upsert({ id: 1, data: parsed.data, updated_at: new Date().toISOString() })
+    .upsert({ id: 1, data: { ...current, ...parsed.data }, updated_at: new Date().toISOString() })
   if (error) return { ok: false, error: error.message }
   revalidatePath('/', 'layout')
   return { ok: true }

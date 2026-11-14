@@ -13,7 +13,7 @@ export const storeBannerSchema = z
       .string()
       .trim()
       .max(500)
-      .refine((v) => v === '' || v.startsWith('/') || /^https?:\/\//i.test(v), '/s/... 또는 https:// 로 시작하는 주소를 입력하세요'),
+      .refine((v) => v === '' || v.startsWith('/') || /^https?:\/\//i.test(v), '/minishop/... 또는 https:// 로 시작하는 주소를 입력하세요'),
     image_pc: z.string().trim().min(1, 'PC 이미지를 선택하세요').max(1000),
     image_mobile: z.string().trim().max(1000),
     starts_on: optionalDate,

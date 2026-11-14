@@ -7,6 +7,7 @@ import { Sidebar } from '@/components/admin/sidebar'
 import { Topbar } from '@/components/admin/topbar'
 import { ThemeScript } from '@/components/admin/theme-toggle'
 import { CommandPalette } from '@/components/admin/command-palette'
+import { SupplierShell } from '@/components/admin/supplier-shell'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import type { NavItem } from '@/lib/modules'
 import type { Org, Role } from '@/types/db'
@@ -14,6 +15,7 @@ import type { Org, Role } from '@/types/db'
 const SIDEBAR_COLLAPSE_KEY = 'jadong-sidebar-collapsed'
 
 interface AdminShellProps {
+  mode?: 'main' | 'supplier'
   org: Org
   role: Role
   nav: { main: NavItem[]; core: NavItem[] }
@@ -23,7 +25,7 @@ interface AdminShellProps {
   children: React.ReactNode
 }
 
-export function AdminShell({ org, role, nav, orgs, user, unreadCount, children }: AdminShellProps) {
+export function AdminShell({ mode = 'main', org, role, nav, orgs, user, unreadCount, children }: AdminShellProps) {
   const [collapsed, setCollapsed] = React.useState(false)
   const [hydrated, setHydrated] = React.useState(false)
   const [mobileOpen, setMobileOpen] = React.useState(false)
@@ -53,6 +55,15 @@ export function AdminShell({ org, role, nav, orgs, user, unreadCount, children }
   const enabledModules = React.useMemo(() => new Set(org.enabled_modules), [org.enabled_modules])
   const isCollapsed = hydrated && collapsed
 
+  // 공급사 관리자: 카페24 공급사관리자페이지 같은 전용 화면 틀
+  if (mode === 'supplier') {
+    return (
+      <SupplierShell orgName={org.name} orgSlug={org.slug} user={user} unreadCount={unreadCount}>
+        {children}
+      </SupplierShell>
+    )
+  }
+
   return (
     <>
       <ThemeScript />
@@ -64,6 +75,7 @@ export function AdminShell({ org, role, nav, orgs, user, unreadCount, children }
           )}
         >
           <Sidebar
+            mode={mode}
             org={org}
             orgs={orgs}
             nav={nav}
@@ -76,7 +88,7 @@ export function AdminShell({ org, role, nav, orgs, user, unreadCount, children }
           <SheetContent side="left" className="w-[232px] p-0 sm:max-w-[232px]">
             <SheetTitle className="sr-only">메뉴</SheetTitle>
             <SheetDescription className="sr-only">관리자 메뉴</SheetDescription>
-            <Sidebar org={org} orgs={orgs} nav={nav} onNavigate={() => setMobileOpen(false)} />
+            <Sidebar mode={mode} org={org} orgs={orgs} nav={nav} onNavigate={() => setMobileOpen(false)} />
           </SheetContent>
         </Sheet>
 

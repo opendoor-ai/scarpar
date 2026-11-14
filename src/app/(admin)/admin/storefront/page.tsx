@@ -13,7 +13,7 @@ export default async function StorefrontSettingsPage() {
   const ctx = await requireOrg()
   requireModule(ctx.org, 'storefront')
 
-  const storefrontUrl = `${env.APP_URL}/s/${ctx.org.slug}`
+  const storefrontUrl = `${env.APP_URL}/minishop/${ctx.org.slug}`
 
   return (
     <>

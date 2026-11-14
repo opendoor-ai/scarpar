@@ -87,6 +87,7 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettings }) {
             >
               <Label>{f.label}</Label>
               <Input
+                type={f.key === 'phone' || f.key === 'fax' ? 'tel' : undefined}
                 value={String(form[f.key] ?? '')}
                 placeholder={f.placeholder}
                 onChange={(e) => set(f.key, e.target.value as never)}

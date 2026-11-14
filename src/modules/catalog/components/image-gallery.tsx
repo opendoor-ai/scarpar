@@ -120,12 +120,12 @@ function ImageGallery({ value, onChange }: ImageGalleryProps) {
               <button
                 type="button"
                 onClick={open}
-                className="group relative flex size-48 items-center justify-center overflow-hidden rounded-md border border-border bg-muted"
+                className="group relative flex size-48 items-center justify-center overflow-hidden rounded-md border border-border bg-[#e9e9e9]"
                 aria-label={main ? '대표이미지 변경' : '대표이미지 등록'}
               >
                 {main ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={mediaUrl(main.path)} alt="" className="size-full object-cover" />
+                  <img src={mediaUrl(main.path)} alt="" className="size-full object-contain" />
                 ) : (
                   <span className="flex flex-col items-center gap-1 text-muted-foreground">
                     <Camera className="size-10" />
@@ -200,12 +200,12 @@ function ImageGallery({ value, onChange }: ImageGalleryProps) {
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={() => dropOn(r.key)}
                   className={cn(
-                    'group relative aspect-square cursor-grab overflow-hidden rounded-md border border-border bg-muted active:cursor-grabbing',
+                    'group relative aspect-square cursor-grab overflow-hidden rounded-md border border-border bg-[#e9e9e9] active:cursor-grabbing',
                     dragKey === r.key && 'opacity-40',
                   )}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={mediaUrl(r.path)} alt="" className="pointer-events-none size-full object-cover" />
+                  <img src={mediaUrl(r.path)} alt="" className="pointer-events-none size-full object-contain" />
                   <span className="absolute top-1 left-1 rounded bg-black/60 px-1.5 text-[10px] font-semibold text-white tabular-nums">
                     {i + 1}
                   </span>

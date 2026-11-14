@@ -6,7 +6,9 @@ import { Headphones, Mail, Phone } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { SITE_NAME } from '@/lib/site'
+import { DEFAULT_FAQ, faqJsonLd } from '@/lib/default-faq'
 import { getSiteSettings } from '@/lib/site-settings'
+import { getSiteConfig } from '@/modules/site-config/get'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,34 +17,15 @@ export const metadata: Metadata = {
   description: '전자동기계광고 고객센터 — 제품 문의, 공급사 입점, 광고 문의를 도와드립니다.',
 }
 
-const FAQ = [
-  {
-    q: '제품은 어떻게 사나요?',
-    a: `${SITE_NAME}는 공급사와 고객을 연결하는 광고 플랫폼이에요. 제품 상세페이지의 전화·문자 버튼으로 공급사에 직접 문의하고, 가격·납기·설치는 공급사와 협의해 주세요.`,
-  },
-  {
-    q: '가격이 "가격협의"로 나와요.',
-    a: '중고·주문제작 기계는 상태와 옵션에 따라 가격이 달라서 공급사가 상담 후 안내해요. 전화나 문자로 문의해 주세요.',
-  },
-  {
-    q: '공급사로 입점하려면 어떻게 하나요?',
-    a: '"공급사등록신청"에서 회원가입 후 입점 신청서를 내면, 확인 후 미니샵과 관리자 화면이 열려요. 제품 등록은 무료예요.',
-  },
-  {
-    q: '광고는 어떻게 하나요?',
-    a: '"광고상품" 페이지에서 광고 자리를 확인하고 고객센터로 연락 주세요. 남은 자리와 기간을 안내해 드려요.',
-  },
-  {
-    q: '거래 중 문제가 생겼어요.',
-    a: '거래 당사자는 고객과 공급사예요. 먼저 공급사와 협의해 주시고, 해결이 어려우면 고객센터로 알려 주세요. 사실 확인 후 공급사 안내·조치를 도와드려요.',
-  },
-]
-
 export default async function SupportPage() {
-  const s = await getSiteSettings()
+  const [s, { seo }] = await Promise.all([getSiteSettings(), getSiteConfig()])
+  // 관리자 → SEO → 자주 묻는 질문을 적었으면 그것을, 없으면 기본 질문
+  const FAQ = seo.faq.length > 0 ? seo.faq : DEFAULT_FAQ
   const digits = s.phone.replace(/[^\d]/g, '')
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+      {/* 검색엔진·AI용 자주 묻는 질문 구조화 데이터 (FAQPage) */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd(FAQ) }} />
       <div className="mb-8 flex items-center gap-3">
         <Headphones className="size-8 text-primary" />
         <div>

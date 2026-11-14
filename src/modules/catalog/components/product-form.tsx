@@ -279,8 +279,8 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
       if (!imagesResult.ok) return void toast.error(`상품은 저장됐지만 사진 저장에 실패했습니다: ${imagesResult.error}`)
 
       toast.success(mode === 'create' ? '상품이 등록되었습니다' : '상품이 수정되었습니다')
-      if (mode === 'create') router.push(`/admin/products/${productId}`)
-      else router.refresh()
+      router.push('/admin/products')
+      router.refresh()
     })
   }
 

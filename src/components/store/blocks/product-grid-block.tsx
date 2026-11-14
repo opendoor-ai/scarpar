@@ -35,7 +35,7 @@ export async function ProductGridBlockView({ block, ctx }: { block: ProductGridB
   }
 
   const { data } = await (block.mode === 'latest'
-    ? query.order('created_at', { ascending: false })
+    ? query.order('display_at', { ascending: false })
     : query.order('position', { ascending: true })
   ).limit(limit)
   let products = (data ?? []) as GridProductRow[]

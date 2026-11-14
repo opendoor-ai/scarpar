@@ -6,10 +6,15 @@ import { ChevronDown, Menu, Search, UserRound } from 'lucide-react'
 
 import { AdLink } from '@/components/platform/ad-link'
 import { BannerHtml } from '@/components/platform/banner-html'
+import { HeaderSearch } from '@/components/platform/header-search'
 import { TopBar } from '@/components/platform/top-bar'
 import { inlineHtml } from '@/lib/inline-html'
 import { categoryQuery, getPlatformCategories, visibleCategories } from '@/lib/platform-categories'
+import { safeJsonLd } from '@/lib/default-faq'
+import { env } from '@/lib/env'
+import { mediaUrl } from '@/lib/media-url'
 import { SITE_NAME } from '@/lib/site'
+import { getSiteConfig } from '@/modules/site-config/get'
 import { getSiteSettings } from '@/lib/site-settings'
 import { getLiveBanners, renderGroupHtml, type LiveBanner } from '@/modules/ads/live'
 
@@ -50,7 +55,7 @@ function WingBanners({ side, banners }: { side: 'left' | 'right'; banners: LiveB
 }
 
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
-  const [settings, categories, wingLeft, wingRight, topBars, logos, menuBanners, quickMenus] = await Promise.all([
+  const [settings, categories, wingLeft, wingRight, topBars, logos, menuBanners, quickMenus, siteConfig] = await Promise.all([
     getSiteSettings(),
     getPlatformCategories(),
     getLiveBanners('wing_left'),
@@ -59,6 +64,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
     getLiveBanners('logo'),
     getLiveBanners('menu_banner'),
     getLiveBanners('quick_menu'),
+    getSiteConfig(),
   ])
   const [topBarHtml, quickHtml] = await Promise.all([
     renderGroupHtml('top_bar', topBars),
@@ -81,8 +87,49 @@ export default async function PlatformLayout({ children }: { children: React.Rea
     settings.privacy_officer && `개인정보보호책임자 ${settings.privacy_officer}`,
   ].filter(Boolean) as string[]
 
+  // 검색엔진·AI용 회사·사이트 정보 (Organization + WebSite 검색창)
+  const base = env.APP_URL.replace(/\/+$/, '')
+  const sameAs = siteConfig.seo.channels
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => /^https?:\/\//.test(l))
+  const orgLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${base}/#organization`,
+        name: SITE_NAME,
+        url: base,
+        ...(logo?.image_pc ? { logo: logo.image_pc } : siteConfig.seo.favicon ? { logo: mediaUrl(siteConfig.seo.favicon) } : {}),
+        ...(settings.company_name ? { legalName: settings.company_name } : {}),
+        ...(settings.email ? { email: settings.email } : {}),
+        ...(settings.phone
+          ? { contactPoint: { '@type': 'ContactPoint', telephone: settings.phone, contactType: 'customer service', areaServed: 'KR', availableLanguage: 'Korean' } }
+          : {}),
+        ...(settings.address ? { address: { '@type': 'PostalAddress', streetAddress: settings.address, addressCountry: 'KR' } } : {}),
+        ...(sameAs.length ? { sameAs } : {}),
+        ...(siteConfig.seo.aiSummary ? { description: siteConfig.seo.aiSummary } : { description: siteConfig.seo.description }),
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${base}/#website`,
+        url: base,
+        name: SITE_NAME,
+        inLanguage: 'ko-KR',
+        publisher: { '@id': `${base}/#organization` },
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: { '@type': 'EntryPoint', urlTemplate: `${base}/products?q={search_term_string}` },
+          'query-input': 'required name=search_term_string',
+        },
+      },
+    ],
+  }
+
   return (
     <div className="flex min-h-dvh flex-col bg-background">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(orgLd) }} />
       {/* 맨 위 띠: 배너 관리 [상단] 탑배너가 있으면 그걸, 없으면 사이트 설정 알림 */}
       {topBarHtml ? (
         <BannerHtml html={topBarHtml} />
@@ -126,17 +173,14 @@ export default async function PlatformLayout({ children }: { children: React.Rea
               SITE_NAME
             )}
           </Link>
-          <form action="/products" method="GET" className="relative ml-auto hidden w-full max-w-md md:block">
-            <input
-              type="search"
-              name="q"
-              placeholder="제품명·모델명·제조사 검색"
-              className="h-10 w-full rounded-full border-2 border-primary/70 bg-background px-5 pr-11 text-sm outline-none focus:border-primary"
-            />
-            <button type="submit" className="absolute top-1/2 right-3 -translate-y-1/2 text-primary" aria-label="검색">
-              <Search className="size-5" />
-            </button>
-          </form>
+          <HeaderSearch
+            promos={siteConfig.search.promoEnabled ? siteConfig.search.promos : []}
+            mode={siteConfig.search.promoMode}
+            popular={siteConfig.search.popular
+              .split(',')
+              .map((k) => k.trim())
+              .filter(Boolean)}
+          />
           <div className="ml-auto flex items-center gap-1 md:ml-4">
             <Link
               href="/products"

@@ -70,7 +70,7 @@ export async function fetchLatestPlatformCards(limit: number, orgId?: string): P
     .eq('status', 'active')
     .eq('org.is_active', true)
   if (orgId) q = q.eq('org_id', orgId)
-  const { data } = await q.order('created_at', { ascending: false }).limit(limit)
+  const { data } = await q.order('display_at', { ascending: false }).limit(limit)
   const [cards] = await toPlatformCards((data ?? []) as unknown as PlatformProductRow[])
   return cards
 }

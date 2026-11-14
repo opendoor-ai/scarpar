@@ -43,7 +43,7 @@ export async function provisionOrg(input: ProvisionOrgInput, ownerUserId: string
   const admin = getAdminClient()
 
   if (await isOrgSlugTaken(input.slug)) {
-    return { ok: false, error: '이미 사용 중인 주소입니다. 다른 주소를 입력하세요.' }
+    return { ok: false, error: '이미 사용 중인 공급사 아이디(주소)예요. 다른 아이디를 입력하세요.' }
   }
 
   const { data: orgRow, error: orgError } = await admin

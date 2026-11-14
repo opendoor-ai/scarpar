@@ -113,7 +113,7 @@ function QuestionItem({ q, storeSlug }: { q: QuestionRow; storeSlug: string }) {
         ) : null}
         {q.product ? (
           <Link
-            href={`/s/${storeSlug}/products/${q.product.product_no}#product-qna`}
+            href={`/minishop/${storeSlug}/products/${q.product.product_no}#product-qna`}
             target="_blank"
             className="font-medium text-foreground hover:underline"
           >

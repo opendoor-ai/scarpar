@@ -18,6 +18,8 @@ import {
 } from '@/lib/platform-categories'
 import { mediaUrl } from '@/lib/media-url'
 import { SITE_DESCRIPTION, SITE_NAME } from '@/lib/site'
+import { getSiteConfig } from '@/modules/site-config/get'
+import { fillTemplate } from '@/modules/site-config/schemas'
 import { getAnonClient } from '@/lib/supabase/anon'
 import type { PageProps } from '@/lib/types'
 import type { Product } from '@/types/db'
@@ -55,24 +57,38 @@ function cleanQuery(q: string | undefined): string {
 
 export async function generateMetadata({ searchParams }: PageProps<Record<string, string>, SearchParams>): Promise<Metadata> {
   const { cate_no, category, q } = await searchParams
-  const activeCat = findCategoryByParam(await getPlatformCategories(), { cate_no, category })
+  const allCats = await getPlatformCategories()
+  const activeCat = findCategoryByParam(allCats, { cate_no, category })
   const categoryName = activeCat?.name
   const query = cleanQuery(q)
+  // 관리자 → SEO → 분류 페이지 문구 틀 (분류마다 따로 적은 검색 문구가 있으면 그것이 먼저)
+  const { seo } = await getSiteConfig()
+  let catVars: Record<string, string | number> = {}
+  if (activeCat) {
+    const { count } = await getAnonClient()
+      .from('products')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'active')
+      .in('category_id', categoryWithDescendants(allCats, activeCat.id))
+    const parent = activeCat.parent_id ? allCats.find((c) => c.id === activeCat.parent_id) : undefined
+    catVars = { 분류명: activeCat.name, 상위분류명: parent?.name ?? '', 상품수: count ?? 0, 사이트명: SITE_NAME }
+  }
   const title = activeCat?.seo_title
     ? activeCat.seo_title
     : categoryName
-      ? `${categoryName} 제품`
+      ? fillTemplate(seo.categoryTitle, catVars) || `${categoryName} 제품`
       : query
         ? `${query} 검색 결과`
         : '전체 제품'
   const description = activeCat?.seo_description
     ? activeCat.seo_description
     : categoryName
-      ? `${categoryName} 산업기계·중고기계를 공급사별로 비교하고 바로 전화·문자로 문의하세요. ${SITE_NAME}`
-      : SITE_DESCRIPTION
+      ? fillTemplate(seo.categoryDescription, catVars) ||
+        `${categoryName} 산업기계·중고기계를 공급사별로 비교하고 바로 전화·문자로 문의하세요. ${SITE_NAME}`
+      : seo.description || SITE_DESCRIPTION
   const canonical = `${env.APP_URL}${BASE_PATH}${activeCat ? `?${categoryQuery(activeCat)}` : ''}`
   return {
-    title: activeCat?.seo_title ? { absolute: title } : `${title} · ${SITE_NAME}`,
+    title: activeCat?.seo_title ? { absolute: title } : { absolute: `${title} | ${SITE_NAME}` },
     description,
     keywords: activeCat?.seo_keywords
       ? activeCat.seo_keywords
@@ -115,13 +131,21 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
   // 1차 카테고리를 고르면 그 아래 2차 카테고리 상품까지 함께
   if (activeCategory) request = request.in('category_id', categoryWithDescendants(allCategories, activeCategory.id))
   // 상품명·모델명·제조사에서 찾기
-  if (query) request = request.or(`name.ilike.%${query}%,model_name.ilike.%${query}%,brand.ilike.%${query}%`)
+  // 관리자 → 상품검색 설정에서 고른 항목으로 찾기 (상품코드는 P10006 · 10006 모두)
+  if (query) {
+    const { search } = await getSiteConfig()
+    const col: Record<string, string> = { name: 'name', model: 'model_name', brand: 'brand', spec: 'spec_summary', summary: 'short_description' }
+    const ors = search.fields.filter((f) => f !== 'code').map((f) => `${col[f]}.ilike.%${query}%`)
+    const codeNo = Number(query.replace(/^p/i, ''))
+    if (search.fields.includes('code') && /^p?\d{4,12}$/i.test(query) && Number.isSafeInteger(codeNo)) ors.push(`product_no.eq.${codeNo}`)
+    request = request.or(ors.length ? ors.join(',') : `name.ilike.%${query}%`)
+  }
 
-  // 카테고리 페이지: 관리자가 정한 진열 순서 / 전체·검색: 추천 상품 → 최근 수정 순
+  // 카테고리 페이지: 관리자가 정한 진열 순서 / 전체·검색: 진열 시각 순 (새 등록·점프한 제품이 맨 위)
   const sort = activeCategory ? categorySortSpec(activeCategory.product_sort) : null
   const ordered = sort
     ? request.order(sort.column, { ascending: sort.ascending }).order('created_at', { ascending: false })
-    : request.order('is_featured', { ascending: false }).order('updated_at', { ascending: false })
+    : request.order('display_at', { ascending: false })
   const { data, count, error } = await ordered.range(from, from + PAGE_SIZE - 1)
   if (error) console.error('[platform products] read failed:', error.message)
 

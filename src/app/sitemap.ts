@@ -37,14 +37,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const orgIds = orgs.map((o) => o.id)
 
     for (const o of orgs) {
-      entries.push({ url: `${base}/s/${o.slug}`, lastModified: o.updated_at, changeFrequency: 'daily', priority: 0.8 })
-      entries.push({ url: `${base}/s/${o.slug}/products`, changeFrequency: 'daily', priority: 0.7 })
+      entries.push({ url: `${base}/minishop/${o.slug}`, lastModified: o.updated_at, changeFrequency: 'daily', priority: 0.8 })
+      entries.push({ url: `${base}/minishop/${o.slug}/products`, changeFrequency: 'daily', priority: 0.7 })
     }
 
     // 통합 제품 검색 + 플랫폼 공통 카테고리 페이지
     entries.push({ url: `${base}/`, changeFrequency: 'daily', priority: 1 })
     entries.push({ url: `${base}/products`, changeFrequency: 'daily', priority: 0.9 })
-    for (const path of ['/suppliers', '/magazine', '/advertise', '/support']) {
+    for (const path of ['/suppliers', '/requests', '/magazine', '/advertise', '/support']) {
       entries.push({ url: `${base}${path}`, changeFrequency: 'weekly', priority: 0.5 })
     }
     for (const c of visibleCategories(await getPlatformCategories())) {
@@ -68,7 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const orgSlug = slugById.get(p.org_id)
       if (!orgSlug) continue
       entries.push({
-        url: `${base}/s/${orgSlug}/products/${p.product_no}`,
+        url: `${base}/minishop/${orgSlug}/products/${p.product_no}`,
         lastModified: p.updated_at,
         changeFrequency: 'weekly',
         priority: 0.9,
@@ -86,7 +86,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const p of pages) {
       const orgSlug = slugById.get(p.org_id)
       if (!orgSlug || p.type === 'home' || p.slug === 'home') continue // 홈은 위의 미니샵 주소와 같음
-      entries.push({ url: `${base}/s/${orgSlug}/${p.slug}`, lastModified: p.updated_at, changeFrequency: 'monthly', priority: 0.4 })
+      entries.push({ url: `${base}/minishop/${orgSlug}/${p.slug}`, lastModified: p.updated_at, changeFrequency: 'monthly', priority: 0.4 })
     }
   } catch (err) {
     console.error('[sitemap] failed:', err)

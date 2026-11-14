@@ -126,7 +126,7 @@ function NewJobDialog() {
               ) : (
                 <div className="grid grid-cols-2 gap-2">
                   <Input placeholder="이름" value={newName} onChange={(event) => setNewName(event.target.value)} />
-                  <Input placeholder="전화번호" value={newPhone} onChange={(event) => setNewPhone(event.target.value)} />
+                  <Input type="tel" placeholder="전화번호" value={newPhone} onChange={(event) => setNewPhone(event.target.value)} />
                 </div>
               )}
               {customerError ? <p className="text-destructive text-xs">{customerError}</p> : null}

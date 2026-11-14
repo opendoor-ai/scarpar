@@ -68,16 +68,16 @@ function HubHeader({ title, description }: { title: string; description: string 
 function MiniProduct({ p, dark }: { p: PlatformProductCard; dark?: boolean }) {
   return (
     <Link
-      href={`/s/${p.orgSlug}/products/${p.card.product_no}`}
+      href={`/minishop/${p.orgSlug}/products/${p.card.product_no}`}
       className={cn(
         'flex min-w-0 flex-col overflow-hidden rounded-lg border transition-colors',
         dark ? 'border-white/20 bg-white/95 text-foreground hover:bg-white' : 'border-border bg-card hover:border-primary/40',
       )}
     >
-      <span className="aspect-square w-full overflow-hidden bg-muted">
+      <span className="aspect-square w-full overflow-hidden bg-[#e9e9e9]">
         {p.card.image ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={p.card.image} alt="" loading="lazy" className="size-full object-cover" />
+          <img src={p.card.image} alt="" loading="lazy" className="size-full object-contain" />
         ) : null}
       </span>
       <span className="flex flex-col gap-0.5 p-2">
@@ -160,10 +160,10 @@ export async function PartnerHub({ banners }: { banners: LiveBanner[] }) {
               {items.length > 0 ? (
                 <div className="mt-auto grid grid-cols-3 gap-1.5 border-t border-border p-2">
                   {items.map((p) => (
-                    <Link key={p.card.id} href={`/s/${p.orgSlug}/products/${p.card.product_no}`} title={p.card.name} className="aspect-square overflow-hidden rounded bg-muted">
+                    <Link key={p.card.id} href={`/minishop/${p.orgSlug}/products/${p.card.product_no}`} title={p.card.name} className="aspect-square overflow-hidden rounded bg-[#e9e9e9]">
                       {p.card.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={p.card.image} alt="" loading="lazy" className="size-full object-cover" />
+                        <img src={p.card.image} alt="" loading="lazy" className="size-full object-contain" />
                       ) : null}
                     </Link>
                   ))}

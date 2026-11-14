@@ -99,6 +99,9 @@ export function StoreFooter({
             <Link href="/products" className="hover:text-foreground">
               더 많은 산업기계 보기
             </Link>
+            <a href={`/minishop/${org.slug}/admin`} className="hover:text-foreground" rel="nofollow">
+              공급사 관리자
+            </a>
           </div>
         </div>
       </div>

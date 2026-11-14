@@ -170,6 +170,7 @@ export function CartPanel({
           onChange={(event) => onCustomerNameChange(event.target.value)}
         />
         <Input
+          type="tel"
           placeholder="전화번호 (선택)"
           value={customerPhone}
           onChange={(event) => onCustomerPhoneChange(event.target.value)}

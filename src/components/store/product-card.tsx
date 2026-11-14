@@ -42,14 +42,14 @@ export function ProductCard({
       href={productPath(orgSlug, product.product_no)}
       className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-foreground/20"
     >
-      <div className="relative aspect-square w-full overflow-hidden bg-muted">
+      <div className="relative aspect-square w-full overflow-hidden bg-[#e9e9e9]">
         {product.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={product.image}
             alt={product.name}
             loading="lazy"
-            className="size-full object-cover transition-transform duration-150 group-hover:scale-[1.03]"
+            className="size-full object-contain transition-transform duration-150 group-hover:scale-[1.03]"
           />
         ) : (
           <div className="text-2xs flex size-full items-center justify-center text-muted-foreground">이미지 없음</div>
@@ -57,7 +57,7 @@ export function ProductCard({
 
         {/* 왼쪽 위: 직접거래 등 아이콘 */}
         {badges.length > 0 ? (
-          <span className="absolute top-0 left-0 flex flex-wrap gap-0.5">
+          <span data-card-field="badges" className="absolute top-0 left-0 flex flex-wrap gap-0.5">
             {badges.map((b, i) => (
               <span
                 key={b}
@@ -76,6 +76,7 @@ export function ProductCard({
         {/* 왼쪽 아래: 신품·중고 */}
         {product.condition ? (
           <span
+            data-card-field="condition"
             className={cn(
               'absolute bottom-1.5 left-1.5 rounded px-1.5 py-0.5 text-[11px] font-bold shadow-sm',
               CONDITION_BADGE_CLASS[product.condition],
@@ -96,9 +97,17 @@ export function ProductCard({
 
       <div className="flex flex-col gap-0.5 p-3">
         <p className="line-clamp-2 text-sm font-semibold text-foreground">{product.name}</p>
-        {product.model_name ? <p className="truncate text-xs text-muted-foreground">{product.model_name}</p> : null}
-        {supplierName ? <p className="mt-1 truncate text-sm font-semibold">{supplierName}</p> : null}
-        <div className="mt-0.5 flex items-baseline gap-2">
+        {product.model_name ? (
+          <p data-card-field="model" className="truncate text-xs text-muted-foreground">
+            {product.model_name}
+          </p>
+        ) : null}
+        {supplierName ? (
+          <p data-card-field="supplier" className="mt-1 truncate text-sm font-semibold">
+            {supplierName}
+          </p>
+        ) : null}
+        <div data-card-field="price" className="mt-0.5 flex items-baseline gap-2">
           <span className="text-sm font-bold text-red-600 tabular-nums dark:text-red-400">{formatPrice(product.price)}</span>
           {hasDiscount ? (
             <span className="text-xs text-muted-foreground line-through tabular-nums">

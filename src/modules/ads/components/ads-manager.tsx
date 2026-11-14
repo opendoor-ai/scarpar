@@ -180,7 +180,7 @@ export function PromotionsTab({ promotions, nowIso }: { promotions: PromotionRow
                     <TableCell className="max-w-64">
                       {p.product && p.org ? (
                         <a
-                          href={`/s/${p.org.slug}/products/${p.product.product_no}`}
+                          href={`/minishop/${p.org.slug}/products/${p.product.product_no}`}
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center gap-1 truncate hover:underline"

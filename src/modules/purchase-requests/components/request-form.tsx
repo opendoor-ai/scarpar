@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { shrinkImage } from '@/lib/image-resize'
 import { mediaUrl } from '@/lib/media-url'
 import { REGIONS } from '@/lib/regions'
 import { cn } from '@/lib/utils'
@@ -73,12 +74,16 @@ export function RequestForm() {
     }
     setUploading(true)
     const added: string[] = []
-    for (const file of Array.from(files).slice(0, room)) {
-      const fd = new FormData()
-      fd.set('file', file)
-      const res = await uploadRequestImageAction(fd)
-      if (res.ok && res.data) added.push(res.data.path)
-      else if (!res.ok) toast.error(res.error)
+    for (const original of Array.from(files).slice(0, room)) {
+      try {
+        const fd = new FormData()
+        fd.set('file', await shrinkImage(original))
+        const res = await uploadRequestImageAction(fd)
+        if (res.ok && res.data) added.push(res.data.path)
+        else if (!res.ok) toast.error(res.error)
+      } catch {
+        toast.error(`${original.name}: 올리지 못했어요. 사진 크기를 줄여서 다시 시도해 주세요.`)
+      }
     }
     setImages((prev) => [...prev, ...added].slice(0, MAX_REQUEST_IMAGES))
     setUploading(false)
@@ -216,8 +221,8 @@ export function RequestForm() {
           <Input
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
+            type="tel"
             placeholder="010-1234-5678"
-            inputMode="tel"
             maxLength={20}
             className="bg-background"
           />

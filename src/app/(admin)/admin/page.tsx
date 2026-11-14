@@ -4,6 +4,8 @@ import { ko } from 'date-fns/locale'
 import { LayoutDashboard } from 'lucide-react'
 
 import { requireOrg } from '@/lib/auth'
+import { getAdminMode } from '@/lib/admin-mode'
+import { SupplierDashboard } from '@/components/admin/supplier-dashboard'
 import { getServerClient } from '@/lib/supabase/server'
 import { widgetsForOrg } from '@/lib/modules'
 import type { DashboardWidgetId } from '@/modules/types'
@@ -97,6 +99,9 @@ function greetingFor(hour: number): string {
 
 export default async function AdminDashboardPage() {
   const ctx = await requireOrg()
+
+  // 공급사 관리자 화면: 공급사 전용 첫 화면
+  if ((await getAdminMode(ctx)) === 'supplier') return <SupplierDashboard ctx={ctx} />
 
   let firstName = ctx.user.email?.split('@')[0] ?? '관리자'
   try {

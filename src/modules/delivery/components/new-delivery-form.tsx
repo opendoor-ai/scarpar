@@ -280,7 +280,7 @@ function NewDeliveryForm({ order, zones, riders, defaultZoneId }: NewDeliveryFor
                 <FormItem>
                   <FormLabel>받는 분 전화번호</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input type="tel" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { mediaUrl } from '@/lib/media-url'
 import { uploadMediaAction } from '@/lib/actions/media'
+import { shrinkImage } from '@/lib/image-resize'
 import { Label } from '@/components/ui/label'
 
 export interface MediaPickerValue {
@@ -46,23 +47,29 @@ function MediaPicker({ value, onChange, label, renderTrigger, multiple = false }
     setUploading(true)
     const toastId = toast.loading(files.length > 1 ? `사진 ${files.length}장을 올리는 중…` : '사진을 올리는 중…')
     let done = 0
-    for (const file of files) {
-      if (!file.type.startsWith('image/')) {
-        toast.error(`${file.name}: 이미지 파일만 올릴 수 있어요.`)
+    for (const original of files) {
+      if (!original.type.startsWith('image/')) {
+        toast.error(`${original.name}: 이미지 파일만 올릴 수 있어요.`)
         continue
       }
+      // 큰 사진은 올리기 전에 알맞은 크기로 줄여요 (서버는 4MB까지 받음)
+      const file = await shrinkImage(original)
       if (file.size > MAX_MB * 1024 * 1024) {
-        toast.error(`${file.name}: ${MAX_MB}MB 이하만 올릴 수 있어요.`)
+        toast.error(`${original.name}: 사진이 너무 커요. ${MAX_MB}MB 이하로 줄여서 올려 주세요.`)
         continue
       }
-      const formData = new FormData()
-      formData.append('file', file)
-      const result = await uploadMediaAction(formData)
-      if (result.ok && result.data) {
-        onChange({ id: result.data.id, path: result.data.path })
-        done += 1
-      } else {
-        toast.error(`${file.name}: ${result.ok ? '올리지 못했어요.' : result.error}`)
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+        const result = await uploadMediaAction(formData)
+        if (result.ok && result.data) {
+          onChange({ id: result.data.id, path: result.data.path })
+          done += 1
+        } else {
+          toast.error(`${original.name}: ${result.ok ? '올리지 못했어요.' : result.error}`)
+        }
+      } catch {
+        toast.error(`${original.name}: 올리지 못했어요. 사진 크기를 줄여서 다시 시도해 주세요.`)
       }
     }
     setUploading(false)

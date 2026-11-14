@@ -82,7 +82,7 @@ export default async function OnboardingPage() {
 
         {isPlatformAdmin ? (
           // 플랫폼 관리자는 공급사를 직접 만들 수 있음
-          <CreateOrgStepper heading={memberships.length > 0 ? '새 조직 추가하기' : '우리 회사(조직) 만들기'} />
+          <CreateOrgStepper heading="공급사 생성" />
         ) : (
           <>
             {latest ? <ApplicationStatus application={latest} /> : null}

@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation'
 import { getServerClient } from '@/lib/supabase/server'
 import { ORG_COOKIE, requireUser } from '@/lib/auth'
 
-/** Validates the caller is a member of orgId, then sets it as the active org. */
+/** 이 공급사의 직원(또는 메인 관리자)인지 확인한 뒤, 관리자 화면에서 볼 공급사로 정하고 /admin으로 이동 */
 export async function setActiveOrg(orgId: string): Promise<void> {
   const user = await requireUser()
   const supabase = await getServerClient()
@@ -19,7 +19,9 @@ export async function setActiveOrg(orgId: string): Promise<void> {
     .single()
 
   if (error || !membership) {
-    redirect('/onboarding')
+    // 메인(플랫폼) 관리자는 어느 공급사든 들어갈 수 있음
+    const { data: isPlatformAdmin } = await supabase.rpc('is_platform_admin')
+    if (!isPlatformAdmin) redirect('/onboarding')
   }
 
   const cookieStore = await cookies()

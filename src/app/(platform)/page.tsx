@@ -49,16 +49,23 @@ import {
   type LiveBanner,
 } from '@/modules/ads/live'
 import { youtubeId, youtubeThumb } from '@/modules/contents/schemas'
+import { getSiteConfig } from '@/modules/site-config/get'
 import { latestPublicRequests } from '@/modules/purchase-requests/data'
 import { RequestStrip } from '@/modules/purchase-requests/components/request-strip'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: { absolute: `${SITE_NAME} | 산업기계 중고기계 매매 직거래·광고 플랫폼` },
-  description: SITE_DESCRIPTION,
-  alternates: { canonical: `${env.APP_URL.replace(/\/+$/, '')}/` },
-  openGraph: { title: SITE_NAME, description: SITE_DESCRIPTION, type: 'website', locale: 'ko_KR' },
+// 메인 화면 검색 정보 — 관리자 → 사이트 설정 → 검색엔진 최적화(SEO)의 사이트 이름·안내
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo } = await getSiteConfig()
+  const title = seo.title || `${SITE_NAME} | 산업기계 중고기계 매매 직거래·광고 플랫폼`
+  const description = seo.description || SITE_DESCRIPTION
+  return {
+    title: { absolute: title },
+    description,
+    alternates: { canonical: `${env.APP_URL.replace(/\/+$/, '')}/` },
+    openGraph: { title, description, type: 'website', locale: 'ko_KR' },
+  }
 }
 
 /** 1차 카테고리 기본 아이콘 (아이콘 이미지를 안 넣었을 때) */
@@ -464,13 +471,13 @@ export default async function HomePage() {
                     </a>
                     {p ? (
                       <Link
-                        href={`/s/${p.orgSlug}/products/${p.card.product_no}`}
+                        href={`/minishop/${p.orgSlug}/products/${p.card.product_no}`}
                         className="mt-auto flex items-center gap-3 border-t border-border bg-muted/40 p-3 hover:bg-muted"
                       >
-                        <span className="size-12 shrink-0 overflow-hidden rounded bg-muted">
+                        <span className="size-12 shrink-0 overflow-hidden rounded bg-[#e9e9e9]">
                           {p.card.image ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={p.card.image} alt="" className="size-full object-cover" />
+                            <img src={p.card.image} alt="" className="size-full object-contain" />
                           ) : null}
                         </span>
                         <span className="flex min-w-0 flex-col">

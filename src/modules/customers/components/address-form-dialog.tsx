@@ -128,7 +128,7 @@ export function AddressFormDialog({
                   <FormItem>
                     <FormLabel>전화번호</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input type="tel" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -101,6 +101,9 @@ export interface Product {
   short_description: string | null
   /** 상세 내용 HTML — 저장 전·표시 전 모두 sanitize */
   detail_html: string | null
+  /** 진열 시각 — 새 등록·점프하면 지금으로 (0026) */
+  display_at?: string
+  jumped_at?: string | null
   created_at: string
   updated_at: string
 }

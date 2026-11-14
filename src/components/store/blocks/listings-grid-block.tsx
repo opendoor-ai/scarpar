@@ -9,7 +9,7 @@ import type { BlockRenderContext } from './render-blocks'
 type ListingRow = Pick<Listing, 'id' | 'title' | 'price' | 'purpose' | 'beds' | 'baths' | 'address'>
 
 // No public listing detail route exists in this storefront (docs/architecture.md's route map
-// lists no (store)/s/[org]/listing/[slug] page) — cards are informational only, per the block
+// lists no (store)/minishop/[org]/listing/[slug] page) — cards are informational only, per the block
 // spec ("listingsGrid (active listings cards — price, beds/baths, district)").
 export async function ListingsGridBlockView({ block, ctx }: { block: ListingsGridBlock; ctx: BlockRenderContext }) {
   const supabase = getAnonClient()

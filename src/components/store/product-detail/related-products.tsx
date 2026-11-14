@@ -32,7 +32,7 @@ export async function RelatedProducts({
     .eq('status', 'active')
     .neq('id', excludeId)
     .order('is_featured', { ascending: false })
-    .order('created_at', { ascending: false })
+    .order('display_at', { ascending: false })
     .limit(200)
   const products = (data ?? []) as Row[]
   if (products.length === 0) return null

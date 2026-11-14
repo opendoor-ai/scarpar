@@ -154,7 +154,7 @@ function StorefrontSettingsForm({ defaultValues }: StorefrontSettingsFormProps) 
                   <FormItem>
                     <FormLabel>대표 전화</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input type="tel" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

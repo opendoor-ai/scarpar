@@ -51,8 +51,8 @@ function PageEditor({ page, orgSlug, orgName, categories, revisions }: PageEdito
 
   const hasDraft = page.draft_blocks !== null || dirty
   // Best-effort storefront URL — this slice doesn't own the (store) route implementation, so the
-  // exact path for non-home pages is inferred (/s/[org]/[slug]) rather than confirmed against it.
-  const viewHref = page.type === 'home' ? `/s/${orgSlug}` : `/s/${orgSlug}/${page.slug}`
+  // exact path for non-home pages is inferred (/minishop/[org]/[slug]) rather than confirmed against it.
+  const viewHref = page.type === 'home' ? `/minishop/${orgSlug}` : `/minishop/${orgSlug}/${page.slug}`
 
   function handleBlocksChange(next: CmsBlock[]) {
     setBlocks(next)

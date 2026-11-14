@@ -313,7 +313,7 @@ export function BannerEditor({
 
           <Row label="링크">
             <div className="flex gap-2">
-              <Input value={item.link_url} onChange={(e) => set('link_url', e.target.value)} placeholder="클릭 시 이동할 주소 (/s/... 또는 https://...)" />
+              <Input value={item.link_url} onChange={(e) => set('link_url', e.target.value)} placeholder="클릭 시 이동할 주소 (/minishop/... 또는 https://...)" />
               <select className={selectClass} value={item.link_target} onChange={(e) => set('link_target', e.target.value as EditableBanner['link_target'])}>
                 <option value="_self">현재창</option>
                 <option value="_blank">새창</option>

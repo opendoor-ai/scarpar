@@ -23,7 +23,7 @@ export function ProductGallery({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-border bg-muted">
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-border bg-[#e9e9e9]">
         {topBadges.length > 0 ? (
           <span className="absolute top-0 left-0 z-10 flex flex-wrap gap-1">
             {topBadges.map((b, i) => (
@@ -51,8 +51,9 @@ export function ProductGallery({
         )}
       </div>
 
+      {/* 작은 사진: 한 줄에 5개, 더 많으면 옆으로 밀어서 보기 */}
       {images.length > 1 ? (
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex snap-x gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
           {images.map((img, i) => (
             <button
               key={img + i}
@@ -60,12 +61,12 @@ export function ProductGallery({
               onClick={() => setActive(i)}
               aria-label={`${i + 1}번째 사진 보기`}
               className={cn(
-                'size-16 shrink-0 overflow-hidden rounded-md border transition-colors',
+                'aspect-square w-[calc((100%-2rem)/5)] shrink-0 snap-start overflow-hidden rounded-md border bg-[#e9e9e9] transition-colors',
                 i === active ? 'border-primary' : 'border-border hover:border-foreground/30',
               )}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img} alt="" className="size-full object-cover" />
+              <img src={img} alt="" className="size-full object-contain" />
             </button>
           ))}
         </div>

@@ -19,6 +19,7 @@ interface SidebarOrg {
 }
 
 interface SidebarProps {
+  mode?: 'main' | 'supplier'
   org: SidebarOrg
   orgs: SidebarOrg[]
   nav: { main: NavItem[]; core: NavItem[] }
@@ -28,7 +29,8 @@ interface SidebarProps {
 }
 
 function isActive(pathname: string, href: string): boolean {
-  if (href === '/admin') return pathname === '/admin'
+  // 하위 메뉴가 따로 있는 주소는 정확히 같을 때만
+  if (href === '/admin' || href === '/admin/site') return pathname === href
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 
@@ -44,14 +46,14 @@ function groupMainNav(main: NavItem[]): NavGroupData[] {
   const indexByKey = new Map<string, number>()
 
   for (const item of main) {
-    const key = item.moduleKey ?? item.href
+    const key = item.group ?? item.moduleKey ?? item.href
     let index = indexByKey.get(key)
     if (index === undefined) {
       index = groups.length
       indexByKey.set(key, index)
       groups.push({
         key,
-        label: item.moduleKey ? MODULES[item.moduleKey].name : item.label,
+        label: item.group ?? (item.moduleKey ? MODULES[item.moduleKey].name : item.label),
         items: [],
       })
     }
@@ -61,7 +63,7 @@ function groupMainNav(main: NavItem[]): NavGroupData[] {
   return groups
 }
 
-export function Sidebar({ org, orgs, nav, collapsed = false, onNavigate, onToggleCollapse }: SidebarProps) {
+export function Sidebar({ mode = 'main', org, orgs, nav, collapsed = false, onNavigate, onToggleCollapse }: SidebarProps) {
   const pathname = usePathname()
 
   const dashboard = nav.core.find((item) => item.href === '/admin')
@@ -77,12 +79,20 @@ export function Sidebar({ org, orgs, nav, collapsed = false, onNavigate, onToggl
         )}
       >
         {collapsed ? (
-          <span className="flex size-7 items-center justify-center rounded-md bg-primary text-[13px] font-bold text-primary-foreground">
-            전
+          <span
+            className={cn(
+              'flex size-7 items-center justify-center rounded-md text-[13px] font-bold text-white',
+              mode === 'supplier' ? 'bg-indigo-600' : 'bg-primary',
+            )}
+          >
+            {mode === 'supplier' ? '공' : '전'}
           </span>
         ) : (
-          <span className="text-[15px] font-semibold tracking-tight text-sidebar-foreground">
-            {SITE_NAME}
+          <span className="flex min-w-0 flex-col leading-tight">
+            <span className="truncate text-[14px] font-semibold tracking-tight text-sidebar-foreground">{SITE_NAME}</span>
+            <span className={cn('text-[11px] font-bold', mode === 'supplier' ? 'text-indigo-600 dark:text-indigo-400' : 'text-primary')}>
+              {mode === 'supplier' ? '공급사 관리자' : '메인 관리자'}
+            </span>
           </span>
         )}
       </div>

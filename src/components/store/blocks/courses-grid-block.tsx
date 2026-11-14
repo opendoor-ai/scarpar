@@ -8,7 +8,7 @@ import type { BlockRenderContext } from './render-blocks'
 type CourseRow = Pick<Course, 'id' | 'title' | 'description' | 'price' | 'cover_media_id'>
 
 // No public course detail route exists in this storefront (docs/architecture.md's route map
-// lists no (store)/s/[org]/course/[slug] page) — cards are informational only, per the block
+// lists no (store)/minishop/[org]/course/[slug] page) — cards are informational only, per the block
 // spec ("coursesGrid (active courses cards)").
 export async function CoursesGridBlockView({ block, ctx }: { block: CoursesGridBlock; ctx: BlockRenderContext }) {
   const supabase = getAnonClient()

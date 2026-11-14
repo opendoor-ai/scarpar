@@ -1,5 +1,7 @@
 'use server'
 
+import { redirect } from 'next/navigation'
+
 import { audit } from '@/lib/audit'
 import { requireUser, type OrgContext } from '@/lib/auth'
 import { setActiveOrg } from '@/lib/actions/set-org'
@@ -7,7 +9,6 @@ import { provisionOrg } from '@/lib/org-provision'
 import { getAdminClient } from '@/lib/supabase/admin'
 import { getServerClient } from '@/lib/supabase/server'
 import type { ActionResult } from '@/lib/types'
-import { slugify } from '@/lib/utils'
 import type { Org } from '@/types/db'
 
 import { createOrgSchema, type CreateOrgInput } from './onboarding-schemas'
@@ -25,10 +26,10 @@ export async function createOrgAction(input: CreateOrgInput): Promise<ActionResu
   }
 
   const { name, phone, vertical } = parsed.data
-  const slug = slugify(parsed.data.slug) || slugify(name)
-  if (!slug) {
-    return { ok: false, error: '회사(조직) 이름을 정확히 입력하세요.' }
-  }
+  const slug = parsed.data.slug
+  // 시스템 주소와 겹치는 아이디는 쓸 수 없음
+  const RESERVED = new Set(['admin', 'api', 'products', 'login', 'signup', 'track', 's', 'www', 'jadong', 'minishop', 'requests', 'suppliers', 'support', 'advertise', 'magazine', 'onboarding'])
+  if (RESERVED.has(slug)) return { ok: false, error: '쓸 수 없는 공급사 아이디예요. 다른 아이디를 입력하세요.' }
 
   // 직접 생성은 플랫폼 관리자만 (일반회원은 입점 신청 → 승인)
   const supabase = await getServerClient()
@@ -38,19 +39,42 @@ export async function createOrgAction(input: CreateOrgInput): Promise<ActionResu
   }
 
   const admin = getAdminClient()
+
+  // 공급사 대표 계정: 적었으면 그 계정(없으면 새로 만듦), 안 적었으면 지금 로그인한 메인 관리자
+  let ownerId = user.id
+  const ownerEmail = parsed.data.ownerEmail || ''
+  if (ownerEmail) {
+    let found: { id: string } | null = null
+    for (let page = 1; page <= 10 && !found; page++) {
+      const { data } = await admin.auth.admin.listUsers({ page, perPage: 1000 })
+      found = data?.users.find((u) => u.email?.toLowerCase() === ownerEmail) ?? null
+      if (!data || data.users.length < 1000) break
+    }
+    if (!found) {
+      const pw = parsed.data.ownerPassword || ''
+      if (pw.length < 8) return { ok: false, error: '새 로그인 계정의 초기 비밀번호를 8자 이상 입력하세요.' }
+      const { data, error } = await admin.auth.admin.createUser({ email: ownerEmail, password: pw, email_confirm: true })
+      if (error || !data.user) return { ok: false, error: `로그인 계정을 만들지 못했어요: ${error?.message ?? ''}` }
+      found = data.user
+    }
+    ownerId = found.id
+  }
+
   let org: Org
   try {
-    const result = await provisionOrg({ name, slug, vertical, phone }, user.id)
+    const result = await provisionOrg({ name, slug, vertical, phone }, ownerId)
     if (!result.ok) return { ok: false, error: result.error }
     org = result.org
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : '조직을 만들지 못했습니다.' }
+    return { ok: false, error: err instanceof Error ? err.message : '공급사를 만들지 못했어요.' }
   }
 
 
   const auditCtx: OrgContext = { user, org, role: 'owner', settings: {} }
   audit(auditCtx, 'org.created', 'org', org.id, null, { vertical: org.vertical })
 
+  // 공급사 계정을 따로 만들었으면 공급사 관리로, 아니면 새 공급사 관리자 화면으로
+  if (ownerEmail) redirect('/admin/suppliers')
   await setActiveOrg(org.id)
   return { ok: true }
 }

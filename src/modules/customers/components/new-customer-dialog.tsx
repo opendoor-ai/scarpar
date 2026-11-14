@@ -92,7 +92,7 @@ export function NewCustomerDialog() {
                 <FormItem>
                   <FormLabel>전화번호</FormLabel>
                   <FormControl>
-                    <Input placeholder="01xxxxxxxxx" {...field} />
+                    <Input type="tel" placeholder="01xxxxxxxxx" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

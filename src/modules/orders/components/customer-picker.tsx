@@ -140,6 +140,7 @@ function CustomerPicker({ value, onChange }: CustomerPickerProps) {
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="customer-phone">전화번호</Label>
             <Input
+              type="tel"
               id="customer-phone"
               value={value.phone}
               onChange={(e) => onChange({ ...value, phone: e.target.value })}
