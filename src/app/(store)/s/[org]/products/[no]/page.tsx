@@ -23,6 +23,7 @@ import { CONDITION_BADGE_CLASS, CONDITION_LABEL, productCode } from '@/component
 import { RelatedProducts } from '@/components/store/product-detail/related-products'
 import { SupplierCard } from '@/components/store/product-detail/supplier-card'
 import { ProductJsonLd } from '@/components/store/product-detail/product-json-ld'
+import { TrackView } from '@/components/store/product-detail/track-view'
 import { SITE_NAME } from '@/lib/site'
 import { ChannelBanners } from '@/components/store/product-detail/channel-banners'
 import { PurchaseGuide } from '@/components/store/product-detail/purchase-guide'
@@ -60,13 +61,17 @@ export async function generateMetadata({
   const supabase = getAnonClient()
   const { data } = await supabase
     .from('products')
-    .select('id, name, description, brand')
+    .select('id, name, description, brand, short_description, seo')
     .eq('org_id', org.id)
     .eq('product_no', productNo)
     .eq('status', 'active')
     .maybeSingle()
   if (!data) return {}
-  const product = data as Pick<Product, 'id' | 'name' | 'description' | 'brand'>
+  const product = data as Pick<Product, 'id' | 'name' | 'description' | 'brand' | 'short_description' | 'seo'>
+  // 상품 등록 화면의 "검색 노출 문구"(AI 작성 가능)가 있으면 우선 사용
+  const seoTitle = typeof product.seo?.title === 'string' && product.seo.title.trim() ? product.seo.title.trim() : null
+  const seoDescription =
+    typeof product.seo?.description === 'string' && product.seo.description.trim() ? product.seo.description.trim() : null
 
   const { data: imageRow } = await supabase
     .from('product_images')
@@ -81,17 +86,19 @@ export async function generateMetadata({
   const image = imagePath ? mediaUrl(imagePath) : undefined
 
   const description =
+    seoDescription ||
+    product.short_description ||
     (product.description ?? '').replace(/\s+/g, ' ').trim().slice(0, 150) ||
     `${org.name}의 ${product.name}${product.brand ? ` (${product.brand})` : ''} 제품 정보와 문의`
   const url = `${env.APP_URL}${productPath(org.slug, productNo)}`
 
   return {
-    title: product.name,
+    title: seoTitle ?? product.name,
     description,
     alternates: { canonical: url },
     openGraph: {
       type: 'website',
-      title: `${product.name} · ${org.name}`,
+      title: `${seoTitle ?? product.name} · ${org.name}`,
       description,
       url,
       siteName: org.name,
@@ -180,6 +187,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
 
   return (
     <div className="mx-auto max-w-6xl px-4 pt-4 pb-28 sm:px-6 md:pb-12">
+      <TrackView productId={product.id} />
       <ProductJsonLd
         product={product}
         org={org}
@@ -268,6 +276,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
             <ProductPurchasePanel product={product} variants={variants} image={imageUrls[0] ?? null} lang={lang} />
           ) : null}
           <ProductInquiryActions
+            productId={product.id}
             productName={product.name}
             modelName={product.model_name ?? product.sku}
             supplierName={org.name}
@@ -283,7 +292,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
             <ProductGallery images={imageUrls} name={product.name} badge={conditionBadge} />
           </div>
 
-          <SupplierCard org={org} />
+          <SupplierCard org={org} productId={product.id} />
 
           <RelatedProducts orgId={org.id} orgSlug={org.slug} excludeId={product.id} lang={lang} />
 

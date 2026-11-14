@@ -7,8 +7,9 @@ import { formatKrPhone, phoneDigits } from '@/lib/phone'
 
 import type { StoreOrg } from '../get-store-org'
 import { storePath } from '../store-links'
+import { TrackedLink } from './tracked-link'
 
-export function SupplierCard({ org }: { org: StoreOrg }) {
+export function SupplierCard({ org, productId }: { org: StoreOrg; productId?: string }) {
   const keywords = org.item_keywords ?? []
   const rows: { label: string; value: React.ReactNode }[] = [
     { label: '업체명', value: <span className="font-semibold">{org.name}</span> },
@@ -71,15 +72,15 @@ export function SupplierCard({ org }: { org: StoreOrg }) {
           공급사 미니샵 바로가기
         </Link>
         {org.homepage_url ? (
-          <a
+          <TrackedLink
             href={org.homepage_url}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
+            productId={productId}
+            event="homepage_click"
             className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
           >
             홈페이지 바로가기
             <ExternalLink className="size-3.5" />
-          </a>
+          </TrackedLink>
         ) : null}
       </div>
       <p className="mt-4 text-xs leading-relaxed text-muted-foreground">

@@ -22,7 +22,11 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { formatKrPhone, isMobilePhone, phoneDigits } from '@/lib/phone'
 
+import { trackProductEvent } from './product-detail/track'
+
 interface ProductInquiryActionsProps {
+  /** 통계 기록용 */
+  productId: string
   productName: string
   modelName?: string | null
   supplierName: string
@@ -32,6 +36,7 @@ interface ProductInquiryActionsProps {
 }
 
 export function ProductInquiryActions({
+  productId,
   productName,
   modelName,
   supplierName,
@@ -50,12 +55,14 @@ export function ProductInquiryActions({
   const canSms = canCall && isMobilePhone(digits)
 
   function openSmsApp() {
+    trackProductEvent(productId, 'sms_click')
     // "sms:번호?&body=" 형식은 안드로이드·아이폰 모두에서 동작함
     window.location.href = `sms:${digits}?&body=${encodeURIComponent(message)}`
     setSmsOpen(false)
   }
 
   async function handleShare() {
+    trackProductEvent(productId, 'share_click')
     const shareData = {
       title: productName,
       text: `${supplierName} · ${productName}`,
@@ -84,7 +91,7 @@ export function ProductInquiryActions({
           {/* 휴대폰 화면 전용 */}
           <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-2 border-t border-border bg-background/95 p-3 backdrop-blur md:hidden">
             <Button asChild size="lg" className={canSms ? '' : 'col-span-2'}>
-              <a href={`tel:${digits}`}>
+              <a href={`tel:${digits}`} onClick={() => trackProductEvent(productId, 'call_click')}>
                 <Phone className="size-4" />
                 전화 문의
               </a>
@@ -110,7 +117,10 @@ export function ProductInquiryActions({
           <Share2 className="size-4" />
           공유하기
         </Button>
-        <Button type="button" variant="outline" size="sm" onClick={() => setQrOpen(true)}>
+        <Button type="button" variant="outline" size="sm" onClick={() => {
+            trackProductEvent(productId, 'qr_open')
+            setQrOpen(true)
+          }}>
           <QrCode className="size-4" />
           QR 코드
         </Button>

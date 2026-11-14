@@ -9,6 +9,7 @@ export const config: ModuleDef = {
     { label: '카테고리', href: '/admin/categories', icon: 'Package' },
     { label: '재고관리', href: '/admin/inventory', icon: 'Package' },
     { label: '상품 Q&A', href: '/admin/questions', icon: 'Package' },
+    { label: '광고 성과', href: '/admin/stats', icon: 'Package' },
   ],
   dashboardWidgets: ['low-stock', 'top-products'],
 }

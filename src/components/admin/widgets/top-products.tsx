@@ -3,7 +3,6 @@ import { BarChart3 } from 'lucide-react'
 
 import { requireOrg } from '@/lib/auth'
 import { getServerClient } from '@/lib/supabase/server'
-import { formatCompact } from '@/lib/money'
 import { truncate } from '@/lib/utils'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -57,7 +56,7 @@ export async function TopProductsWidget() {
         {top5.length === 0 ? (
           <EmptyState icon={BarChart3} title="아직 판매 내역이 없습니다" className="py-8" />
         ) : (
-          <MiniBarChart data={top5} height={120} formatValue={(value) => formatCompact(value, { symbol: true })} />
+          <MiniBarChart data={top5} height={120} valueFormat="compactWon" />
         )}
       </CardContent>
     </Card>

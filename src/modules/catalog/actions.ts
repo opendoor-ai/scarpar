@@ -98,6 +98,7 @@ export async function createProduct(input: ProductActionInput): Promise<ActionRe
         spec_summary: data.spec_summary,
         short_description: data.short_description,
         detail_html: data.detail_html ? sanitizeDetailHtml(data.detail_html) : null,
+        seo: data.seo_title || data.seo_description ? { title: data.seo_title, description: data.seo_description } : null,
       })
       .select('id, product_no')
       .single()
@@ -169,6 +170,7 @@ export async function updateProduct(
         spec_summary: data.spec_summary,
         short_description: data.short_description,
         detail_html: data.detail_html ? sanitizeDetailHtml(data.detail_html) : null,
+        seo: data.seo_title || data.seo_description ? { title: data.seo_title, description: data.seo_description } : null,
       })
       .eq('id', id)
       .eq('org_id', ctx.org.id)

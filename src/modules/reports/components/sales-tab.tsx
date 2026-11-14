@@ -27,7 +27,7 @@ function SalesTab({ salesByDay, ordersByStatus }: SalesTabProps) {
 
       <div className="rounded-lg border bg-card p-4">
         <p className="mb-3 text-[13px] font-medium text-foreground">일별 매출</p>
-        <MiniBarChart data={chartData} formatValue={(v) => formatMoney(v)} height={160} />
+        <MiniBarChart data={chartData} valueFormat="won" height={160} />
       </div>
 
       <div className="flex flex-wrap gap-3">

@@ -26,6 +26,7 @@ import type { Product, ProductImage, ProductVariant } from '@/types/db'
 import { createProduct, deleteProduct, saveImages, saveVariants, updateProduct } from '../actions'
 import { productFormSchema, type ProductActionInput, type ProductFormValues } from '../schemas'
 import { ImageGallery, fromImageRow, toImageRow, type ImageRow } from './image-gallery'
+import { AiCopyPanel } from './ai-copy-panel'
 import { CategoryTwoLevelSelect } from './category-two-level-select'
 import { DetailHtmlEditor } from './detail-html-editor'
 import { VariantEditor, fromVariantRow, newVariantRow, toVariantRow, type VariantRow } from './variant-editor'
@@ -70,6 +71,8 @@ function toFormValues(product?: Product): ProductFormValues {
       spec_summary: '',
       short_description: '',
       detail_html: '',
+      seo_title: '',
+      seo_description: '',
     }
   }
 
@@ -97,6 +100,8 @@ function toFormValues(product?: Product): ProductFormValues {
     spec_summary: product.spec_summary ?? '',
     short_description: product.short_description ?? '',
     detail_html: product.detail_html ?? '',
+    seo_title: typeof product.seo?.title === 'string' ? product.seo.title : '',
+    seo_description: typeof product.seo?.description === 'string' ? product.seo.description : '',
   }
 }
 
@@ -130,6 +135,8 @@ function toActionInput(values: ProductFormValues): ProductActionInput {
     spec_summary: values.spec_summary?.trim() ? values.spec_summary.trim() : null,
     short_description: values.short_description?.trim() ? values.short_description.trim() : null,
     detail_html: values.detail_html?.trim() ? values.detail_html.trim() : null,
+    seo_title: values.seo_title?.trim() ? values.seo_title.trim() : null,
+    seo_description: values.seo_description?.trim() ? values.seo_description.trim() : null,
   }
 }
 
@@ -362,6 +369,8 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
               </CardContent>
             </Card>
 
+            <AiCopyPanel form={form} categories={categories} />
+
             <Card className="gap-4 p-4">
               <CardHeader className="p-0">
                 <CardTitle>상세 내용</CardTitle>
@@ -374,6 +383,40 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                     <FormItem>
                       <FormControl>
                         <DetailHtmlEditor value={field.value ?? ''} onChange={field.onChange} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            <Card className="gap-4 p-4">
+              <CardHeader className="p-0">
+                <CardTitle>검색 노출 문구</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4 p-0">
+                <FormField
+                  control={form.control}
+                  name="seo_title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>검색 결과 제목 (비우면 상품명 사용)</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value ?? ''} maxLength={70} placeholder="예: 현대위아 VX650 수직 머시닝센터 중고" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="seo_description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>검색 결과 설명 (비우면 간략설명·상품 설명 사용)</FormLabel>
+                      <FormControl>
+                        <Textarea rows={2} {...field} value={field.value ?? ''} maxLength={160} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

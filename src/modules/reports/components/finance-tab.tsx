@@ -58,7 +58,7 @@ function FinanceTab({ pnl, expensesByCategory, from, to }: FinanceTabProps) {
         ) : (
           <MiniBarChart
             data={expensesByCategory.map((c) => ({ label: c.category, value: c.total }))}
-            formatValue={(v) => formatMoney(v)}
+            valueFormat="won"
             height={160}
           />
         )}

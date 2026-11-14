@@ -50,6 +50,8 @@ export const productFormSchema = z.object({
   spec_summary: z.string().trim().max(500).optional(),
   short_description: z.string().trim().max(500).optional(),
   detail_html: z.string().max(100000).optional(),
+  seo_title: z.string().trim().max(70, '70자 이내로 입력하세요').optional(),
+  seo_description: z.string().trim().max(160, '160자 이내로 입력하세요').optional(),
 })
 export type ProductFormValues = z.infer<typeof productFormSchema>
 
@@ -78,6 +80,8 @@ export const productActionSchema = z.object({
   spec_summary: z.string().trim().max(500).nullable(),
   short_description: z.string().trim().max(500).nullable(),
   detail_html: z.string().max(100000).nullable(),
+  seo_title: z.string().trim().max(70).nullable(),
+  seo_description: z.string().trim().max(160).nullable(),
 })
 export type ProductActionInput = z.infer<typeof productActionSchema>
 

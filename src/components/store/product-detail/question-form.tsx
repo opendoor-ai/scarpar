@@ -13,6 +13,8 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { askQuestionAction } from '@/modules/questions/public-actions'
 
+import { trackProductEvent } from './track'
+
 export function QuestionForm({ orgSlug, productId }: { orgSlug: string; productId: string }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -47,6 +49,7 @@ export function QuestionForm({ orgSlug, productId }: { orgSlug: string; productI
         toast.error(result.error)
         return
       }
+      trackProductEvent(productId, 'question_submit')
       toast.success('질문이 등록되었습니다. 공급사가 확인 후 답변해 드립니다.')
       setQuestion('')
       setOpen(false)

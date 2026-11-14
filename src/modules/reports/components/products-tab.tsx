@@ -30,7 +30,7 @@ function ProductsTab({ topProducts }: ProductsTabProps) {
     <div className="flex flex-col gap-6">
       <div className="rounded-lg border bg-card p-4">
         <p className="mb-3 text-[13px] font-medium text-foreground">매출 상위 상품</p>
-        <MiniBarChart data={chartData} formatValue={(v) => formatMoney(v)} height={160} />
+        <MiniBarChart data={chartData} valueFormat="won" height={160} />
       </div>
 
       <div className="overflow-hidden rounded-md border">
