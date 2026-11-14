@@ -183,7 +183,7 @@ function Section({
   right?: React.ReactNode
 }) {
   return (
-    <section id={`sec-${id}`} className="scroll-mt-28 overflow-hidden rounded-lg border border-border bg-card">
+    <section id={`sec-${id}`} className="scroll-mt-16 overflow-hidden rounded-lg border border-border bg-card">
       <div className="flex items-center justify-between gap-3 border-b border-border bg-muted/50 px-4 py-3">
         <div>
           <h2 className="text-sm font-bold">{title}</h2>
@@ -311,7 +311,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, () => toast.error('입력값을 확인해 주세요. 빨간 글씨 항목이 있어요.'))} className="flex flex-col gap-5">
         {/* 바로가기 */}
-        <nav className="sticky top-14 z-20 -mx-1 flex gap-1 overflow-x-auto rounded-lg border border-border bg-background/95 p-1 backdrop-blur [scrollbar-width:none]">
+        <nav className="sticky -top-5 z-20 -mx-6 -mt-5 flex gap-1 overflow-x-auto border-b border-border bg-background px-5 py-1.5 shadow-sm [scrollbar-width:none]">
           {SECTIONS.map(([id, label]) => (
             <a key={id} href={`#sec-${id}`} className="shrink-0 rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
               {label}
@@ -392,7 +392,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
 
         {/* 3. 판매 정보 */}
         <Section id="sale" title="판매 정보" description="거래는 고객과 공급사가 직접 하고, 화면에는 가격만 안내해요.">
-          <Row label="판매가" hint={negotiable ? '"가격협의"로 표시돼요.' : '원 단위 숫자만 입력하세요.'}>
+          <Row label="판매가" hint={negotiable ? '숫자를 입력하면 그 가격으로, 비워 두면 "가격협의"로 표시돼요.' : `${Number(price).toLocaleString('ko-KR')}원으로 표시돼요.`}>
             <div className="flex flex-wrap items-center gap-3">
               <FormField
                 control={form.control}
@@ -401,7 +401,19 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   <FormItem>
                     <FormControl>
                       <div className="flex items-center gap-1.5">
-                        <Input inputMode="numeric" className="w-44" {...field} disabled={negotiable} value={negotiable ? '' : field.value} placeholder={negotiable ? '가격협의' : '예: 7500000'} />
+                        <Input
+                          inputMode="numeric"
+                          className="w-48 text-right tabular-nums"
+                          name={field.name}
+                          ref={field.ref}
+                          onBlur={field.onBlur}
+                          value={negotiable ? '' : Number(field.value).toLocaleString('ko-KR')}
+                          placeholder="가격협의"
+                          onChange={(e) => {
+                            const digits = e.target.value.replace(/[^\d]/g, '').replace(/^0+/, '')
+                            field.onChange(digits || '0')
+                          }}
+                        />
                         <span className="text-sm">원</span>
                       </div>
                     </FormControl>
@@ -409,12 +421,15 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
                   </FormItem>
                 )}
               />
-              <label className="inline-flex items-center gap-1.5 text-sm">
+              <label className="inline-flex cursor-pointer items-center gap-1.5 text-sm">
                 <input
                   type="checkbox"
                   className="accent-primary"
                   checked={negotiable}
-                  onChange={(e) => form.setValue('price', e.target.checked ? '0' : '', { shouldDirty: true })}
+                  onChange={(e) => {
+                    if (e.target.checked) form.setValue('price', '0', { shouldDirty: true })
+                    else setTimeout(() => document.querySelector<HTMLInputElement>('input[name="price"]')?.focus(), 0)
+                  }}
                 />
                 가격협의
               </label>
@@ -546,7 +561,7 @@ function ProductForm({ mode, product, variants, images, categories }: ProductFor
         </Section>
 
         {/* 9. 추가 설정 (잘 안 쓰는 항목) */}
-        <section id="sec-more" className="scroll-mt-28 overflow-hidden rounded-lg border border-dashed border-border">
+        <section id="sec-more" className="scroll-mt-16 overflow-hidden rounded-lg border border-dashed border-border">
           <button
             type="button"
             onClick={() => setMoreOpen((v) => !v)}
