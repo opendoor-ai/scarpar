@@ -7,5 +7,6 @@ export const config: ModuleDef = {
   nav: [
     { label: '페이지', href: '/admin/cms/pages', icon: 'LayoutTemplate' },
     { label: '메뉴', href: '/admin/cms/menus', icon: 'LayoutTemplate' },
+    { label: '미니샵 배너', href: '/admin/banners', icon: 'Image' },
   ],
 }

@@ -89,7 +89,7 @@ export function ProductInquiryActions({
       {canCall ? (
         <>
           {/* 휴대폰 화면 전용 */}
-          <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-2 border-t border-border bg-background/95 p-3 backdrop-blur md:hidden">
+          <div data-mobile-inquiry-bar className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-2 border-t border-border bg-background/95 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur md:hidden">
             <Button asChild size="lg" className={canSms ? '' : 'col-span-2'}>
               <a href={`tel:${digits}`} onClick={() => trackProductEvent(productId, 'call_click')}>
                 <Phone className="size-4" />

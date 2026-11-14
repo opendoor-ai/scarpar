@@ -305,3 +305,8 @@
 .detail-html td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
 .detail-html th { background: var(--muted); font-weight: 600; width: 30%; }
 .detail-html blockquote { border-left: 4px solid var(--border); padding-left: 0.75rem; color: var(--muted-foreground); }
+
+/* 휴대폰: 상세페이지 아래 고정 전화·문자 버튼이 바닥글을 가리지 않도록 여백 */
+@media (max-width: 767px) {
+  body:has([data-mobile-inquiry-bar]) { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+}

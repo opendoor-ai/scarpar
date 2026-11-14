@@ -42,7 +42,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     // 통합 제품 검색 + 플랫폼 공통 카테고리 페이지
-    entries.push({ url: `${base}/products`, changeFrequency: 'daily', priority: 1 })
+    entries.push({ url: `${base}/`, changeFrequency: 'daily', priority: 1 })
+    entries.push({ url: `${base}/products`, changeFrequency: 'daily', priority: 0.9 })
     for (const c of await getPlatformCategories()) {
       entries.push({
         url: `${base}/products?category=${encodeURIComponent(c.slug)}`,

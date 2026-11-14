@@ -16,13 +16,32 @@ function sendAdEvent(bannerId: string, type: 'impression' | 'click') {
       navigator.sendBeacon('/api/ads/event', new Blob([body], { type: 'application/json' }))
       return
     }
-    void fetch('/api/ads/event', { method: 'POST', body, headers: { 'Content-Type': 'application/json' }, keepalive: true })
+    void fetch('/api/ads/event', {
+      method: 'POST',
+      body,
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+    })
   } catch {
     // 기록 실패는 무시
   }
 }
 
-export function BannerCarousel({ banners, className }: { banners: LiveBanner[]; className?: string }) {
+/**
+ * track: 광고 배너(banner_ads)만 노출·클릭을 기록. 공급사 미니샵 배너는 false.
+ * label: 왼쪽 위 "광고" 표시 여부.
+ */
+export function BannerCarousel({
+  banners,
+  className,
+  track = true,
+  label = true,
+}: {
+  banners: LiveBanner[]
+  className?: string
+  track?: boolean
+  label?: boolean
+}) {
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const seen = useRef(new Set<string>())
@@ -44,10 +63,10 @@ export function BannerCarousel({ banners, className }: { banners: LiveBanner[]; 
 
   useEffect(() => {
     const b = banners[index]
-    if (!visible || !b || seen.current.has(b.id)) return
+    if (!track || !visible || !b || seen.current.has(b.id)) return
     seen.current.add(b.id)
     sendAdEvent(b.id, 'impression')
-  }, [index, visible, banners])
+  }, [index, visible, banners, track])
 
   useEffect(() => {
     if (count < 2 || paused) return
@@ -65,40 +84,52 @@ export function BannerCarousel({ banners, className }: { banners: LiveBanner[]; 
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
-      aria-label="광고 배너"
+      aria-label={label ? '광고 배너' : '배너'}
     >
       <div className="flex transition-transform duration-500" style={{ transform: `translateX(-${index * 100}%)` }}>
         {banners.map((b, i) => {
           const external = /^https?:\/\//i.test(b.link_url)
+          const picture = (
+            <picture>
+              <source media="(max-width: 639px)" srcSet={b.image_mobile} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={b.image_pc}
+                alt={b.title}
+                className="aspect-[15/8] w-full object-cover sm:aspect-[4/1]"
+                loading={i === 0 ? 'eager' : 'lazy'}
+              />
+            </picture>
+          )
+          if (!b.link_url) {
+            return (
+              <div key={b.id} className="w-full shrink-0" aria-hidden={i !== index}>
+                {picture}
+              </div>
+            )
+          }
           return (
             <a
               key={b.id}
               href={b.link_url}
               target={external ? '_blank' : undefined}
-              rel={external ? 'noopener sponsored' : 'sponsored'}
+              rel={external ? (track ? 'noopener sponsored' : 'noopener') : track ? 'sponsored' : undefined}
               className="block w-full shrink-0"
-              onClick={() => sendAdEvent(b.id, 'click')}
+              onClick={() => track && sendAdEvent(b.id, 'click')}
               aria-hidden={i !== index}
               tabIndex={i === index ? 0 : -1}
             >
-              <picture>
-                <source media="(max-width: 639px)" srcSet={b.image_mobile} />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={b.image_pc}
-                  alt={b.title}
-                  className="aspect-[15/8] w-full object-cover sm:aspect-[4/1]"
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                />
-              </picture>
+              {picture}
             </a>
           )
         })}
       </div>
 
-      <span className="pointer-events-none absolute top-2 left-2 rounded bg-black/50 px-1.5 py-0.5 text-[10px] font-medium text-white">
-        광고
-      </span>
+      {label ? (
+        <span className="pointer-events-none absolute top-2 left-2 rounded bg-black/50 px-1.5 py-0.5 text-[10px] font-medium text-white">
+          광고
+        </span>
+      ) : null}
 
       {count > 1 ? (
         <>

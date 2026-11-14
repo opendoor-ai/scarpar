@@ -16,7 +16,10 @@ function productsHref(orgSlug: string, opts: { category?: string; query?: string
   return `${base}${qs ? `?${qs}` : ''}`
 }
 
-const PILL = 'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors'
+const PILL = 'shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors'
+/** 휴대폰: 옆으로 밀어서 보는 한 줄 / PC: 여러 줄로 감싸기 */
+const PILL_ROW =
+  '-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden'
 const PILL_ACTIVE = 'border-primary bg-primary text-primary-foreground'
 const PILL_IDLE = 'border-input hover:bg-accent'
 
@@ -51,8 +54,8 @@ export function CategoryPills({
   const subs = activeRoot ? categories.filter((c) => c.parent_id === activeRoot.id) : []
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-2">
+    <div className="flex min-w-0 flex-col gap-2">
+      <div className={PILL_ROW}>
         <Link href={productsHref(orgSlug, { query, basePath })} className={cn(PILL, !activeSlug ? PILL_ACTIVE : PILL_IDLE)}>
           {t('all_products', lang)}
         </Link>
@@ -68,7 +71,7 @@ export function CategoryPills({
       </div>
 
       {activeRoot && subs.length > 0 ? (
-        <div className="flex flex-wrap gap-2 rounded-lg bg-muted/50 p-2">
+        <div className="flex gap-2 overflow-x-auto rounded-lg bg-muted/50 p-2 [scrollbar-width:none] sm:flex-wrap [&::-webkit-scrollbar]:hidden">
           <Link
             href={productsHref(orgSlug, { category: activeRoot.slug, query, basePath })}
             className={cn(PILL, active?.id === activeRoot.id ? 'border-foreground bg-background' : 'border-transparent hover:bg-background')}
@@ -113,7 +116,7 @@ export function ProductSearchBox({
         name="q"
         defaultValue={query}
         placeholder={placeholder ?? t('search', lang)}
-        className="h-8 w-full rounded-md border border-input bg-transparent px-3 text-[13px] shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+        className="h-10 w-full rounded-md border border-input bg-transparent px-3 text-base shadow-xs sm:h-8 sm:text-[13px] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
       />
     </form>
   )

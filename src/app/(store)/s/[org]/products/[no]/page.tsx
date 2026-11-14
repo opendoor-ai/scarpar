@@ -186,7 +186,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
   const hasPrice = product.price > 0 || variants.some((v) => v.price > 0)
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-4 pb-28 sm:px-6 md:pb-12">
+    <div className="mx-auto max-w-6xl px-4 pt-4 pb-12 sm:px-6">
       <TrackView productId={product.id} />
       <ProductJsonLd
         product={product}

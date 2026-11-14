@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { formatKrPhone, phoneDigits } from '@/lib/phone'
 import { SITE_NAME } from '@/lib/site'
 
 import type { MenuItem } from '@/types/db'
@@ -20,7 +21,11 @@ export function StoreFooter({
           <div className="flex flex-col gap-1">
             <p className="text-base font-semibold">{org.name}</p>
             {org.address ? <p className="text-xs text-muted-foreground">{org.address}</p> : null}
-            {org.phone ? <p className="text-xs text-muted-foreground">{org.phone}</p> : null}
+            {org.phone ? (
+              <a href={`tel:${phoneDigits(org.phone)}`} className="text-xs text-muted-foreground hover:underline">
+                {formatKrPhone(org.phone)}
+              </a>
+            ) : null}
             {org.email ? <p className="text-xs text-muted-foreground">{org.email}</p> : null}
           </div>
 
