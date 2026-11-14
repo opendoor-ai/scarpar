@@ -2,7 +2,7 @@
 // Settings UI (src/app/(admin)/admin/settings) renders groups from SETTING_DEFS.
 import type { Role } from '@/types/db'
 
-export type SettingType = 'boolean' | 'number' | 'text' | 'select' | 'json'
+export type SettingType = 'boolean' | 'number' | 'text' | 'textarea' | 'select' | 'json'
 
 export type SettingGroup =
   | 'checkout'
@@ -311,6 +311,57 @@ export const SETTING_DEFS: SettingDef[] = [
     label: '쇼핑몰 포인트 색상',
     type: 'text',
     default: '#059669',
+  },
+
+  // 상품 상세페이지 — 소식 받기 배너 -------------------------------------------
+  {
+    key: 'storefront.kakao_channel_url',
+    group: 'storefront',
+    label: '카카오톡 채널 주소',
+    help: '예: https://pf.kakao.com/_xxxx — 비워 두면 배너가 숨겨집니다',
+    type: 'text',
+    default: '',
+  },
+  {
+    key: 'storefront.naver_band_url',
+    group: 'storefront',
+    label: '네이버 밴드 주소',
+    help: '예: https://band.us/@xxxx — 비워 두면 배너가 숨겨집니다',
+    type: 'text',
+    default: '',
+  },
+
+  // 상품 상세페이지 — 상품구매안내 탭 --------------------------------------------
+  {
+    key: 'storefront.guide_payment',
+    group: 'storefront',
+    label: '구매안내: 결제 정보',
+    type: 'textarea',
+    default:
+      '제품 가격과 결제 방법은 공급사와 직접 협의합니다.\n가격협의 제품은 사양·수량·설치 조건에 따라 견적이 달라질 수 있습니다.',
+  },
+  {
+    key: 'storefront.guide_shipping',
+    group: 'storefront',
+    label: '구매안내: 배송·설치 정보',
+    type: 'textarea',
+    default:
+      '배송, 운반(중량물 도비), 설치, 시운전 일정과 비용은 공급사와 협의 후 결정됩니다.\n지역과 장비 크기에 따라 비용이 달라질 수 있습니다.',
+  },
+  {
+    key: 'storefront.guide_returns',
+    group: 'storefront',
+    label: '구매안내: 교환·반품 정보',
+    type: 'textarea',
+    default:
+      '교환·반품 조건은 제품 상태(신품/중고)와 공급사 정책에 따라 다릅니다.\n구매 전 공급사에 반드시 확인해 주세요.',
+  },
+  {
+    key: 'storefront.guide_service',
+    group: 'storefront',
+    label: '구매안내: 서비스 문의',
+    type: 'textarea',
+    default: 'A/S, 부품, 유지보수 문의는 상세페이지의 공급사 연락처로 문의해 주세요.',
   },
 ]
 

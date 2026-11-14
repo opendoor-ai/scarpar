@@ -293,6 +293,25 @@ export interface ReturnItem {
   created_at: string
 }
 
+export type ProductQuestionStatus = 'pending' | 'answered' | 'hidden'
+
+/** 상품 Q&A (0009_product_questions.sql) */
+export interface ProductQuestion {
+  id: string
+  org_id: string
+  product_id: string
+  author_name: string
+  author_contact: string | null
+  question: string
+  is_private: boolean
+  answer: string | null
+  answered_at: string | null
+  answered_by: string | null
+  status: ProductQuestionStatus
+  created_at: string
+  updated_at: string
+}
+
 export interface Review {
   id: string
   org_id: string

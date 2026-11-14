@@ -163,6 +163,21 @@ function SettingField({ def, value, disabled, onChange, onValidityChange }: Sett
     )
   }
 
+  if (def.type === 'textarea') {
+    return (
+      <div className="flex flex-col gap-2 border-b py-3 last:border-b-0">
+        <FieldLabel def={def} />
+        <Textarea
+          id={def.key}
+          rows={3}
+          value={typeof value === 'string' ? value : ''}
+          disabled={disabled}
+          onChange={(event) => onChange(def.key, event.target.value)}
+        />
+      </div>
+    )
+  }
+
   // text
   return (
     <div className="flex items-center justify-between gap-6 border-b py-3 last:border-b-0">

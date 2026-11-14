@@ -21,6 +21,9 @@ import { InfoTable } from '@/components/store/product-detail/info-table'
 import { CONDITION_BADGE_CLASS, CONDITION_LABEL, productCode } from '@/components/store/product-detail/labels'
 import { RelatedProducts } from '@/components/store/product-detail/related-products'
 import { SupplierCard } from '@/components/store/product-detail/supplier-card'
+import { ChannelBanners } from '@/components/store/product-detail/channel-banners'
+import { PurchaseGuide } from '@/components/store/product-detail/purchase-guide'
+import { QuestionsSection, getQuestionCount } from '@/components/store/product-detail/questions-section'
 import { getStoreOrg } from '@/components/store/get-store-org'
 import { productPath, storePath } from '@/components/store/store-links'
 import { ProductGallery } from '@/components/store/product-gallery'
@@ -170,6 +173,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
     })
     .filter((url): url is string => Boolean(url))
 
+  const questionCount = await getQuestionCount(product.id)
   const productUrl = `${env.APP_URL}${productPath(org.slug, product.product_no)}`
   const qrDataUrl = await QRCode.toDataURL(productUrl, {
     margin: 1,
@@ -242,6 +246,8 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
             </Link>
           </div>
 
+          <ChannelBanners settings={settings} />
+
           <InfoTable
             rows={[
               { label: '상품코드', value: code },
@@ -282,10 +288,16 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
           <div>
             <nav
               aria-label="상세 정보 메뉴"
-              className="sticky top-14 z-20 grid grid-cols-2 border-b border-border bg-background text-center text-sm"
+              className="sticky top-14 z-20 grid grid-cols-4 border-b border-border bg-background text-center text-sm"
             >
               <a href="#product-detail" className="border-b-2 border-foreground py-3 font-semibold">
                 제품상세
+              </a>
+              <a href="#product-guide" className="py-3 text-muted-foreground hover:text-foreground">
+                구매안내
+              </a>
+              <a href="#product-qna" className="py-3 text-muted-foreground hover:text-foreground">
+                Q&amp;A({questionCount})
               </a>
               <a href="#product-reviews" className="py-3 text-muted-foreground hover:text-foreground">
                 리뷰
@@ -298,6 +310,12 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
                 supplierPhone={org.phone}
                 platformName="전자동기계광고"
               />
+            </div>
+            <div id="product-guide" className="scroll-mt-28 pt-12">
+              <PurchaseGuide settings={settings} />
+            </div>
+            <div id="product-qna" className="scroll-mt-28 pt-12">
+              <QuestionsSection orgId={org.id} orgSlug={org.slug} productId={product.id} />
             </div>
             <div id="product-reviews" className="scroll-mt-28 pt-12">
               <ReviewsSection orgId={org.id} orgSlug={org.slug} productId={product.id} />

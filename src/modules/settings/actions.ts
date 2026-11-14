@@ -21,6 +21,7 @@ function validateSettingValue(def: SettingDef, value: unknown): string | null {
         ? null
         : `${def.label}: 숫자를 입력하세요`
     case 'text':
+    case 'textarea':
       return typeof value === 'string' ? null : `${def.label}: 글자를 입력하세요`
     case 'select':
       return typeof value === 'string' && def.options?.some((opt) => opt.value === value)
