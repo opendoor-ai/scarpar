@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { Search } from 'lucide-react'
 
+import { CategoryIcon } from '@/components/platform/category-icon'
 import { t, type Lang } from '@/lib/i18n'
+import { mediaUrl } from '@/lib/media-url'
 import { cn } from '@/lib/utils'
 import { categoryKey, type PlatformCategory } from '@/lib/platform-categories'
 
@@ -17,16 +19,26 @@ function productsHref(orgSlug: string, opts: { category?: string; query?: string
   return `${base}${qs ? `?${qs}` : ''}`
 }
 
-const PILL = 'shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors'
-/** 휴대폰: 옆으로 밀어서 보는 한 줄 / PC: 여러 줄로 감싸기 */
-const PILL_ROW =
-  '-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden'
-const PILL_ACTIVE = 'border-primary bg-primary text-primary-foreground'
-const PILL_IDLE = 'border-input hover:bg-accent'
+/** 휴대폰: 옆으로 밀어서 보는 한 줄 / 태블릿·PC: 칸을 맞춘 바둑판 */
+const ROW_1 =
+  'flex gap-1.5 overflow-x-auto [scrollbar-width:none] sm:grid sm:grid-cols-3 sm:overflow-visible lg:grid-cols-4 [&::-webkit-scrollbar]:hidden'
+const ROW_2 =
+  'flex gap-1 overflow-x-auto [scrollbar-width:none] sm:grid sm:grid-cols-3 sm:gap-x-2 sm:gap-y-0.5 sm:overflow-visible lg:grid-cols-5 [&::-webkit-scrollbar]:hidden'
+const ITEM_1 =
+  'flex shrink-0 items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[13px] whitespace-nowrap transition-colors sm:min-w-0'
+const ITEM_2 =
+  'flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-2 text-[13px] whitespace-nowrap transition-colors sm:min-w-0 sm:whitespace-normal'
+
+function Count({ n, on }: { n?: number; on?: boolean }) {
+  if (!n) return null
+  return <span className={cn('ml-auto shrink-0 pl-1 text-[11px] tabular-nums', on ? 'opacity-80' : 'text-muted-foreground')}>{n.toLocaleString()}</span>
+}
+
+type PillCategory = Pick<PlatformCategory, 'id' | 'name' | 'slug' | 'parent_id' | 'cate_no'> & { icon_image?: string | null }
 
 /**
- * 카테고리 버튼. 1차 카테고리를 한 줄로 보여주고,
- * 1차(또는 그 아래 2차)를 고른 상태면 바로 아래 줄에 그 1차의 2차 카테고리를 보여줍니다.
+ * 카테고리 고르기 표 — [1차 카테고리] 줄과, 1차를 고르면 그 아래 [2차 카테고리] 줄.
+ * 칸을 맞춰 바둑판으로 보여줘서 긴 이름도 한눈에 읽혀요. (휴대폰은 옆으로 밀어서 보기)
  */
 export function CategoryPills({
   orgSlug,
@@ -38,9 +50,9 @@ export function CategoryPills({
   basePath,
 }: {
   orgSlug: string
-  categories: Pick<PlatformCategory, 'id' | 'name' | 'slug' | 'parent_id' | 'cate_no'>[]
+  categories: PillCategory[]
   activeSlug?: string
-  /** 분류 id → 상품 수 (주면 이름 옆에 표시) */
+  /** 카테고리 id → 상품 수 (주면 이름 옆에 표시) */
   counts?: Record<string, number>
   query?: string
   lang?: Lang
@@ -48,6 +60,7 @@ export function CategoryPills({
 }) {
   if (categories.length === 0) return null
 
+  const ko = lang === 'ko'
   const ids = new Set(categories.map((c) => c.id))
   // 부모가 없거나(1차) 부모를 찾을 수 없는 카테고리는 1차로 취급
   const roots = categories.filter((c) => !c.parent_id || !ids.has(c.parent_id))
@@ -56,43 +69,78 @@ export function CategoryPills({
     ? roots.find((r) => r.id === active.id) ?? roots.find((r) => r.id === active.parent_id)
     : undefined
   const subs = activeRoot ? categories.filter((c) => c.parent_id === activeRoot.id) : []
+  const href = (c?: PillCategory) => productsHref(orgSlug, { category: c ? categoryKey(c) : undefined, query, basePath })
+  const showIcons = roots.some((r) => 'icon_image' in r)
 
   return (
-    <div className="flex min-w-0 flex-col gap-2">
-      <div className={PILL_ROW}>
-        <Link href={productsHref(orgSlug, { query, basePath })} className={cn(PILL, !activeSlug ? PILL_ACTIVE : PILL_IDLE)}>
-          {t('all_products', lang)}
-        </Link>
-        {roots.map((c) => (
+    <div className="overflow-hidden rounded-xl border border-border bg-background">
+      {/* 1차 카테고리 */}
+      <div className="flex flex-col sm:flex-row">
+        <div className="flex shrink-0 items-center gap-1.5 bg-muted/60 px-4 py-2 text-xs font-bold text-foreground/80 sm:w-32 sm:flex-col sm:items-start sm:justify-center sm:gap-0.5 sm:py-3">
+          {ko ? '1차 카테고리' : 'Category'}
+          <span className="font-normal text-muted-foreground">{roots.length}개</span>
+        </div>
+        <div className={cn(ROW_1, 'min-w-0 flex-1 p-2.5 sm:p-3')}>
           <Link
-            key={c.id}
-            href={productsHref(orgSlug, { category: categoryKey(c), query, basePath })}
-            className={cn(PILL, activeRoot?.id === c.id ? PILL_ACTIVE : PILL_IDLE)}
+            href={href()}
+            className={cn(ITEM_1, !activeSlug ? 'border-primary bg-primary font-semibold text-primary-foreground' : 'border-border hover:border-primary/50 hover:bg-primary/5')}
           >
-            {c.name}
-            {counts?.[c.id] ? <span className="ml-1 opacity-70">{counts[c.id]}</span> : null}
+            {showIcons ? <CategoryIcon slug="all" className={cn('size-6 shrink-0 shadow-none', !activeSlug && 'from-white/90 to-white/70')} /> : null}
+            <span className="truncate">{t('all_products', lang)}</span>
           </Link>
-        ))}
+          {roots.map((c) => {
+            const on = activeRoot?.id === c.id
+            return (
+              <Link
+                key={c.id}
+                href={href(c)}
+                title={c.name}
+                className={cn(ITEM_1, on ? 'border-primary bg-primary font-semibold text-primary-foreground' : 'border-border hover:border-primary/50 hover:bg-primary/5')}
+              >
+                {showIcons ? (
+                  <CategoryIcon slug={c.slug} image={c.icon_image ? mediaUrl(c.icon_image) : null} className="size-6 shrink-0 shadow-none" />
+                ) : null}
+                <span className="truncate">{c.name}</span>
+                <Count n={counts?.[c.id]} on={on} />
+              </Link>
+            )
+          })}
+        </div>
       </div>
 
-      {activeRoot && subs.length > 0 ? (
-        <div className="flex gap-2 overflow-x-auto rounded-lg bg-muted/50 p-2 [scrollbar-width:none] sm:flex-wrap [&::-webkit-scrollbar]:hidden">
-          <Link
-            href={productsHref(orgSlug, { category: categoryKey(activeRoot), query, basePath })}
-            className={cn(PILL, active?.id === activeRoot.id ? 'border-foreground bg-background' : 'border-transparent hover:bg-background')}
-          >
-            {activeRoot.name} 전체
-          </Link>
-          {subs.map((c) => (
-            <Link
-              key={c.id}
-              href={productsHref(orgSlug, { category: categoryKey(c), query, basePath })}
-              className={cn(PILL, active?.id === c.id ? 'border-foreground bg-background' : 'border-transparent hover:bg-background')}
-            >
-              {c.name}
-              {counts?.[c.id] ? <span className="ml-1 opacity-70">{counts[c.id]}</span> : null}
-            </Link>
-          ))}
+      {/* 2차 카테고리 */}
+      {activeRoot ? (
+        <div className="flex flex-col border-t border-border sm:flex-row">
+          <div className="flex shrink-0 items-center gap-1.5 bg-muted/60 px-4 py-2 text-xs font-bold text-foreground/80 sm:w-32 sm:flex-col sm:items-start sm:justify-center sm:gap-0.5 sm:py-3">
+            {ko ? '2차 카테고리' : 'Subcategory'}
+            <span className="font-normal text-muted-foreground">{subs.length}개</span>
+          </div>
+          {subs.length > 0 ? (
+            <div className={cn(ROW_2, 'min-w-0 flex-1 p-2 sm:p-3')}>
+              <Link
+                href={href(activeRoot)}
+                className={cn(ITEM_2, active?.id === activeRoot.id ? 'bg-primary/10 font-bold text-primary ring-1 ring-primary/30' : 'font-semibold hover:bg-muted')}
+              >
+                <span className="truncate">{ko ? `${activeRoot.name} 전체` : `All ${activeRoot.name}`}</span>
+              </Link>
+              {subs.map((c) => {
+                const on = active?.id === c.id
+                return (
+                  <Link
+                    key={c.id}
+                    href={href(c)}
+                    className={cn(ITEM_2, on ? 'bg-primary/10 font-bold text-primary ring-1 ring-primary/30' : 'text-foreground/80 hover:bg-muted hover:text-foreground')}
+                  >
+                    <span className={cn('hidden size-1 shrink-0 rounded-full sm:block', on ? 'bg-primary' : 'bg-muted-foreground/40')} />
+                    <span className="leading-snug break-keep">{c.name.replaceAll('·', '·​')}</span>
+                    <Count n={counts?.[c.id]} on={false} />
+                  </Link>
+                )
+              })}
+            </div>
+          ) : (
+            <p className="flex-1 p-3 text-sm text-muted-foreground">{ko ? '2차 카테고리가 없어요.' : 'No subcategories.'}</p>
+          )}
         </div>
       ) : null}
     </div>

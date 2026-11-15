@@ -122,7 +122,7 @@ export function AllProductsHub({
         </div>
       ) : items.length === 0 ? (
         <p className="rounded-lg border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          {activeTab ? `${activeTab.name} 분류에 등록된 제품이 아직 없어요.` : '아직 등록된 제품이 없어요.'}
+          {activeTab ? `${activeTab.name} 카테고리에 등록된 제품이 아직 없어요.` : '아직 등록된 제품이 없어요.'}
         </p>
       ) : (
         <div className={cn('grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5', loading && 'opacity-60')}>

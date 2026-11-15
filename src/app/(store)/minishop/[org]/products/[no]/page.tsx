@@ -305,7 +305,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
             rows={(
               [
                 ['code', '상품코드', code],
-                ['category', '제품분류', categoryLabel],
+                ['category', '카테고리', categoryLabel],
                 ['model', '모델명', product.model_name],
                 ['spec', '제품사양', product.spec_summary],
                 ['brand', '제조사', product.brand],

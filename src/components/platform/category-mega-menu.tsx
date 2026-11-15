@@ -189,8 +189,8 @@ export function CategoryMegaMenu({ roots, banner }: { roots: MegaRoot[]; banner?
                     ref={inputRef}
                     value={term}
                     onChange={(e) => setTerm(e.target.value)}
-                    placeholder="분류 이름으로 바로 찾기 (예: 지게차, 레이저, 컴프레샤)"
-                    aria-label="분류 이름으로 찾기"
+                    placeholder="카테고리 이름으로 바로 찾기 (예: 지게차, 레이저, 컴프레샤)"
+                    aria-label="카테고리 이름으로 찾기"
                     className="h-10 w-full rounded-full border border-input bg-muted/40 pr-9 pl-9 text-sm outline-none focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/15"
                   />
                   {term ? (
@@ -208,7 +208,7 @@ export function CategoryMegaMenu({ roots, banner }: { roots: MegaRoot[]; banner?
                   ) : null}
                 </label>
                 <span className="hidden text-xs text-muted-foreground lg:inline">
-                  1차 {roots.length}개 · 세부 {roots.reduce((n, r) => n + r.children.length, 0)}개 분류
+                  1차 {roots.length}개 · 2차 {roots.reduce((n, r) => n + r.children.length, 0)}개 카테고리
                 </span>
               </div>
 
@@ -216,7 +216,7 @@ export function CategoryMegaMenu({ roots, banner }: { roots: MegaRoot[]; banner?
                 {q ? (
                   results.length === 0 ? (
                     <div className="flex h-full flex-col items-center justify-center gap-3 py-16 text-center text-sm text-muted-foreground">
-                      “{q}” 이름의 분류가 없어요.
+                      “{q}” 이름의 카테고리가 없어요.
                       <Link href={`/products?q=${encodeURIComponent(q)}`} className="inline-flex items-center gap-1 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground">
                         “{q}” 제품으로 검색하기 <ArrowRight className="size-3.5" />
                       </Link>
@@ -224,7 +224,7 @@ export function CategoryMegaMenu({ roots, banner }: { roots: MegaRoot[]; banner?
                   ) : (
                     <div className="flex flex-col gap-5">
                       <p className="text-xs text-muted-foreground">
-                        분류 {resultCount}개를 찾았어요 ·{' '}
+                        카테고리 {resultCount}개를 찾았어요 ·{' '}
                         <Link href={`/products?q=${encodeURIComponent(q)}`} className="font-semibold text-primary hover:underline">
                           “{q}” 제품 검색 결과 보기 →
                         </Link>
@@ -248,7 +248,7 @@ export function CategoryMegaMenu({ roots, banner }: { roots: MegaRoot[]; banner?
                         <div>
                           <h3 className="text-lg leading-tight font-bold">{active.name}</h3>
                           <p className="mt-0.5 text-xs text-muted-foreground">
-                            세부 분류 {active.children.length}개
+                            2차 카테고리 {active.children.length}개
                             {active.count > 0 ? ` · 등록 제품 ${active.count.toLocaleString()}개` : ''}
                           </p>
                         </div>
@@ -263,7 +263,7 @@ export function CategoryMegaMenu({ roots, banner }: { roots: MegaRoot[]; banner?
                     {active.children.length > 0 ? (
                       <SubGrid subs={active.children} term="" />
                     ) : (
-                      <p className="py-10 text-center text-sm text-muted-foreground">세부 분류가 없어요. 위 “전체 보기”로 제품을 확인하세요.</p>
+                      <p className="py-10 text-center text-sm text-muted-foreground">2차 카테고리가 없어요. 위 “전체 보기”로 제품을 확인하세요.</p>
                     )}
                   </div>
                 ) : null}
@@ -295,15 +295,16 @@ export function CategoryMegaMenu({ roots, banner }: { roots: MegaRoot[]; banner?
 
 function SubGrid({ subs, term }: { subs: MegaSub[]; term: string }) {
   return (
-    <ul className="grid grid-cols-2 gap-x-6 gap-y-0.5 lg:grid-cols-3">
+    <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5">
       {subs.map((c) => (
         <li key={c.id}>
           <Link
             href={c.href}
-            className="group flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] text-foreground/80 transition-colors hover:bg-primary/5 hover:text-primary"
+            title={c.name}
+            className="group flex items-center gap-2 rounded-md px-2.5 py-2 text-[13px] text-foreground/80 transition-colors hover:bg-primary/5 hover:text-primary"
           >
             <span className="size-1 shrink-0 rounded-full bg-muted-foreground/40 group-hover:bg-primary" />
-            <span className="min-w-0 flex-1 leading-snug break-keep">
+            <span className="min-w-0 flex-1 truncate whitespace-nowrap">
               <Highlight text={c.name} term={term} />
             </span>
             {c.count > 0 ? (

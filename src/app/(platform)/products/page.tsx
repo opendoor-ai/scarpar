@@ -30,6 +30,7 @@ import { getPrimaryImages } from '@/components/store/get-primary-images'
 import { Pagination } from '@/components/store/pagination'
 import { ProductCard, type ProductCardData } from '@/components/store/product-card'
 import { CategoryPills } from '@/components/store/products-filters'
+import { getPlatformCategoryCounts } from '@/lib/platform-category-counts'
 import { MembersHub, PremiumHub, SpecialHub } from '@/components/platform/hubs'
 import { BannerCarousel } from '@/modules/ads/components/banner-carousel'
 import { getHubBanners, getLiveBanners, getLivePromotedProductIds } from '@/modules/ads/live'
@@ -110,6 +111,12 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
 
   const allCategories = await getPlatformCategories()
   const categories = visibleCategories(allCategories)
+  // 카테고리별 제품 수 (1차 = 하위 2차 합계 포함)
+  const rawCounts = await getPlatformCategoryCounts()
+  const catCounts: Record<string, number> = { ...rawCounts }
+  for (const c of categories) {
+    if (c.parent_id && rawCounts[c.id]) catCounts[c.parent_id] = (catCounts[c.parent_id] ?? 0) + rawCounts[c.id]
+  }
   const activeCategory = findCategoryByParam(allCategories, { cate_no, category: legacySlug })
   // 예전 영문 주소(?category=...)로 들어오면 번호 주소로 영구 이동
   if (legacySlug && !cate_no && activeCategory?.cate_no) {
@@ -235,6 +242,7 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
         orgSlug=""
         basePath={BASE_PATH}
         categories={categories}
+        counts={catCounts}
         activeSlug={activeCategory ? categoryKey(activeCategory) : undefined}
         query={query || undefined}
       />

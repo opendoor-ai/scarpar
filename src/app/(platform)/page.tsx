@@ -527,7 +527,7 @@ export default async function HomePage() {
         ) : null}
 
         {/* 12. 전체제품 허브 — 분류 탭 · 5×3 · 더보기 */}
-        <Hub title="전체제품 허브" description="모든 공급사의 산업기계·중고기계를 분류별로 한눈에 보세요." href="/products" linkLabel="전체 보기">
+        <Hub title="전체제품 허브" description="모든 공급사의 산업기계·중고기계를 카테고리별로 한눈에 보세요." href="/products" linkLabel="전체 보기">
           <AllProductsHub
             initial={allFeed.items}
             initialHasMore={allFeed.hasMore}

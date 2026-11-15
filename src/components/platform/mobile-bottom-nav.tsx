@@ -195,7 +195,7 @@ export function MobileBottomNav({ categories, popular }: { categories: NavCatego
         <SheetContent side="left" className="w-[86vw] max-w-sm gap-0 p-0">
           <div className="border-b border-border px-4 py-3.5">
             <SheetTitle className="text-base">전체 카테고리</SheetTitle>
-            <SheetDescription className="sr-only">기계 분류를 골라요</SheetDescription>
+            <SheetDescription className="sr-only">기계 카테고리를 골라요</SheetDescription>
           </div>
           <div className="overflow-y-auto">
             <Link href="/products" onClick={() => setPanel(null)} className="flex items-center gap-3 border-b border-border px-4 py-3 font-semibold">
@@ -214,7 +214,7 @@ export function MobileBottomNav({ categories, popular }: { categories: NavCatego
                       type="button"
                       onClick={() => setOpenCat(openCat === c.id ? null : c.id)}
                       className="px-4 py-3 text-muted-foreground"
-                      aria-label={`${c.name} 하위 분류 ${openCat === c.id ? '접기' : '펼치기'}`}
+                      aria-label={`${c.name} 2차 카테고리 ${openCat === c.id ? '접기' : '펼치기'}`}
                     >
                       <ChevronRight className={cn('size-4 transition-transform', openCat === c.id && 'rotate-90')} />
                     </button>
