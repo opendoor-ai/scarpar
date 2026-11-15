@@ -25,6 +25,10 @@ export const contentSchema = z
     summary: z.string().trim().max(500),
     body_html: z.string().max(100_000),
     product_no: z.coerce.number().int().min(0).nullable(),
+    /** 블로그: 함께 보여줄 제품 번호 (쉼표로 최대 3개, 예: 10001, 10002) */
+    product_nos: z.string().trim().max(100).optional().default(''),
+    /** 블로그 작성자 (by. ○○) */
+    author: z.string().trim().max(60).optional().default(''),
     is_published: z.boolean(),
     sort_order: z.coerce.number().int().min(0).max(9999),
   })

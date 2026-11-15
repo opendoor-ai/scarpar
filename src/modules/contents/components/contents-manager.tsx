@@ -43,6 +43,9 @@ export interface ContentRow {
   sort_order: number
   published_at: string
   product: { product_no: number; name: string } | null
+  /** 0030 — 블로그 작성자 · 함께 보여줄 제품 번호들 (쉼표) */
+  author?: string | null
+  product_nos_text?: string
 }
 
 const KIND_HELP: Record<ContentKind, string> = {
@@ -121,7 +124,12 @@ export function ContentsManager({ rows }: { rows: ContentRow[] }) {
                           <span className="truncate text-sm font-medium">{c.title}</span>
                           {!c.is_published ? <Badge variant="secondary">숨김</Badge> : null}
                         </div>
-                        {c.product ? (
+                        {c.author ? <span className="truncate text-xs text-muted-foreground">by. {c.author}</span> : null}
+                        {c.product_nos_text ? (
+                          <span className="truncate text-xs text-muted-foreground">
+                            연결 제품: {c.product_nos_text.split(',').map((n) => `P${n.trim()}`).join(', ')}
+                          </span>
+                        ) : c.product ? (
                           <span className="truncate text-xs text-muted-foreground">
                             연결 제품: P{c.product.product_no} {c.product.name}
                           </span>
@@ -184,7 +192,9 @@ function ContentDialog({ kind, row, onClose }: { kind: ContentKind; row: Content
     thumbnail: row?.thumbnail ?? '',
     summary: row?.summary ?? '',
     body_html: row?.body_html ?? '',
-    product_no: row?.product?.product_no ?? null,
+    product_no: kind === 'blog' ? null : (row?.product?.product_no ?? null),
+    product_nos: row?.product_nos_text ?? (row?.product ? String(row.product.product_no) : ''),
+    author: row?.author ?? '',
     is_published: row?.is_published ?? true,
     sort_order: row?.sort_order ?? 0,
   }))
@@ -239,7 +249,17 @@ function ContentDialog({ kind, row, onClose }: { kind: ContentKind; row: Content
           <Field label="짧은 소개 (선택)">
             <Textarea rows={2} value={form.summary} onChange={(e) => set('summary', e.target.value)} />
           </Field>
-          {kind !== 'short' ? (
+          {kind === 'blog' ? (
+            <>
+              <Field label="블로그 작성자 (선택)" hint="메인 카드에 'by. 작성자'로 보여요. 예: 포코토리">
+                <Input value={form.author} onChange={(e) => set('author', e.target.value)} maxLength={60} />
+              </Field>
+              <Field label="함께 보여줄 제품 번호 (최대 3개)" hint="쉼표로 나눠 적어요. 예: 10001, 10004, 10006 · 3개가 안 되면 같은 공급사 제품으로 채워요.">
+                <Input value={form.product_nos} onChange={(e) => set('product_nos', e.target.value)} placeholder="10001, 10004, 10006" />
+              </Field>
+            </>
+          ) : null}
+          {kind === 'magazine' ? (
             <Field label="함께 보여줄 제품 번호 (선택)" hint="상품 목록의 P10001 에서 숫자만">
               <Input
                 type="number"

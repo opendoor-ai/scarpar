@@ -29,12 +29,23 @@ export async function saveContentAction(id: string | null, input: ContentInput):
   const d = parsed.data
   const admin = getAdminClient()
 
-  let productId: string | null = null
-  if (d.product_no) {
-    const { data } = await admin.from('products').select('id').eq('product_no', d.product_no).maybeSingle()
-    if (!data) return { ok: false, error: `상품번호 P${d.product_no} 상품을 찾을 수 없어요.` }
-    productId = (data as { id: string }).id
+  // 함께 보여줄 제품: 블로그는 쉼표로 최대 3개, 매거진은 1개
+  const nos = [
+    ...new Set(
+      [d.product_no ?? 0, ...(d.product_nos ?? '').split(/[,\s]+/).map((x) => Number(x.replace(/^p/i, '')))].filter(
+        (n) => Number.isInteger(n) && n > 0,
+      ),
+    ),
+  ].slice(0, 3)
+  const productIds: string[] = []
+  if (nos.length > 0) {
+    const { data } = await admin.from('products').select('id, product_no').in('product_no', nos)
+    const byNo = new Map(((data ?? []) as { id: string; product_no: number }[]).map((r) => [r.product_no, r.id]))
+    const missing = nos.filter((n) => !byNo.has(n))
+    if (missing.length) return { ok: false, error: `상품번호 ${missing.map((n) => `P${n}`).join(', ')} 상품을 찾을 수 없어요.` }
+    for (const n of nos) productIds.push(byNo.get(n)!)
   }
+  const productId = productIds[0] ?? null
 
   const row = {
     kind: d.kind,
@@ -44,13 +55,20 @@ export async function saveContentAction(id: string | null, input: ContentInput):
     summary: d.summary || null,
     body_html: d.kind === 'magazine' && d.body_html ? sanitizeDetailHtml(d.body_html) : null,
     product_id: productId,
+    product_ids: productIds,
+    author: d.author || null,
     is_published: d.is_published,
     sort_order: d.sort_order,
     updated_at: new Date().toISOString(),
   }
-  const { error } = id
-    ? await admin.from('site_contents').update(row).eq('id', id)
-    : await admin.from('site_contents').insert({ ...row, created_by: user.id })
+  const write = (r: Record<string, unknown>) =>
+    id ? admin.from('site_contents').update(r).eq('id', id) : admin.from('site_contents').insert({ ...r, created_by: user.id })
+  let { error } = await write(row)
+  // 0030 실행 전이면 새 칸 없이 저장
+  if (error && /product_ids|author/.test(error.message)) {
+    const { product_ids: _p, author: _a, ...base } = row
+    ;({ error } = await write(base))
+  }
   if (error) return { ok: false, error: error.message }
   refresh()
   return { ok: true }

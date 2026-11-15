@@ -23,6 +23,7 @@ import {
 
 import { AdLink } from '@/components/platform/ad-link'
 import { BannerHtml } from '@/components/platform/banner-html'
+import { BlogProductsHub, type BlogHubItem } from '@/components/platform/blog-products-hub'
 import { HeroSliderB, type HeroSlideB } from '@/components/platform/hero-slider-b'
 import { MainPopup } from '@/components/platform/main-popup'
 import { HScroller } from '@/components/platform/h-scroller'
@@ -91,6 +92,14 @@ interface ContentRow {
   summary: string | null
   product_id: string | null
   published_at: string
+  author?: string | null
+  product_ids?: string[] | null
+}
+
+/** 블로그에 연결한 제품 id들 (0030 product_ids, 예전 product_id) */
+function blogProductIds(b: ContentRow): string[] {
+  const list = (b.product_ids ?? []).filter(Boolean)
+  return list.length ? list.slice(0, 3) : b.product_id ? [b.product_id] : []
 }
 
 // ------------------------------------------------------------------ 작은 화면 조각
@@ -102,7 +111,7 @@ function Hub({
   linkLabel,
   children,
 }: {
-  title: string
+  title: React.ReactNode
   description?: string
   href?: string
   linkLabel?: string
@@ -194,7 +203,7 @@ export default async function HomePage() {
     fetchLatestPlatformCards(20),
     supabase
       .from('site_contents')
-      .select('id, kind, title, url, thumbnail, summary, product_id, published_at')
+      .select('*') // 0030 전후 모두 (author·product_ids)
       .eq('is_published', true)
       .order('sort_order', { ascending: true })
       .order('published_at', { ascending: false })
@@ -221,7 +230,7 @@ export default async function HomePage() {
         ? [{ id: c.id, title: c.title, videoId: vid, thumb: c.thumbnail ? mediaUrl(c.thumbnail) : youtubeThumb(vid) }]
         : []
     })
-  const blogs = contents.filter((c) => c.kind === 'blog').slice(0, 6)
+  const blogs = contents.filter((c) => c.kind === 'blog').slice(0, 12)
   const magazines = contents.filter((c) => c.kind === 'magazine').slice(0, 3)
 
   const specialIds = [...promotedIds, ...((featuredRes.data ?? []) as { id: string }[]).map((r) => r.id)]
@@ -231,10 +240,47 @@ export default async function HomePage() {
     fetchPlatformCardsByIds(realtimeIds),
     fetchPlatformCardsByIds(inquiryIds),
     fetchPlatformCardsByIds([...new Set(specialIds)].slice(0, 10)),
-    fetchPlatformCardsByIds(blogs.flatMap((b) => (b.product_id ? [b.product_id] : []))),
+    fetchPlatformCardsByIds([...new Set(blogs.flatMap((b) => blogProductIds(b)))]),
     latestPublicRequests(12),
   ])
   const blogProductById = new Map(blogProducts.map((p) => [p.card.id, p]))
+
+  // 블로그마다 제품 3개 — 모자라면 첫 제품과 같은 공급사의 최근 제품으로 채움
+  const blogItems: BlogHubItem[] = []
+  {
+    const firstIds = blogs.map((b) => blogProductIds(b)[0]).filter(Boolean) as string[]
+    const { data: orgRows } = firstIds.length
+      ? await getAnonClient().from('products').select('id, org_id').in('id', firstIds)
+      : { data: [] }
+    const orgOf = new Map(((orgRows ?? []) as { id: string; org_id: string }[]).map((r) => [r.id, r.org_id]))
+    const fillOrgs = [...new Set([...orgOf.values()])]
+    const fillByOrg = new Map(await Promise.all(fillOrgs.map(async (o) => [o, await fetchLatestPlatformCards(6, o)] as const)))
+    for (const b of blogs) {
+      const ids = blogProductIds(b)
+      const cards = ids.map((id) => blogProductById.get(id)).filter(Boolean) as PlatformProductCard[]
+      const org = ids[0] ? orgOf.get(ids[0]) : undefined
+      for (const c of (org ? fillByOrg.get(org) : undefined) ?? []) {
+        if (cards.length >= 3) break
+        if (!cards.some((x) => x.card.id === c.card.id)) cards.push(c)
+      }
+      blogItems.push({
+        id: b.id,
+        title: b.title,
+        url: b.url ?? '#',
+        thumb: b.thumbnail ? mediaUrl(b.thumbnail) : null,
+        author: b.author ?? null,
+        products: cards.slice(0, 3).map((c) => ({
+          id: c.card.id,
+          href: `/minishop/${c.orgSlug}/products/${c.card.product_no}`,
+          name: c.card.name,
+          image: c.card.image,
+          price: c.card.price,
+          compareAt: c.card.compare_at_price ?? null,
+          supplier: c.orgName,
+        })),
+      })
+    }
+  }
 
   // 메인 슬라이드: 배너 관리에서 켜 둔 그룹을 씀 (A·B는 한쪽을 켜면 다른 쪽이 꺼짐)
   // B타입 그룹이 꺼져 있거나 배너가 없으면 빈 목록이라 A타입이 보여요
@@ -383,21 +429,35 @@ export default async function HomePage() {
         {tAuto ? (
           <BannerHtml html={tAuto} />
         ) : autoScroll.some((b) => b.image_pc) ? (
-          <section aria-label="파트너 로고" className="-mx-4 overflow-hidden border-y border-border py-4 sm:mx-0">
-            <div className="jadong-marquee flex w-max items-center gap-10">
-              {[...autoScroll, ...autoScroll]
-                .filter((b) => b.image_pc)
-                .map((b, i) => (
-                  <AdLink key={`${b.id}-${i}`} bannerId={b.id} href={b.link_url} title={b.title} className="shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={b.image_pc}
-                      alt={b.title}
-                      className="h-10 w-auto object-contain grayscale transition hover:grayscale-0"
-                      loading="lazy"
-                    />
-                  </AdLink>
-                ))}
+          <section aria-label="함께하는 공급사" className="flex items-center gap-4 rounded-xl bg-muted/50 py-3 pr-0 pl-4">
+            <p className="hidden shrink-0 text-xs leading-tight font-bold text-muted-foreground sm:block">
+              함께하는
+              <br />
+              공급사
+            </p>
+            {/* 양쪽 끝이 부드럽게 사라지는 띠 — 마우스를 올리면 멈춤 */}
+            <div className="relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+              <div className="jadong-marquee flex w-max items-center gap-3 py-1">
+                {[...autoScroll, ...autoScroll]
+                  .filter((b) => b.image_pc)
+                  .map((b, i) => (
+                    <AdLink
+                      key={`${b.id}-${i}`}
+                      bannerId={b.id}
+                      href={b.link_url}
+                      title={b.subtitle || b.title}
+                      className="flex h-14 w-36 shrink-0 items-center justify-center rounded-lg border border-border bg-background px-3 py-2 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={b.image_pc}
+                        alt={b.subtitle || b.title}
+                        className="max-h-full max-w-full object-contain opacity-80 grayscale transition group-hover:opacity-100 hover:opacity-100 hover:grayscale-0"
+                        loading="lazy"
+                      />
+                    </AdLink>
+                  ))}
+              </div>
             </div>
           </section>
         ) : null}
@@ -443,53 +503,17 @@ export default async function HomePage() {
           </Hub>
         ) : null}
 
-        {/* 9. 인기 기계 블로그와 함께하는 제품 */}
-        {blogs.length > 0 ? (
+        {/* 9. 인기 기계 블로그와 함께 찾는 제품 */}
+        {blogItems.length > 0 ? (
           <Hub
-            title="인기 기계 블로그와 함께하는 제품"
-            description="기계 분야에서 많이 읽히는 블로그 글과 소개된 제품이에요."
+            title={
+              <>
+                인기 <span className="text-primary">기계</span> 블로그와 함께 찾는 제품
+              </>
+            }
+            description="기계 분야에서 많이 읽히는 블로그 글과 함께 보는 제품이에요."
           >
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {blogs.map((b) => {
-                const p = b.product_id ? blogProductById.get(b.product_id) : undefined
-                return (
-                  <div key={b.id} className="flex flex-col overflow-hidden rounded-xl border border-border bg-card">
-                    <a href={b.url ?? '#'} target="_blank" rel="noopener" className="group flex flex-col gap-2 p-4">
-                      {b.thumbnail ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={mediaUrl(b.thumbnail)}
-                          alt=""
-                          loading="lazy"
-                          className="aspect-[16/9] w-full rounded-md object-cover"
-                        />
-                      ) : null}
-                      <span className="line-clamp-2 font-semibold group-hover:underline">{b.title}</span>
-                      {b.summary ? (
-                        <span className="line-clamp-2 text-sm text-muted-foreground">{b.summary}</span>
-                      ) : null}
-                    </a>
-                    {p ? (
-                      <Link
-                        href={`/minishop/${p.orgSlug}/products/${p.card.product_no}`}
-                        className="mt-auto flex items-center gap-3 border-t border-border bg-muted/40 p-3 hover:bg-muted"
-                      >
-                        <span className="size-12 shrink-0 overflow-hidden rounded bg-[#e9e9e9]">
-                          {p.card.image ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={p.card.image} alt="" className="size-full object-contain" />
-                          ) : null}
-                        </span>
-                        <span className="flex min-w-0 flex-col">
-                          <span className="truncate text-sm font-medium">{p.card.name}</span>
-                          <span className="text-xs text-muted-foreground">{p.orgName}</span>
-                        </span>
-                      </Link>
-                    ) : null}
-                  </div>
-                )
-              })}
-            </div>
+            <BlogProductsHub items={blogItems} />
           </Hub>
         ) : null}
 
