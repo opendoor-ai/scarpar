@@ -130,11 +130,19 @@ export function CategoryMegaMenu({ roots, banner }: { roots: MegaRoot[]; banner?
         <div
           role="dialog"
           aria-label="전체 카테고리"
+          // 메뉴 안의 분류·바로가기를 누르면 바로 닫기 (같은 제품 화면 안에서 분류만 바뀔 때도)
+          onClickCapture={(e) => {
+            if ((e.target as HTMLElement).closest('a')) {
+              clear(openTimer)
+              setOpen(false)
+              setTerm('')
+            }
+          }}
           className="absolute top-full left-0 z-40 hidden w-[min(96vw,1152px)] overflow-hidden rounded-b-xl rounded-tr-xl border border-border bg-background shadow-2xl md:block"
         >
           <div className="flex">
             {/* 왼쪽: 1차 분류 */}
-            <ul className="w-[268px] shrink-0 border-r border-border bg-muted/40 py-2" role="menu">
+            <ul className="w-[300px] shrink-0 border-r border-border bg-muted/40 py-2" role="menu">
               {roots.map((r) => {
                 const on = !q && r.id === active?.id
                 const hits = q ? results.find((x) => x.root.id === r.id) : undefined
@@ -151,19 +159,19 @@ export function CategoryMegaMenu({ roots, banner }: { roots: MegaRoot[]; banner?
                       }}
                       className={cn(
                         'group relative flex items-center gap-2.5 py-1.5 pr-3 pl-4 text-[13px] transition-colors',
-                        on ? 'bg-background font-bold text-primary' : 'text-foreground/85 hover:bg-background/70',
+                        on ? 'bg-background font-semibold text-primary' : 'text-foreground/85 hover:bg-background/70',
                         q && !hits && 'opacity-35',
                       )}
                     >
                       {on ? <span className="absolute inset-y-1 left-0 w-1 rounded-r bg-primary" /> : null}
                       <CategoryIcon slug={r.slug} image={r.icon} className="size-8 shrink-0 shadow-none" />
-                      <span className="min-w-0 flex-1 leading-tight break-keep">{soft(r.name)}</span>
+                      <span className="min-w-0 flex-1 truncate leading-tight" title={r.name}>{r.name}</span>
                       {q && hits ? (
-                        <span className="rounded-full bg-amber-100 px-1.5 text-[10px] font-bold text-amber-800 dark:bg-amber-500/20 dark:text-amber-300">
+                        <span className="shrink-0 rounded-full bg-amber-100 px-1.5 text-[10px] font-bold text-amber-800 dark:bg-amber-500/20 dark:text-amber-300">
                           {hits.subs.length}
                         </span>
                       ) : r.count > 0 ? (
-                        <span className="text-[11px] text-muted-foreground tabular-nums">{r.count.toLocaleString()}</span>
+                        <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">{r.count.toLocaleString()}</span>
                       ) : null}
                       <ChevronRight className={cn('size-3.5 shrink-0', on ? 'text-primary' : 'text-muted-foreground/60')} />
                     </Link>
