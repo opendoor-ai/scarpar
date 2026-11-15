@@ -43,7 +43,8 @@ export async function submitApplicationAction(input: ApplicationInput): Promise<
 
   // 본인 권한(RLS)으로 저장 — 정책상 본인 이름의 "대기" 신청만 들어감
   const supabase = await getServerClient()
-  const { error } = await supabase.from('supplier_applications').insert({
+  const logo = d.logo_path && /^applications\/[\w./-]+$/.test(d.logo_path) && !d.logo_path.includes('..') ? d.logo_path : null
+  const row = {
     user_id: user.id,
     company_name: d.company_name,
     desired_slug: d.desired_slug,
@@ -55,7 +56,10 @@ export async function submitApplicationAction(input: ApplicationInput): Promise<
     homepage_url: d.homepage_url || null,
     item_keywords: splitKeywords(d.item_keywords),
     message: d.message || null,
-  })
+  }
+  let { error } = await supabase.from('supplier_applications').insert({ ...row, name_en: d.name_en || null, logo_path: logo })
+  // 0031 실행 전이면 영문명·로고 없이
+  if (error && /name_en|logo_path/.test(error.message)) ({ error } = await supabase.from('supplier_applications').insert(row))
   if (error) {
     if (error.code === '23505') return { ok: false, error: '이미 심사 중인 신청이 있습니다.' }
     return { ok: false, error: '신청을 저장하지 못했습니다. 다시 시도해 주세요.' }
@@ -92,6 +96,8 @@ export async function approveApplicationAction(id: string): Promise<ActionResult
       contact_name: app.contact_name,
       homepage_url: app.homepage_url,
       item_keywords: app.item_keywords,
+      name_en: (app as { name_en?: string | null }).name_en ?? null,
+      logo_path: (app as { logo_path?: string | null }).logo_path ?? null,
     },
     app.user_id,
   )
@@ -128,4 +134,20 @@ export async function rejectApplicationAction(id: string, reason: string): Promi
 
   revalidatePath('/admin/platform')
   return { ok: true }
+}
+
+const LOGO_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+
+/** 일반회원: 입점 신청용 회사 로고 올리기 (아직 공급사가 없어서 따로 받아요) */
+export async function uploadApplicationLogoAction(formData: FormData): Promise<ActionResult<{ path: string }>> {
+  const user = await requireUser()
+  const file = formData.get('file')
+  if (!(file instanceof File) || file.size === 0) return { ok: false, error: '로고 파일을 선택하세요.' }
+  if (!LOGO_TYPES.includes(file.type)) return { ok: false, error: 'JPG·PNG·GIF·WEBP·SVG 로고만 올릴 수 있어요.' }
+  if (file.size > 4 * 1024 * 1024) return { ok: false, error: '4MB 이하 로고만 올릴 수 있어요.' }
+  const ext = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'image/webp': 'webp', 'image/svg+xml': 'svg' } as Record<string, string>)[file.type]
+  const path = `applications/${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const { error } = await getAdminClient().storage.from('media').upload(path, file, { contentType: file.type, upsert: false })
+  if (error) return { ok: false, error: '로고를 올리지 못했어요. 다시 시도해 주세요.' }
+  return { ok: true, data: { path } }
 }

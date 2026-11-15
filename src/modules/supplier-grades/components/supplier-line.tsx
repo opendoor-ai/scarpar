@@ -10,6 +10,8 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Input } from '@/components/ui/input'
+import { MediaPicker } from '@/components/admin/media-picker'
+import { mediaUrl } from '@/lib/media-url'
 import { formatKrPhone } from '@/lib/phone'
 import { cn } from '@/lib/utils'
 
@@ -47,6 +49,8 @@ export interface SupplierRow {
   ownerEmail: string | null
   isPlatform: boolean
   logs: SupplierLog[]
+  logoPath?: string | null
+  nameEn?: string | null
 }
 
 export function todayKst() {
@@ -89,6 +93,8 @@ export function SupplierLine({ s, grades, defaultGrade }: { s: SupplierRow; grad
   // 기본 정보
   const [info, setInfo] = useState({
     name: s.name,
+    name_en: s.nameEn ?? '',
+    logo_path: s.logoPath ?? '',
     phone: s.phone ?? '',
     email: s.email ?? '',
     contact_name: s.contactName ?? '',
@@ -315,9 +321,20 @@ export function SupplierLine({ s, grades, defaultGrade }: { s: SupplierRow; grad
             {tab === 'info' ? (
               <div className="flex flex-col gap-3">
                 <div className="grid gap-3 text-xs sm:grid-cols-2 lg:grid-cols-4">
+                  <label className="flex flex-col gap-1 sm:col-span-2 lg:col-span-4">
+                    <span className={label}>회사 로고 · 공급사 목록과 메인 &quot;함께하는 공급사&quot;에 보여요</span>
+                    <span className="flex items-center gap-3">
+                      {info.logo_path ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={mediaUrl(info.logo_path)} alt="" className="h-14 w-36 rounded border border-border bg-white object-contain p-1" />
+                      ) : null}
+                      <MediaPicker value={info.logo_path ? { id: '', path: info.logo_path } : null} onChange={(m) => setInfo((p) => ({ ...p, logo_path: m?.path ?? '' }))} />
+                    </span>
+                  </label>
                   {(
                     [
                       ['name', '공급사명', 'text'],
+                      ['name_en', '영문명', 'text'],
                       ['contact_name', '담당자', 'text'],
                       ['phone', '대표 전화', 'tel'],
                       ['email', '이메일', 'email'],

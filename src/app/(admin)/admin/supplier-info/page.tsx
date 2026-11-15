@@ -20,6 +20,8 @@ interface OrgRow {
   item_keywords: string[] | null
   contact_name: string | null
   bin_number: string | null
+  logo_path: string | null
+  name_en?: string | null
   grade_memo?: string | null
   fax?: string | null
   contacts?: { name?: string; phone?: string; email?: string }[] | null
@@ -63,6 +65,8 @@ export default async function SupplierInfoPage() {
     // 메인 관리자가 보고 있을 때는 메인 관리자 비밀번호가 바뀌지 않게 숨김
     canChangePassword: !ctx.viaPlatform && !platformAdmin,
     values: {
+      name_en: o.name_en ?? '',
+      logo_path: o.logo_path ?? '',
       item_keywords: (o.item_keywords ?? []).join(', '),
       phone: o.phone ?? '',
       fax: o.fax ?? '',

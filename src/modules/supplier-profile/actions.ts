@@ -16,6 +16,8 @@ const opt = (max: number) => z.string().trim().max(max).optional().or(z.literal(
 const contactSchema = z.object({ name: opt(40), phone: opt(20), email: opt(120) })
 
 const infoSchema = z.object({
+  name_en: opt(80),
+  logo_path: opt(300),
   item_keywords: opt(300),
   phone: z.string().trim().min(9, '일반전화를 입력하세요').max(20),
   fax: opt(20),
@@ -74,7 +76,14 @@ export async function saveSupplierInfoAction(input: SupplierInfoInput): Promise<
     updated_at: new Date().toISOString(),
   }
   const supabase = await getServerClient()
-  const { error } = await supabase.from('orgs').update(update).eq('id', ctx.org.id)
+  let { error } = await supabase
+    .from('orgs')
+    .update({ ...update, name_en: d.name_en || null, logo_path: d.logo_path || null })
+    .eq('id', ctx.org.id)
+  // 0031 실행 전이면 영문명 없이 (로고는 원래 있던 칸)
+  if (error && /name_en/.test(error.message)) {
+    ;({ error } = await supabase.from('orgs').update({ ...update, logo_path: d.logo_path || null }).eq('id', ctx.org.id))
+  }
   if (error) {
     return { ok: false, error: /column/.test(error.message) ? '0029 SQL을 먼저 실행해 주세요.' : '저장하지 못했어요. 다시 시도해 주세요.' }
   }

@@ -162,6 +162,8 @@ export async function setOrgStatusAction(input: z.input<typeof statusSchema>): P
 const infoSchema = z.object({
   orgId: z.string().uuid(),
   name: z.string().trim().min(2, '공급사명을 2자 이상 입력하세요').max(120),
+  name_en: z.string().trim().max(80).optional().or(z.literal('')),
+  logo_path: z.string().trim().max(300).optional().or(z.literal('')),
   phone: z.string().trim().max(20).optional().or(z.literal('')),
   email: z.string().trim().email('이메일 형식이 올바르지 않아요').max(120).optional().or(z.literal('')),
   contact_name: z.string().trim().max(60).optional().or(z.literal('')),
@@ -176,10 +178,10 @@ export async function updateSupplierInfoAction(input: z.input<typeof infoSchema>
   const parsed = infoSchema.safeParse(input)
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? '입력값을 확인하세요' }
   const { orgId, ...d } = parsed.data
-  const { error } = await getAdminClient()
-    .from('orgs')
-    .update({
+  const admin = getAdminClient()
+  const base = {
       name: d.name,
+      logo_path: d.logo_path || null,
       phone: d.phone || null,
       email: d.email || null,
       contact_name: d.contact_name || null,
@@ -187,8 +189,9 @@ export async function updateSupplierInfoAction(input: z.input<typeof infoSchema>
       homepage_url: d.homepage_url || null,
       bin_number: d.bin_number || null,
       updated_at: new Date().toISOString(),
-    })
-    .eq('id', orgId)
+  }
+  let { error } = await admin.from('orgs').update({ ...base, name_en: d.name_en || null }).eq('id', orgId)
+  if (error && /name_en/.test(error.message)) ({ error } = await admin.from('orgs').update(base).eq('id', orgId))
   if (error) return { ok: false, error: '정보를 저장하지 못했어요' }
   await logSupplier(orgId, 'info', '기본 정보 수정', null, user.id)
   refresh()

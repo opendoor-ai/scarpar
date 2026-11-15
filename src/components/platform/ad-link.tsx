@@ -56,7 +56,7 @@ export function AdLink({
       title={title}
       target={external ? '_blank' : undefined}
       rel={external ? 'noopener sponsored' : 'sponsored'}
-      className={className}
+      className={className ? `font-banner ${className}` : 'font-banner'}
       style={style}
       onClick={() => sendAdEvent(bannerId, 'click')}
     >

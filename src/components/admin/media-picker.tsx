@@ -32,8 +32,12 @@ interface MediaPickerProps {
 }
 
 const MAX_MB = 10
+/** 움직이는 GIF는 줄일 수 없어서 서버가 받을 수 있는 크기(4MB)까지만 */
+const MAX_GIF_MB = 4
 
-const DEFAULT_ACCEPT = 'image/png,image/jpeg,image/gif,image/webp,image/svg+xml,image/avif'
+// 확장자도 함께 적어야 윈도우 파일 선택 창에서 webp·gif가 빠짐없이 보여요
+const DEFAULT_ACCEPT =
+  'image/jpeg,image/png,image/gif,image/webp,image/svg+xml,image/avif,.jpg,.jpeg,.jfif,.png,.gif,.webp,.svg,.avif'
 
 function MediaPicker({ value, onChange, label, renderTrigger, multiple = false, accept = DEFAULT_ACCEPT }: MediaPickerProps) {
   const [uploading, setUploading] = React.useState(false)
@@ -58,6 +62,11 @@ function MediaPicker({ value, onChange, label, renderTrigger, multiple = false, 
       }
       // 큰 사진은 올리기 전에 알맞은 크기로 줄여요 (서버는 4MB까지 받음)
       const file = await shrinkImage(original)
+      const isGif = original.type === 'image/gif' || /\.gif$/i.test(original.name)
+      if (isGif && file.size > MAX_GIF_MB * 1024 * 1024) {
+        toast.error(`${original.name}: 움직이는 GIF는 ${MAX_GIF_MB}MB까지 올릴 수 있어요. 프레임 수나 크기를 줄여 주세요.`)
+        continue
+      }
       if (file.size > MAX_MB * 1024 * 1024) {
         toast.error(`${original.name}: 사진이 너무 커요. ${MAX_MB}MB 이하로 줄여서 올려 주세요.`)
         continue

@@ -48,5 +48,5 @@ export function BannerHtml({ html, className }: { html: string; className?: stri
     }
   }, [html])
 
-  return <div ref={ref} className={className} dangerouslySetInnerHTML={{ __html: html }} />
+  return <div ref={ref} className={className ? `font-banner ${className}` : 'font-banner'} dangerouslySetInnerHTML={{ __html: html }} />
 }

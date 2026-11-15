@@ -29,6 +29,9 @@ export interface ProvisionOrgInput {
   contact_name?: string | null
   homepage_url?: string | null
   item_keywords?: string[] | null
+  /** 0031 — 공급사 영문명 · 회사 로고 (media 경로) */
+  name_en?: string | null
+  logo_path?: string | null
 }
 
 export type ProvisionResult = { ok: true; org: Org } | { ok: false; error: string }
@@ -46,9 +49,7 @@ export async function provisionOrg(input: ProvisionOrgInput, ownerUserId: string
     return { ok: false, error: '이미 사용 중인 공급사 아이디(주소)예요. 다른 아이디를 입력하세요.' }
   }
 
-  const { data: orgRow, error: orgError } = await admin
-    .from('orgs')
-    .insert({
+  const base = {
       name: input.name,
       slug: input.slug,
       vertical: input.vertical,
@@ -63,9 +64,17 @@ export async function provisionOrg(input: ProvisionOrgInput, ownerUserId: string
       country: 'KR',
       timezone: 'Asia/Seoul',
       enabled_modules: VERTICAL_PRESETS[input.vertical].modules,
-    })
+      logo_path: input.logo_path || null,
+  }
+  let { data: orgRow, error: orgError } = await admin
+    .from('orgs')
+    .insert({ ...base, name_en: input.name_en || null })
     .select('*')
     .single()
+  // 0031 실행 전이면 영문명 없이
+  if (orgError && /name_en/.test(orgError.message)) {
+    ;({ data: orgRow, error: orgError } = await admin.from('orgs').insert(base).select('*').single())
+  }
   if (orgError || !orgRow) return { ok: false, error: orgError?.message ?? '조직을 만들지 못했습니다.' }
   const org = orgRow as Org
 

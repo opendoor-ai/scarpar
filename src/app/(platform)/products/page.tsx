@@ -2,6 +2,7 @@
 // 주소: /products , /products?cate_no=54 , /products?q=머시닝 (예전 ?category=영문주소 는 번호 주소로 이동)
 
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { PackageSearch } from 'lucide-react'
 
 import { categoryWithDescendants } from '@/lib/category-tree'
@@ -28,7 +29,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { getPrimaryImages } from '@/components/store/get-primary-images'
 import { Pagination } from '@/components/store/pagination'
 import { ProductCard, type ProductCardData } from '@/components/store/product-card'
-import { CategoryPills, ProductSearchBox } from '@/components/store/products-filters'
+import { CategoryPills } from '@/components/store/products-filters'
 import { MembersHub, PremiumHub, SpecialHub } from '@/components/platform/hubs'
 import { BannerCarousel } from '@/modules/ads/components/banner-carousel'
 import { getHubBanners, getLiveBanners, getLivePromotedProductIds } from '@/modules/ads/live'
@@ -211,6 +212,7 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
           className="mb-6 aspect-[5/2] w-full rounded-lg border border-border object-cover sm:aspect-[5/1]"
         />
       ) : null}
+      {/* 제목 (검색은 맨 위 머리글 검색창 하나로 — 휴대폰은 위·아래 검색 버튼) */}
       <div className="mb-6 flex flex-col gap-1">
         <h1 className="text-xl font-bold sm:text-2xl">{heading}</h1>
         {activeCategory?.description && !query ? (
@@ -219,24 +221,23 @@ export default async function PlatformProductsPage({ searchParams }: PageProps<R
         <p className="text-sm text-muted-foreground">
           모든 공급사의 산업기계·중고기계 {count ?? 0}개 — 마음에 드는 제품은 공급사에 바로 전화·문자로 문의하세요.
         </p>
+        {query ? (
+          <Link
+            href={activeCategory ? `${BASE_PATH}?cate_no=${categoryKey(activeCategory)}` : BASE_PATH}
+            className="mt-1 inline-flex w-fit items-center gap-1 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
+          >
+            “{query}” 검색어 지우기 ✕
+          </Link>
+        ) : null}
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <CategoryPills
-          orgSlug=""
-          basePath={BASE_PATH}
-          categories={categories}
-          activeSlug={activeCategory ? categoryKey(activeCategory) : undefined}
-          query={query || undefined}
-        />
-        <ProductSearchBox
-          orgSlug=""
-          basePath={BASE_PATH}
-          query={query || undefined}
-          category={activeCategory ? categoryKey(activeCategory) : undefined}
-          placeholder="제품명·모델명·제조사 검색"
-        />
-      </div>
+      <CategoryPills
+        orgSlug=""
+        basePath={BASE_PATH}
+        categories={categories}
+        activeSlug={activeCategory ? categoryKey(activeCategory) : undefined}
+        query={query || undefined}
+      />
 
       {banners.length > 0 ? <BannerCarousel banners={banners} className="mt-6" /> : null}
 

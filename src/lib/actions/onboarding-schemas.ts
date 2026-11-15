@@ -5,6 +5,8 @@ import { z } from 'zod'
 
 export const createOrgSchema = z.object({
   name: z.string().trim().min(2, '공급사명을 2자 이상 입력하세요').max(120),
+  name_en: z.string().trim().max(80).optional().or(z.literal('')),
+  logo_path: z.string().trim().max(300).optional().or(z.literal('')),
   slug: z
     .string()
     .trim()

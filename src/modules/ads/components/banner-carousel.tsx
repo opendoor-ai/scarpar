@@ -64,7 +64,7 @@ export function BannerCarousel({
   return (
     <div
       ref={rootRef}
-      className={cn('group relative overflow-hidden rounded-lg border border-border bg-muted', className)}
+      className={cn('font-banner group relative overflow-hidden rounded-lg border border-border bg-muted', className)}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"

@@ -12,11 +12,15 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 
-import { submitApplicationAction } from '../actions'
+import { submitApplicationAction, uploadApplicationLogoAction } from '../actions'
+import { mediaUrl } from '@/lib/media-url'
+import { ImagePlus, Loader2, X } from 'lucide-react'
 import type { ApplicationInput } from '../schemas'
 
 const EMPTY: ApplicationInput = {
   company_name: '',
+  name_en: '',
+  logo_path: '',
   desired_slug: '',
   business_number: '',
   contact_name: '',
@@ -69,7 +73,8 @@ export function ApplicationForm({ defaultEmail }: { defaultEmail?: string }) {
       <CardContent>
         <form onSubmit={submit} className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {field('company_name', '회사명 *', { required: true, placeholder: '예: 한일기계' })}
+            {field('company_name', '공급사명 (한글) *', { required: true, placeholder: '예: 한일기계' })}
+            {field('name_en', '공급사 영문명', { placeholder: '예: HANIL MACHINE' })}
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="app-desired_slug">미니샵 주소 (영문) *</Label>
               <div className="flex items-center gap-1 text-sm">
@@ -88,6 +93,7 @@ export function ApplicationForm({ defaultEmail }: { defaultEmail?: string }) {
             {field('email', '이메일', { type: 'email' })}
             {field('business_number', '사업자등록번호', { placeholder: '123-45-67890' })}
           </div>
+          <LogoField value={values.logo_path ?? ''} onChange={(p) => set('logo_path', p)} />
           {field('address', '사업장 주소')}
           {field('homepage_url', '홈페이지', { placeholder: 'https://' })}
           {field('item_keywords', '취급품목 (쉼표로 구분)', { placeholder: '예: CNC선반, 머시닝센터, 중고기계' })}
@@ -107,5 +113,54 @@ export function ApplicationForm({ defaultEmail }: { defaultEmail?: string }) {
         </form>
       </CardContent>
     </Card>
+  )
+}
+
+/** 회사 로고 올리기 — 공급사 미니샵 목록과 메인 "함께하는 공급사"에 보여요 */
+function LogoField({ value, onChange }: { value: string; onChange: (path: string) => void }) {
+  const [busy, setBusy] = useState(false)
+  async function pick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setBusy(true)
+    const fd = new FormData()
+    fd.set('file', file)
+    try {
+      const res = await uploadApplicationLogoAction(fd)
+      if (!res.ok) toast.error(res.error)
+      else if (res.data) onChange(res.data.path)
+    } catch {
+      toast.error('로고를 올리지 못했어요. 4MB 이하로 다시 시도해 주세요.')
+    }
+    setBusy(false)
+  }
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label>회사 로고</Label>
+      <div className="flex items-center gap-3">
+        <label className="relative flex h-24 w-44 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-dashed border-input bg-white hover:border-primary">
+          {value ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={mediaUrl(value)} alt="회사 로고" className="max-h-full max-w-full object-contain p-2" />
+          ) : busy ? (
+            <Loader2 className="size-5 animate-spin text-muted-foreground" />
+          ) : (
+            <span className="flex flex-col items-center gap-1 text-xs text-muted-foreground">
+              <ImagePlus className="size-5" />
+              로고 올리기
+            </span>
+          )}
+          <input type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml,.jpg,.jpeg,.png,.gif,.webp,.svg" className="hidden" onChange={pick} />
+        </label>
+        {value ? (
+          <Button type="button" variant="ghost" size="sm" onClick={() => onChange('')}>
+            <X className="size-4" />
+            빼기
+          </Button>
+        ) : null}
+      </div>
+      <p className="text-xs text-muted-foreground">가로형 로고 · 배경이 투명하거나 흰색인 PNG가 가장 깔끔해요. 공급사 목록과 메인 &quot;함께하는 공급사&quot;에 보여요.</p>
+    </div>
   )
 }

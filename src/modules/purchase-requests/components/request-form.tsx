@@ -180,7 +180,7 @@ export function RequestForm() {
           <input
             ref={fileRef}
             type="file"
-            accept="image/jpeg,image/png,image/gif,image/webp"
+            accept="image/jpeg,image/png,image/gif,image/webp,.jpg,.jpeg,.jfif,.png,.gif,.webp"
             multiple
             className="hidden"
             onChange={(e) => onFiles(e.target.files)}

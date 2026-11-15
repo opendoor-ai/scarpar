@@ -218,7 +218,16 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
 
   return (
     <div className="mx-auto max-w-6xl px-4 pt-4 pb-12 sm:px-6">
-      <TrackView productId={product.id} />
+      <TrackView
+        productId={product.id}
+        recent={{
+          href: productPath(org.slug, product.product_no),
+          name: product.name,
+          image: imageUrls[0] ?? null,
+          price: formatPrice(product.price),
+          supplier: org.name,
+        }}
+      />
       <ProductJsonLd
         product={product}
         org={org}

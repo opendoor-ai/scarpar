@@ -2,6 +2,7 @@
 
 // 플랫폼 관리자: 공급사 입점 신청 심사 (승인 / 거절)
 
+import { mediaUrl } from '@/lib/media-url'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
@@ -19,6 +20,8 @@ import { approveApplicationAction, rejectApplicationAction } from '../actions'
 export interface ApplicationRow {
   id: string
   company_name: string
+  name_en?: string | null
+  logo_path?: string | null
   desired_slug: string
   business_number: string | null
   contact_name: string
@@ -83,7 +86,12 @@ function ApplicationItem({ a }: { a: ApplicationRow }) {
     <li className="flex flex-col gap-3 rounded-lg border border-border p-4 text-sm">
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant={status.variant}>{status.label}</Badge>
+        {a.logo_path ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={mediaUrl(a.logo_path)} alt="" className="h-8 w-20 rounded border border-border bg-white object-contain" />
+        ) : null}
         <span className="font-semibold">{a.company_name}</span>
+        {a.name_en ? <span className="text-xs text-muted-foreground">{a.name_en}</span> : null}
         <span className="text-muted-foreground">/minishop/{a.desired_slug}</span>
         <span className="ml-auto text-xs text-muted-foreground">{format(new Date(a.created_at), 'yyyy.MM.dd HH:mm')}</span>
       </div>

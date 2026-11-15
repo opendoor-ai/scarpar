@@ -1,11 +1,15 @@
-// 사진 올리기 전 크기 줄이기 (브라우저 전용)
-// 휴대폰·카메라 사진은 5~15MB라서 서버가 받을 수 있는 크기를 넘어요.
-// 긴 변을 최대 2000px로 줄이고 압축해서 보통 1MB 아래로 만들어요.
-// GIF(움직이는 그림)·SVG는 그대로 보내요.
+// 사진 올리기 전 자동 최적화 (브라우저 전용)
+// - 용량이 큰 JPG·PNG·WEBP는 WEBP로 바꿔서 올려요. (같은 화질에서 JPG보다 25~35%, PNG보다 훨씬 작아요)
+// - 화질은 0.92(눈으로 차이를 거의 못 느끼는 수준), 투명한 부분(PNG)도 그대로 살아요.
+// - 아주 큰 사진만 긴 변 2400px로 맞춰요. (상세페이지·확대 보기에 충분한 크기)
+// - 바꾼 파일이 원본보다 크면 원본을 그대로 올려요. → 손해 보는 일 없음
+// - GIF(움직이는 그림)·SVG·작은 사진(500KB 이하)은 손대지 않아요.
+// - WEBP를 못 만드는 오래된 브라우저에서는 JPG(흰 배경)로 줄여요.
 
-const MAX_SIDE = 2000
-/** 이보다 작고 크기도 작으면 손대지 않아요 */
-const SKIP_BELOW_BYTES = 900 * 1024
+const MAX_SIDE = 2400
+const QUALITY = 0.92
+/** 이보다 작고 크기도 알맞으면 손대지 않아요 */
+const SKIP_BELOW_BYTES = 500 * 1024
 
 function loadImage(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -40,26 +44,25 @@ export async function shrinkImage(file: File): Promise<File> {
     canvas.height = Math.round(h * scale)
     const ctx = canvas.getContext('2d')
     if (!ctx) return file
-
-    // PNG는 투명한 부분이 있을 수 있어 WEBP로, 나머지는 JPG로
-    const wantWebp = file.type === 'image/png'
-    if (!wantWebp) {
-      ctx.fillStyle = '#fff'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-    }
+    // 줄일 때 부드럽게 (계단 현상 방지)
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
 
-    let type = wantWebp ? 'image/webp' : 'image/jpeg'
-    let blob = await toBlob(canvas, type, 0.85)
-    // WEBP로 못 만드는 브라우저면 JPG(흰 배경)로
+    // 1순위: WEBP (투명 배경 유지)
+    let type = 'image/webp'
+    let blob = await toBlob(canvas, type, QUALITY)
+    // WEBP를 못 만드는 브라우저면 JPG(흰 배경)로
     if (!blob || blob.type !== type) {
       ctx.globalCompositeOperation = 'destination-over'
       ctx.fillStyle = '#fff'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
       type = 'image/jpeg'
-      blob = await toBlob(canvas, type, 0.85)
+      blob = await toBlob(canvas, type, QUALITY)
     }
-    if (!blob || blob.size >= file.size) return file
+    // 바꾼 게 더 크면(이미 잘 압축된 사진) 원본 그대로 — 크기를 줄일 필요가 없을 때만
+    if (!blob) return file
+    if (blob.size >= file.size && scale === 1) return file
 
     const base = file.name.replace(/\.[^.]+$/, '') || 'image'
     const ext = type === 'image/webp' ? 'webp' : 'jpg'

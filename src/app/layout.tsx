@@ -82,6 +82,13 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} font-sans antialiased`}
       >
+        {/* 배너 글꼴 Pretendard — 쓰인 글자 묶음만 내려받는 방식이라 가벼워요 */}
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+          precedence="default"
+          crossOrigin="anonymous"
+        />
         {hiddenCardFields.length ? <style>{`${hiddenCardFields.join(",")}{display:none!important}`}</style> : null}
         {children}
         <Toaster richColors position="top-right" />

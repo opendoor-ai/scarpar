@@ -84,7 +84,7 @@ export function HeroSliderB({ slides }: { slides: HeroSlideB[] }) {
 
   return (
     <section
-      className="group relative w-full overflow-hidden bg-muted"
+      className="font-banner group relative w-full overflow-hidden bg-muted"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       aria-roledescription="carousel"

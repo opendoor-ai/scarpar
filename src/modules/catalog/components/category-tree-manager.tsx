@@ -260,7 +260,7 @@ export function CategoryTreeManager({ initial, canEdit }: { initial: CategoryIte
   return (
     <div className="grid gap-4 lg:grid-cols-[360px_1fr]">
       {/* ---------------------------------------------------------- 왼쪽: 분류 나무 */}
-      <div className="flex flex-col gap-2 self-start rounded-lg border border-border bg-card lg:sticky lg:top-20">
+      <div className="flex flex-col gap-2 self-start rounded-lg border border-border bg-card lg:sticky lg:top-0 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto">
         {canEdit ? (
           <div className="flex flex-wrap items-center gap-1.5 border-b border-border p-2">
             <Button

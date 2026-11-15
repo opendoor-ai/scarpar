@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Search } from 'lucide-react'
 
 export function HeaderSearch({
@@ -18,6 +18,11 @@ export function HeaderSearch({
 }) {
   const router = useRouter()
   const [q, setQ] = useState('')
+  const pathname = usePathname()
+  // 제품 검색 결과 화면에서는 지금 검색어를 검색창에 그대로 보여 줘요 (다른 화면으로 가면 비움)
+  useEffect(() => {
+    setQ(pathname === '/products' ? new URLSearchParams(window.location.search).get('q') ?? '' : '')
+  }, [pathname])
   const list = useMemo(() => promos.filter((p) => p.text.trim()), [promos])
   const [idx, setIdx] = useState(0)
 

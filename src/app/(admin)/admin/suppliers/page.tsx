@@ -38,10 +38,12 @@ interface OrgRow {
   bin_number: string | null
   status_reason?: string | null
   status_changed_at?: string | null
+  logo_path: string | null
+  name_en?: string | null
 }
 
 const ORG_COLS =
-  'id, name, slug, is_active, supplier_grade_id, grade_until, grade_memo, created_at, phone, email, contact_name, address, homepage_url, bin_number'
+  'id, name, slug, is_active, supplier_grade_id, grade_until, grade_memo, created_at, phone, email, contact_name, address, homepage_url, bin_number, logo_path'
 
 export default async function SuppliersPage() {
   await requireUser()
@@ -52,7 +54,7 @@ export default async function SuppliersPage() {
     admin.from('supplier_grades').select('*').order('sort_order'),
     admin
       .from('orgs')
-      .select(`${ORG_COLS}, status_reason, status_changed_at`)
+      .select(`${ORG_COLS}, status_reason, status_changed_at, name_en`)
       .order('created_at', { ascending: false }),
     admin.from('products').select('org_id, status').limit(100000),
     admin.from('product_jumps').select('org_id').gte('created_at', kstDayStartIso()),
@@ -116,6 +118,8 @@ export default async function SuppliersPage() {
     homepageUrl: o.homepage_url,
     bizNo: o.bin_number,
     statusReason: o.status_reason ?? null,
+    logoPath: o.logo_path,
+    nameEn: o.name_en ?? null,
     statusChangedAt: o.status_changed_at ?? null,
     ownerEmail: ownerByOrg.get(o.id) ?? null,
     isPlatform: o.slug === PLATFORM_ORG_SLUG,

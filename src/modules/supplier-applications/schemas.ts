@@ -4,6 +4,12 @@ const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 export const applicationSchema = z.object({
   company_name: z.string().trim().min(2, '회사명을 입력하세요').max(100),
+  /** 공급사 영문명 (예: KIHYUN) — 공급사 목록·함께하는 공급사에 보여요 */
+  name_en: z
+    .union([z.string().trim().max(80).regex(/^[A-Za-z0-9 .,&()'\-]+$/, '영문명은 영문·숫자·공백·기호(.,&()-)만 쓸 수 있어요'), z.literal('')])
+    .optional(),
+  /** 회사 로고 (올린 사진 경로) */
+  logo_path: z.string().trim().max(300).optional(),
   desired_slug: z
     .string()
     .trim()

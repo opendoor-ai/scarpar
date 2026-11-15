@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { MediaPicker } from '@/components/admin/media-picker'
 import { createOrgAction } from '@/lib/actions/onboarding'
 import { createOrgSchema, type CreateOrgInput } from '@/lib/actions/onboarding-schemas'
 
@@ -42,7 +43,7 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
   const form = useForm<CreateOrgInput>({
     resolver: zodResolver(createOrgSchema),
     mode: 'onTouched',
-    defaultValues: { name: '', slug: '', phone: '', vertical: 'ecommerce', seedDemo: false, ownerEmail: '', ownerPassword: '' },
+    defaultValues: { name: '', name_en: '', logo_path: '', slug: '', phone: '', vertical: 'ecommerce', seedDemo: false, ownerEmail: '', ownerPassword: '' },
   })
   const slug = form.watch('slug')
 
@@ -92,6 +93,33 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
                       />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="name_en"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>공급사 영문명 (선택)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="예: HANIL MACHINE" {...field} />
+                    </FormControl>
+                    <FormDescription>공급사 미니샵 목록과 메인 &quot;함께하는 공급사&quot;에 한글명 아래 보여요.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="logo_path"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>회사 로고 (선택)</FormLabel>
+                    <MediaPicker value={field.value ? { id: '', path: field.value } : null} onChange={(m) => field.onChange(m?.path ?? '')} />
+                    <FormDescription>가로형·배경 투명(또는 흰색) PNG가 가장 깔끔해요.</FormDescription>
                   </FormItem>
                 )}
               />

@@ -2,13 +2,16 @@
 // 맨 위 알림 띠 → 로고·검색 → 메뉴(전체 카테고리 펼침) → 본문 → 바닥글(사업자 정보), 넓은 PC 화면엔 좌우 날개 배너
 
 import Link from 'next/link'
-import { ChevronDown, Menu, Search, UserRound } from 'lucide-react'
+import { Menu, Search, UserRound } from 'lucide-react'
 
 import { AdLink } from '@/components/platform/ad-link'
 import { BannerHtml } from '@/components/platform/banner-html'
+import { CategoryMegaMenu, type MegaRoot } from '@/components/platform/category-mega-menu'
 import { HeaderSearch } from '@/components/platform/header-search'
+import { MobileBottomNav, OpenPanelButton } from '@/components/platform/mobile-bottom-nav'
 import { TopBar } from '@/components/platform/top-bar'
 import { inlineHtml } from '@/lib/inline-html'
+import { getPlatformCategoryCounts } from '@/lib/platform-category-counts'
 import { categoryQuery, getPlatformCategories, visibleCategories } from '@/lib/platform-categories'
 import { safeJsonLd } from '@/lib/default-faq'
 import { env } from '@/lib/env'
@@ -67,6 +70,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
     getLiveBanners('quick_menu'),
     getSiteConfig(),
   ])
+  const categoryCounts = await getPlatformCategoryCounts()
   const [topBarHtml, quickHtml] = await Promise.all([
     renderGroupHtml('top_bar', topBars),
     renderGroupHtml('quick_menu', quickMenus),
@@ -75,6 +79,24 @@ export default async function PlatformLayout({ children }: { children: React.Rea
   const shown = visibleCategories(categories)
   const roots = shown.filter((c) => !c.parent_id)
   const childrenOf = (id: string) => shown.filter((c) => c.parent_id === id)
+  // 전체 카테고리 펼침 메뉴 데이터 (제품 수 포함)
+  const megaRoots: MegaRoot[] = roots.map((r) => {
+    const children = childrenOf(r.id).map((c) => ({
+      id: c.id,
+      name: c.name,
+      href: `/products?${categoryQuery(c)}`,
+      count: categoryCounts[c.id] ?? 0,
+    }))
+    return {
+      id: r.id,
+      name: r.name,
+      slug: r.slug,
+      href: `/products?${categoryQuery(r)}`,
+      icon: r.icon_image ? mediaUrl(r.icon_image) : null,
+      count: (categoryCounts[r.id] ?? 0) + children.reduce((n, c) => n + c.count, 0),
+      children,
+    }
+  })
 
   const footerLines = [
     settings.company_name && `상호 ${settings.company_name}`,
@@ -126,7 +148,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
   }
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="flex min-h-dvh flex-col bg-background pb-[calc(76px+env(safe-area-inset-bottom))] md:pb-0">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(orgLd) }} />
       {/* 맨 위 띠: 배너 관리 [상단] 탑배너가 있으면 그걸, 없으면 사이트 설정 알림 */}
       {topBarHtml ? (
@@ -171,26 +193,25 @@ export default async function PlatformLayout({ children }: { children: React.Rea
               SITE_NAME
             )}
           </Link>
-          <HeaderSearch
-            promos={siteConfig.search.promoEnabled ? siteConfig.search.promos : []}
-            mode={siteConfig.search.promoMode}
-            popular={siteConfig.search.popular
-              .split(',')
-              .map((k) => k.trim())
-              .filter(Boolean)}
-          />
+            <HeaderSearch
+              promos={siteConfig.search.promoEnabled ? siteConfig.search.promos : []}
+              mode={siteConfig.search.promoMode}
+              popular={siteConfig.search.popular
+                .split(',')
+                .map((k) => k.trim())
+                .filter(Boolean)}
+            />
           <div className="ml-auto flex items-center gap-1 md:ml-4">
-            <Link
-              href="/products"
-              className="flex flex-col items-center px-2 text-[11px] text-muted-foreground hover:text-foreground md:hidden"
-              aria-label="검색"
-            >
-              <Search className="size-5" />
-              검색
-            </Link>
+            {/* 모바일: 검색 · 전체 메뉴 (하단 바와 같은 창을 열어요) */}
+            <OpenPanelButton panel="search" label="검색" className="rounded-full p-2 text-foreground md:hidden">
+              <Search className="size-6" />
+            </OpenPanelButton>
+            <OpenPanelButton panel="category" label="전체 카테고리 메뉴" className="rounded-full p-2 text-foreground md:hidden">
+              <Menu className="size-6" />
+            </OpenPanelButton>
             <Link
               href="/login"
-              className="flex flex-col items-center px-2 text-[11px] text-muted-foreground hover:text-foreground"
+              className="hidden flex-col items-center px-2 text-[11px] text-muted-foreground hover:text-foreground md:flex"
             >
               <UserRound className="size-5" />
               공급사 로그인
@@ -201,43 +222,11 @@ export default async function PlatformLayout({ children }: { children: React.Rea
         {/* 메뉴 */}
         <nav className="border-t border-border">
           <div className="mx-auto flex max-w-6xl items-center gap-1 overflow-x-auto px-4 text-sm font-medium [scrollbar-width:none] sm:px-6 md:overflow-visible [&::-webkit-scrollbar]:hidden">
-            <div className="group relative shrink-0">
-              <Link href="/products" className="flex h-11 items-center gap-1.5 px-2 font-semibold hover:text-primary">
-                <Menu className="size-4" />
-                전체 카테고리
-                <ChevronDown className="size-3.5" />
-              </Link>
-              {/* 펼침 메뉴 (PC) */}
-              <div className="invisible absolute top-full left-0 z-40 hidden w-[min(92vw,1100px)] gap-6 rounded-b-lg border border-border bg-background p-5 opacity-0 shadow-lg transition-opacity group-hover:visible group-hover:opacity-100 md:flex">
-                <div className="grid flex-1 grid-cols-3 gap-x-6 gap-y-4 lg:grid-cols-4">
-                  {roots.map((r) => (
-                    <div key={r.id} className="flex flex-col gap-1">
-                      <Link href={`/products?${categoryQuery(r)}`} className="text-sm font-semibold hover:text-primary">
-                        {r.name}
-                      </Link>
-                      {childrenOf(r.id)
-                        .slice(0, 6)
-                        .map((c) => (
-                          <Link
-                            key={c.id}
-                            href={`/products?${categoryQuery(c)}`}
-                            className="truncate text-xs font-normal text-muted-foreground hover:text-foreground"
-                          >
-                            {c.name}
-                          </Link>
-                        ))}
-                      {childrenOf(r.id).length > 6 ? (
-                        <Link href={`/products?${categoryQuery(r)}`} className="text-xs font-normal text-primary">
-                          더보기 +{childrenOf(r.id).length - 6}
-                        </Link>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-                {/* [전체메뉴] 배너 */}
-                {menuBanners.length > 0 ? (
-                  <div className="hidden w-[250px] shrink-0 flex-col gap-3 lg:flex">
-                    {menuBanners.slice(0, 2).map((b) => (
+            <CategoryMegaMenu
+              roots={megaRoots}
+              banner={
+                menuBanners.length > 0
+                  ? menuBanners.slice(0, 2).map((b) => (
                       <AdLink
                         key={b.id}
                         bannerId={b.id}
@@ -246,23 +235,15 @@ export default async function PlatformLayout({ children }: { children: React.Rea
                         className="group/mb block overflow-hidden rounded-lg border border-border"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={b.image_pc}
-                          alt={b.title}
-                          className="aspect-[25/23] w-full object-cover"
-                          loading="lazy"
-                        />
+                        <img src={b.image_pc} alt={b.title} className="aspect-[25/23] w-full object-cover" loading="lazy" />
                         {b.subtitle ? (
-                          <span className="block truncate px-3 py-2 text-xs font-medium group-hover/mb:text-primary">
-                            {b.subtitle}
-                          </span>
+                          <span className="block truncate px-3 py-2 text-xs font-medium group-hover/mb:text-primary">{b.subtitle}</span>
                         ) : null}
                       </AdLink>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </div>
+                    ))
+                  : undefined
+              }
+            />
             <span className="mx-1 h-4 w-px shrink-0 bg-border" />
             {NAV.map((n) => (
               <Link key={n.href} href={n.href} className="flex h-11 shrink-0 items-center px-2.5 hover:text-primary">
@@ -276,13 +257,14 @@ export default async function PlatformLayout({ children }: { children: React.Rea
       <WingBanners side="left" banners={wingLeft} />
       <WingBanners side="right" banners={wingRight} />
 
-      <main className="flex-1">{children}</main>
+      {/* 모바일은 하단 바 높이만큼 아래 여백 */}
+      <main className="flex-1 pb-4 md:pb-0">{children}</main>
 
       {/* [공통] 퀵메뉴 — 오른쪽 아래 바로가기 */}
       {quickHtml ? (
         <BannerHtml html={quickHtml} />
       ) : quickMenus.length > 0 ? (
-        <nav className="fixed right-3 bottom-20 z-30 flex flex-col gap-2 md:right-5 md:bottom-8" aria-label="바로가기">
+        <nav className="fixed right-3 bottom-24 z-30 flex flex-col gap-2 md:right-5 md:bottom-8" aria-label="바로가기">
           {quickMenus.slice(0, 6).map((b) => (
             <AdLink
               key={b.id}
@@ -346,6 +328,21 @@ export default async function PlatformLayout({ children }: { children: React.Rea
           </div>
         </div>
       </footer>
+      <MobileBottomNav
+        categories={roots.map((r) => ({
+          id: r.id,
+          slug: r.slug,
+          name: r.name,
+          href: `/products?${categoryQuery(r)}`,
+          iconImage: r.icon_image ? mediaUrl(r.icon_image) : null,
+          children: childrenOf(r.id).map((c) => ({ id: c.id, name: c.name, href: `/products?${categoryQuery(c)}` })),
+        }))}
+        popular={siteConfig.search.popular
+          .split(',')
+          .map((k) => k.trim())
+          .filter(Boolean)
+          .slice(0, 10)}
+      />
     </div>
   )
 }

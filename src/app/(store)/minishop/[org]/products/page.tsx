@@ -113,7 +113,15 @@ export default async function ProductsPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-4">
+        <ProductSearchBox
+          orgSlug={org.slug}
+          query={q}
+          category={activeCategory ? categoryKey(activeCategory) : undefined}
+          lang={lang}
+          placeholder="제품명·모델명·제조사·상품코드 검색"
+          className="sm:ml-auto"
+        />
         <CategoryPills
           orgSlug={org.slug}
           categories={categories}
@@ -122,7 +130,6 @@ export default async function ProductsPage({
           query={q}
           lang={lang}
         />
-        <ProductSearchBox orgSlug={org.slug} query={q} category={activeCategory ? categoryKey(activeCategory) : undefined} lang={lang} />
       </div>
 
       {products.length === 0 ? (

@@ -111,7 +111,7 @@ function ImageGallery({ value, onChange }: ImageGalleryProps) {
   return (
     <>
       {/* 대표이미지 */}
-      <RowLayout label="대표이미지" hint="목록·상세페이지 첫 화면에 쓰여요. 권장 1000×1000 이상 정사각형 · 10MB 이하 · jpg, png, webp">
+      <RowLayout label="대표이미지" hint="목록·상세페이지 첫 화면에 쓰여요. 권장 1000×1000 이상 정사각형 · 10MB 이하 · jpg, png, gif, webp">
         <div className="flex flex-wrap items-end gap-3">
           <MediaPicker
             value={main ? { id: main.mediaId, path: main.path } : null}

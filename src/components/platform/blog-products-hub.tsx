@@ -88,13 +88,13 @@ export function BlogProductsHub({ items }: { items: BlogHubItem[] }) {
         className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {items.map((b) => (
-          <div key={b.id} className="flex w-full shrink-0 snap-start flex-col gap-4 md:w-[calc((100%-2.5rem)/3)]">
+          <div key={b.id} className="flex w-full shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-border bg-card md:w-[calc((100%-2.5rem)/3)]">
             {/* 블로그 카드 */}
             <a
               href={b.url}
               target="_blank"
               rel="noopener"
-              className="group relative flex h-40 items-center gap-4 overflow-hidden rounded-xl bg-neutral-700 p-6 text-white sm:h-44"
+              className="group relative flex h-40 items-center gap-4 overflow-hidden bg-neutral-700 p-6 text-white sm:h-44"
             >
               {b.thumb ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -106,7 +106,7 @@ export function BlogProductsHub({ items }: { items: BlogHubItem[] }) {
                   <span className="shrink-0 rounded-full bg-[#03c75a] px-2.5 py-0.5 font-bold">blog</span>
                   {b.author ? <span className="truncate text-white/80">by. {b.author}</span> : null}
                 </span>
-                <span className="line-clamp-2 text-lg leading-snug font-bold group-hover:underline sm:text-xl">{b.title}</span>
+                <span className="line-clamp-3 text-[15px] leading-snug font-bold group-hover:underline sm:text-base">{b.title}</span>
               </span>
               {b.thumb ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -115,11 +115,11 @@ export function BlogProductsHub({ items }: { items: BlogHubItem[] }) {
             </a>
 
             {/* 함께 보는 제품 */}
-            <ul className="flex flex-col gap-4">
+            <ul className="flex flex-col divide-y divide-border px-4">
               {b.products.slice(0, 3).map((p) => {
                 const off = p.compareAt && p.compareAt > p.price && p.price > 0 ? Math.round((1 - p.price / p.compareAt) * 100) : 0
                 return (
-                  <li key={p.id}>
+                  <li key={p.id} className="py-3.5">
                     <Link href={p.href} className="group flex gap-3.5">
                       <span className="size-24 shrink-0 overflow-hidden rounded-lg bg-[#e9e9e9] sm:size-28">
                         {p.image ? (

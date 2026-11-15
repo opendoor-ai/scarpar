@@ -62,7 +62,10 @@ export async function createOrgAction(input: CreateOrgInput): Promise<ActionResu
 
   let org: Org
   try {
-    const result = await provisionOrg({ name, slug, vertical, phone }, ownerId)
+    const result = await provisionOrg(
+      { name, slug, vertical, phone, name_en: parsed.data.name_en || null, logo_path: parsed.data.logo_path || null },
+      ownerId,
+    )
     if (!result.ok) return { ok: false, error: result.error }
     org = result.org
   } catch (err) {

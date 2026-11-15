@@ -74,3 +74,24 @@ export async function fetchLatestPlatformCards(limit: number, orgId?: string): P
   const [cards] = await toPlatformCards((data ?? []) as unknown as PlatformProductRow[])
   return cards
 }
+
+/** 전체제품 허브 — 분류(하위 포함)별 최신 진열 순, 쪽 단위 (더 있는지도 알려줌) */
+export async function fetchPlatformFeed(
+  categoryIds: string[] | null,
+  offset: number,
+  limit: number,
+): Promise<{ items: PlatformProductCard[]; hasMore: boolean; total: number }> {
+  let q = getAnonClient()
+    .from('products')
+    .select(PLATFORM_PRODUCT_COLUMNS, { count: 'exact' })
+    .eq('status', 'active')
+    .eq('org.is_active', true)
+  if (categoryIds) q = q.in('category_id', categoryIds.length ? categoryIds : ['00000000-0000-0000-0000-000000000000'])
+  const { data, count } = await q
+    .order('display_at', { ascending: false })
+    .order('product_no', { ascending: false })
+    .range(offset, offset + limit - 1)
+  const [items] = await toPlatformCards((data ?? []) as unknown as PlatformProductRow[])
+  const total = count ?? 0
+  return { items, hasMore: offset + limit < total, total }
+}

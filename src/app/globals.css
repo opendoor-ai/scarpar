@@ -276,6 +276,11 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
+  /* 광고관리 → 배너관리의 모든 배너 글꼴: Pretendard (jadong.co.kr 배너와 같은 글꼴, 무료 OFL)
+     글꼴 파일은 layout.tsx 에서 필요한 글자만 나눠 불러와요 */
+  .font-banner {
+    font-family: 'Pretendard Variable', Pretendard, var(--font-sans), 'Malgun Gothic', sans-serif;
+  }
 }
 
 /* 상품 상세 내용(detail_html) 기본 서식 — src/lib/detail-html.ts 에서 허용한 태그만 들어옵니다 */

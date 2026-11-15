@@ -9,6 +9,8 @@ import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { MediaPicker } from '@/components/admin/media-picker'
+import { mediaUrl } from '@/lib/media-url'
 import { DetailHtmlEditor } from '@/modules/catalog/components/detail-html-editor'
 import { cn } from '@/lib/utils'
 
@@ -86,6 +88,18 @@ export function SupplierInfoForm({ view }: { view: SupplierInfoView }) {
       <Box title="기본정보">
         <Row label="공급사명">
           <b>{view.name}</b>
+        </Row>
+        <Row label="공급사 영문명" hint="공급사 미니샵 목록·메인 '함께하는 공급사'에 한글명 아래 보여요.">
+          <Input value={v.name_en ?? ''} onChange={(e) => set({ name_en: e.target.value })} placeholder="예: KIHYUN" maxLength={80} className={input} />
+        </Row>
+        <Row label="회사 로고" hint="가로형·배경 투명(또는 흰색) PNG 권장. 미니샵 머리글·공급사 목록·함께하는 공급사에 보여요.">
+          <div className="flex items-center gap-3">
+            {v.logo_path ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={mediaUrl(v.logo_path)} alt="" className="h-16 w-40 rounded border border-border bg-white object-contain p-1.5" />
+            ) : null}
+            <MediaPicker value={v.logo_path ? { id: '', path: v.logo_path } : null} onChange={(m) => set({ logo_path: m?.path ?? '' })} />
+          </div>
         </Row>
         <Row label="공급사 아이디">
           <span>

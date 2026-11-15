@@ -1,33 +1,22 @@
 // 전자동기계광고 메인 화면 (jadong.co.kr 구성)
 // 메인 배너(3장씩) → 카테고리 아이콘 → 스마트 허브 → 추천(AD) 제품 → 와이드 허브 → 파트너 허브 → 플러스 허브
 // → SHORTS → 등록제품 허브 → 블로그와 함께하는 제품 → 구매문의 → 현장에서 많이 찾는 제품 → 큰 이미지 광고 → 전체제품 허브
-// → MAGAZINE → 입점 안내. 광고·콘텐츠가 없는 칸은 보이지 않아요.
+// → MAGAZINE → 입점 안내 → 함께하는 공급사(로고 띠). 광고·콘텐츠가 없는 칸은 보이지 않아요.
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import {
-  ArrowRight,
-  Bot,
-  Boxes,
-  Cog,
-  Cpu,
-  Fan,
-  FlaskConical,
-  Package,
-  Phone,
-  Recycle,
-  Tractor,
-  Wrench,
-  type LucideIcon,
-} from 'lucide-react'
+import { ArrowRight, Phone } from 'lucide-react'
 
 import { AdLink } from '@/components/platform/ad-link'
+import { AllProductsHub } from '@/components/platform/all-products-hub'
 import { BannerHtml } from '@/components/platform/banner-html'
+import { CategoryIcon } from '@/components/platform/category-icon'
 import { BlogProductsHub, type BlogHubItem } from '@/components/platform/blog-products-hub'
 import { HeroSliderB, type HeroSlideB } from '@/components/platform/hero-slider-b'
 import { MainPopup } from '@/components/platform/main-popup'
 import { HScroller } from '@/components/platform/h-scroller'
 import { PartnerHub, PlusHub, SmartHub, WideHub } from '@/components/platform/hubs'
+import { PartnerLogos, type PartnerItem } from '@/components/platform/partner-logos'
 import { PopularTabs } from '@/components/platform/popular-tabs'
 import { ShortsRow } from '@/components/platform/shorts-row'
 import { Button } from '@/components/ui/button'
@@ -38,7 +27,7 @@ import { inlineHtml } from '@/lib/inline-html'
 import { mediaUrl } from '@/lib/media-url'
 import { categoryQuery, getPlatformCategories, visibleCategories } from '@/lib/platform-categories'
 import { inquiryTop, realtimeTop, todayTopViewed } from '@/lib/platform-popular'
-import { fetchLatestPlatformCards, fetchPlatformCardsByIds, type PlatformProductCard } from '@/lib/platform-products'
+import { fetchLatestPlatformCards, fetchPlatformCardsByIds, fetchPlatformFeed, type PlatformProductCard } from '@/lib/platform-products'
 import { SITE_DESCRIPTION, SITE_NAME } from '@/lib/site'
 import { getSiteSettings } from '@/lib/site-settings'
 import { getAnonClient } from '@/lib/supabase/anon'
@@ -69,19 +58,6 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-/** 1차 카테고리 기본 아이콘 (아이콘 이미지를 안 넣었을 때) */
-const CATEGORY_ICONS: Record<string, LucideIcon> = {
-  'machine-tools': Cog,
-  'automation-fa-robot': Bot,
-  'packaging-logistics': Package,
-  'food-pharma-cosmetic': FlaskConical,
-  'plastic-mold-injection': Boxes,
-  'pneumatic-hvac-energy': Fan,
-  'electrical-electronics': Cpu,
-  'environment-construction': Tractor,
-  'tools-parts-mro': Wrench,
-  'etc-used-service': Recycle,
-}
 
 interface ContentRow {
   id: string
@@ -179,7 +155,7 @@ export default async function HomePage() {
     customGroups,
     promotedIds,
     latest,
-    allLatest,
+    allFeed,
     contentsRes,
     todayIds,
     realtimeIds,
@@ -200,7 +176,7 @@ export default async function HomePage() {
     getCustomGroupHtml(),
     getLivePromotedProductIds('main'),
     fetchLatestPlatformCards(16),
-    fetchLatestPlatformCards(20),
+    fetchPlatformFeed(null, 0, 15),
     supabase
       .from('site_contents')
       .select('*') // 0030 전후 모두 (author·product_ids)
@@ -279,6 +255,26 @@ export default async function HomePage() {
           supplier: c.orgName,
         })),
       })
+    }
+  }
+
+  // 함께하는 공급사: 배너(광고) 먼저 + 로고를 올린 입점 공급사 자동 연동
+  const partnerItems: PartnerItem[] = autoScroll
+    .filter((b) => b.image_pc)
+    .map((b) => ({
+      key: `b-${b.id}`,
+      bannerId: b.id,
+      href: b.link_url,
+      image: b.image_pc,
+      name: b.texts?.[0]?.text?.trim() || b.subtitle?.trim() || b.title,
+      sub: b.texts?.[1]?.text?.trim() || '',
+    }))
+  {
+    const anon = getAnonClient()
+    let res = await anon.from('orgs').select('id, name, slug, logo_path, name_en').eq('is_active', true).not('logo_path', 'is', null).order('created_at').limit(120)
+    if (res.error) res = (await anon.from('orgs').select('id, name, slug, logo_path').eq('is_active', true).not('logo_path', 'is', null).order('created_at').limit(120)) as typeof res
+    for (const o of (res.data ?? []) as { id: string; name: string; slug: string; logo_path: string; name_en?: string | null }[]) {
+      partnerItems.push({ key: `o-${o.id}`, href: `/minishop/${o.slug}`, image: mediaUrl(o.logo_path), name: o.name, sub: o.name_en ?? '' })
     }
   }
 
@@ -396,71 +392,27 @@ export default async function HomePage() {
 
         {/* 2. 카테고리 동그라미 아이콘 */}
         {roots.length > 0 ? (
-          <section
-            aria-label="기계 카테고리"
-            className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
-          >
-            <div className="flex min-w-max gap-3 sm:min-w-0 sm:flex-wrap sm:justify-center sm:gap-x-6 sm:gap-y-5">
-              {roots.map((c) => {
-                const Icon = CATEGORY_ICONS[c.slug] ?? Cog
-                return (
-                  <Link
-                    key={c.id}
-                    href={`/products?${categoryQuery(c)}`}
-                    className="group flex w-20 flex-col items-center gap-2 text-center"
-                  >
-                    <span className="flex size-16 items-center justify-center overflow-hidden rounded-full border border-border bg-muted transition-colors group-hover:border-primary sm:size-[72px]">
-                      {c.icon_image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={mediaUrl(c.icon_image)} alt="" className="size-full object-cover" />
-                      ) : (
-                        <Icon className="size-7 text-primary" />
-                      )}
-                    </span>
-                    <span className="line-clamp-2 text-xs leading-tight font-medium">{c.name}</span>
-                  </Link>
-                )
-              })}
+          <section aria-label="기계 카테고리">
+            {/* 스크롤 없이 바둑판 — 모바일 4칸 · 태블릿 6칸 · PC 한 줄 (마지막 칸은 전체 카테고리) */}
+            <div className="grid grid-cols-4 gap-x-2.5 gap-y-5 sm:grid-cols-6 lg:grid-cols-12 lg:gap-x-3">
+              {roots.map((c) => (
+                <Link key={c.id} href={`/products?${categoryQuery(c)}`} className="group flex flex-col items-center gap-2 text-center">
+                  <CategoryIcon
+                    slug={c.slug}
+                    image={c.icon_image ? mediaUrl(c.icon_image) : null}
+                    className="w-full max-w-[88px] transition-transform group-hover:-translate-y-0.5"
+                  />
+                  <span className="line-clamp-3 text-[13px] leading-tight font-medium break-keep sm:text-xs">{c.name.replaceAll('·', '·​')}</span>
+                </Link>
+              ))}
+              <Link href="/products" className="group flex flex-col items-center gap-2 text-center">
+                <CategoryIcon slug="all" className="w-full max-w-[88px] transition-transform group-hover:-translate-y-0.5" />
+                <span className="text-[13px] leading-tight font-medium sm:text-xs">전체 카테고리</span>
+              </Link>
             </div>
           </section>
         ) : null}
 
-        {/* 오토 스크롤 배너 (로고 띠) */}
-        {tAuto ? (
-          <BannerHtml html={tAuto} />
-        ) : autoScroll.some((b) => b.image_pc) ? (
-          <section aria-label="함께하는 공급사" className="flex items-center gap-4 rounded-xl bg-muted/50 py-3 pr-0 pl-4">
-            <p className="hidden shrink-0 text-xs leading-tight font-bold text-muted-foreground sm:block">
-              함께하는
-              <br />
-              공급사
-            </p>
-            {/* 양쪽 끝이 부드럽게 사라지는 띠 — 마우스를 올리면 멈춤 */}
-            <div className="relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
-              <div className="jadong-marquee flex w-max items-center gap-3 py-1">
-                {[...autoScroll, ...autoScroll]
-                  .filter((b) => b.image_pc)
-                  .map((b, i) => (
-                    <AdLink
-                      key={`${b.id}-${i}`}
-                      bannerId={b.id}
-                      href={b.link_url}
-                      title={b.subtitle || b.title}
-                      className="flex h-14 w-36 shrink-0 items-center justify-center rounded-lg border border-border bg-background px-3 py-2 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={b.image_pc}
-                        alt={b.subtitle || b.title}
-                        className="max-h-full max-w-full object-contain opacity-80 grayscale transition group-hover:opacity-100 hover:opacity-100 hover:grayscale-0"
-                        loading="lazy"
-                      />
-                    </AdLink>
-                  ))}
-              </div>
-            </div>
-          </section>
-        ) : null}
 
         {/* 3. 스마트 허브 — 4칸 카드 */}
         {tSmart ? <BannerHtml html={tSmart} /> : <SmartHub banners={smart} />}
@@ -574,15 +526,19 @@ export default async function HomePage() {
           </section>
         ) : null}
 
-        {/* 12. 전체제품 허브 */}
-        <Hub title="전체제품 허브" description="모든 공급사의 산업기계·중고기계" href="/products" linkLabel="전체 보기">
-          {allLatest.length > 0 ? (
-            <ProductGrid items={allLatest} />
-          ) : (
-            <p className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              아직 등록된 제품이 없어요.
-            </p>
-          )}
+        {/* 12. 전체제품 허브 — 분류 탭 · 5×3 · 더보기 */}
+        <Hub title="전체제품 허브" description="모든 공급사의 산업기계·중고기계를 분류별로 한눈에 보세요." href="/products" linkLabel="전체 보기">
+          <AllProductsHub
+            initial={allFeed.items}
+            initialHasMore={allFeed.hasMore}
+            tabs={roots.map((c) => ({
+              id: c.id,
+              slug: c.slug,
+              name: c.name,
+              icon: c.icon_image ? mediaUrl(c.icon_image) : null,
+              href: `/products?${categoryQuery(c)}`,
+            }))}
+          />
         </Hub>
 
         {/* 13. MAGAZINE */}
@@ -644,6 +600,9 @@ export default async function HomePage() {
           </div>
         </section>
       </div>
+
+      {/* 함께하는 공급사 — 바닥글 바로 위, 끊김 없이 흐르는 로고 카드 (배너 관리 → [메인] 오토 스크롤 배너) */}
+      {tAuto ? <BannerHtml html={tAuto} /> : <PartnerLogos items={partnerItems} />}
     </>
   )
 }

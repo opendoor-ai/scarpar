@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Search } from 'lucide-react'
 
 import { t, type Lang } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
@@ -105,6 +106,7 @@ export function ProductSearchBox({
   lang = 'ko',
   basePath,
   placeholder,
+  className,
 }: {
   orgSlug: string
   query?: string
@@ -112,17 +114,22 @@ export function ProductSearchBox({
   lang?: Lang
   basePath?: string
   placeholder?: string
+  className?: string
 }) {
   return (
-    <form action={basePath ?? storePath(orgSlug, '/products')} method="GET" className="relative w-full sm:w-72">
+    <form action={basePath ?? storePath(orgSlug, '/products')} method="GET" role="search" className={cn('relative w-full sm:w-96', className)}>
       {category ? <input type="hidden" name="cate_no" value={category} /> : null}
       <input
         type="search"
         name="q"
         defaultValue={query}
         placeholder={placeholder ?? t('search', lang)}
-        className="h-10 w-full rounded-md border border-input bg-transparent px-3 text-base shadow-xs sm:h-8 sm:text-[13px] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+        aria-label={placeholder ?? t('search', lang)}
+        className="h-11 w-full rounded-full border-2 border-primary/70 bg-background pr-12 pl-5 text-base outline-none placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-[3px] focus-visible:ring-primary/20 sm:text-sm"
       />
+      <button type="submit" aria-label={t('search', lang)} className="absolute top-1/2 right-1.5 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-primary hover:bg-primary/10">
+        <Search className="size-[18px]" strokeWidth={2.25} />
+      </button>
     </form>
   )
 }

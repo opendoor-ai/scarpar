@@ -40,9 +40,19 @@ export async function uploadMediaAction(formData: FormData): Promise<ActionResul
   const folder = String(formData.get('folder') ?? '')
   const dotIndex = file.name.lastIndexOf('.')
   const hasExt = dotIndex > 0 && dotIndex < file.name.length - 1
-  const baseName = slugify(hasExt ? file.name.slice(0, dotIndex) : file.name) || 'file'
-  const ext = hasExt ? file.name.slice(dotIndex + 1).toLowerCase() : undefined
-  const storagePath = `${ctx.org.id}/${Date.now()}-${baseName}${ext ? `.${ext}` : ''}`
+  // 저장소 주소에는 영문·숫자만 쓸 수 있어요 (한글·공백·특수문자 파일명은 저장소가 거절).
+  // 그래서 주소는 "시각-무작위값-영문부분"으로 만들고, 원래 파일명(한글 포함)은 media.name에 그대로 남겨요.
+  const asciiBase = slugify(hasExt ? file.name.slice(0, dotIndex) : file.name)
+    .normalize('NFKD')
+    .replace(/[^a-z0-9-]/gi, '')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase()
+    .slice(0, 40)
+  const rawExt = hasExt ? file.name.slice(dotIndex + 1).toLowerCase() : ''
+  const ext = /^[a-z0-9]{1,8}$/.test(rawExt) ? rawExt : (file.type.split('/')[1]?.replace('jpeg', 'jpg').replace(/[^a-z0-9]/g, '') || undefined)
+  const rand = Math.random().toString(36).slice(2, 8)
+  const storagePath = `${ctx.org.id}/${Date.now()}-${rand}${asciiBase ? `-${asciiBase}` : ''}${ext ? `.${ext}` : ''}`
 
   const supabase = getAdminClient()
 
