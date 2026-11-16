@@ -3,6 +3,8 @@
 // 상품 목록 표 (카페24식) — 선택 → 일괄 처리(판매중·임시저장·보관·복사·삭제·분류수정·점프·엑셀), 정렬·개수, 쪽 번호
 // 줄 데이터는 src/app/(admin)/admin/products/page.tsx(서버)가 준비해요.
 
+import { productPath } from '@/components/store/store-links'
+import { minishopUrl } from '@/lib/domains'
 import { useMemo, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -173,7 +175,7 @@ export function ProductList({
     run(target, () => jumpProductsAction(target), (n) => `${n}개를 맨 위로 올렸어요`)
 
   async function copyUrl(no: number) {
-    const link = `${window.location.origin}/minishop/${orgSlug}/products/${no}`
+    const link = minishopUrl(orgSlug, `/products/${no}`)
     try {
       await navigator.clipboard.writeText(link)
       toast.success('상품 주소를 복사했어요')
@@ -412,7 +414,7 @@ export function ProductList({
                     <td>
                       <div className="flex flex-col items-center gap-1">
                         <a
-                          href={`/minishop/${orgSlug}/products/${r.productNo}`}
+                          href={productPath(orgSlug, r.productNo)}
                           target="_blank"
                           rel="noopener"
                           className="inline-flex items-center gap-0.5 text-muted-foreground hover:text-foreground"

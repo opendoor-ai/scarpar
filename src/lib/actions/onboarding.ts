@@ -1,5 +1,6 @@
 'use server'
 
+import { RESERVED_SLUGS } from '@/lib/domains'
 import { redirect } from 'next/navigation'
 
 import { audit } from '@/lib/audit'
@@ -28,8 +29,7 @@ export async function createOrgAction(input: CreateOrgInput): Promise<ActionResu
   const { name, phone, vertical } = parsed.data
   const slug = parsed.data.slug
   // 시스템 주소와 겹치는 아이디는 쓸 수 없음
-  const RESERVED = new Set(['admin', 'api', 'products', 'login', 'signup', 'track', 's', 'www', 'jadong', 'minishop', 'requests', 'suppliers', 'support', 'advertise', 'magazine', 'onboarding'])
-  if (RESERVED.has(slug)) return { ok: false, error: '쓸 수 없는 공급사 아이디예요. 다른 아이디를 입력하세요.' }
+  if (RESERVED_SLUGS.has(slug)) return { ok: false, error: '쓸 수 없는 공급사 아이디예요. 다른 아이디를 입력하세요.' }
 
   // 직접 생성은 플랫폼 관리자만 (일반회원은 입점 신청 → 승인)
   const supabase = await getServerClient()

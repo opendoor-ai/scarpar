@@ -3,6 +3,7 @@
 // → SHORTS → 등록제품 허브 → 블로그와 함께하는 제품 → 구매문의 → 현장에서 많이 찾는 제품 → 큰 이미지 광고 → 전체제품 허브
 // → MAGAZINE → 입점 안내 → 함께하는 공급사(로고 띠). 광고·콘텐츠가 없는 칸은 보이지 않아요.
 
+import { productPath, storePath } from '@/components/store/store-links'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, Phone } from 'lucide-react'
@@ -247,7 +248,7 @@ export default async function HomePage() {
         author: b.author ?? null,
         products: cards.slice(0, 3).map((c) => ({
           id: c.card.id,
-          href: `/minishop/${c.orgSlug}/products/${c.card.product_no}`,
+          href: productPath(c.orgSlug, c.card.product_no),
           name: c.card.name,
           image: c.card.image,
           price: c.card.price,
@@ -274,7 +275,7 @@ export default async function HomePage() {
     let res = await anon.from('orgs').select('id, name, slug, logo_path, name_en').eq('is_active', true).not('logo_path', 'is', null).order('created_at').limit(120)
     if (res.error) res = (await anon.from('orgs').select('id, name, slug, logo_path').eq('is_active', true).not('logo_path', 'is', null).order('created_at').limit(120)) as typeof res
     for (const o of (res.data ?? []) as { id: string; name: string; slug: string; logo_path: string; name_en?: string | null }[]) {
-      partnerItems.push({ key: `o-${o.id}`, href: `/minishop/${o.slug}`, image: mediaUrl(o.logo_path), name: o.name, sub: o.name_en ?? '' })
+      partnerItems.push({ key: `o-${o.id}`, href: storePath(o.slug), image: mediaUrl(o.logo_path), name: o.name, sub: o.name_en ?? '' })
     }
   }
 

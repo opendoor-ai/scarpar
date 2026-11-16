@@ -1,6 +1,7 @@
 // /sitemap.xml — 검색엔진(네이버·구글)에 알려줄 공개 페이지 목록을 자동으로 만듭니다.
 // 활성 공급사의 미니샵 홈, 상품 목록, 카테고리, 공개 상품, 게시된 CMS 페이지를 포함합니다.
 
+import { minishopUrl } from '@/lib/domains'
 import type { MetadataRoute } from 'next'
 
 import { env } from '@/lib/env'
@@ -37,8 +38,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const orgIds = orgs.map((o) => o.id)
 
     for (const o of orgs) {
-      entries.push({ url: `${base}/minishop/${o.slug}`, lastModified: o.updated_at, changeFrequency: 'daily', priority: 0.8 })
-      entries.push({ url: `${base}/minishop/${o.slug}/products`, changeFrequency: 'daily', priority: 0.7 })
+      entries.push({ url: minishopUrl(o.slug), lastModified: o.updated_at, changeFrequency: 'daily', priority: 0.8 })
+      entries.push({ url: minishopUrl(o.slug, '/products'), changeFrequency: 'daily', priority: 0.7 })
     }
 
     // 통합 제품 검색 + 플랫폼 공통 카테고리 페이지
@@ -68,7 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const orgSlug = slugById.get(p.org_id)
       if (!orgSlug) continue
       entries.push({
-        url: `${base}/minishop/${orgSlug}/products/${p.product_no}`,
+        url: minishopUrl(orgSlug, `/products/${p.product_no}`),
         lastModified: p.updated_at,
         changeFrequency: 'weekly',
         priority: 0.9,
@@ -86,7 +87,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const p of pages) {
       const orgSlug = slugById.get(p.org_id)
       if (!orgSlug || p.type === 'home' || p.slug === 'home') continue // 홈은 위의 미니샵 주소와 같음
-      entries.push({ url: `${base}/minishop/${orgSlug}/${p.slug}`, lastModified: p.updated_at, changeFrequency: 'monthly', priority: 0.4 })
+      entries.push({ url: minishopUrl(orgSlug, `/${p.slug}`), lastModified: p.updated_at, changeFrequency: 'monthly', priority: 0.4 })
     }
   } catch (err) {
     console.error('[sitemap] failed:', err)

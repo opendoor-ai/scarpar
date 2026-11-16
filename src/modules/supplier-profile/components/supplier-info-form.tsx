@@ -2,6 +2,7 @@
 
 // 공급사 기본정보 (카페24 "공급사 기본정보"처럼) — 공급사 운영자가 직접 고쳐요
 
+import { minishopLabel } from '@/lib/domains'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
@@ -103,7 +104,7 @@ export function SupplierInfoForm({ view }: { view: SupplierInfoView }) {
         </Row>
         <Row label="공급사 아이디">
           <span>
-            {view.slug} <span className="text-muted-foreground">(미니샵 주소 /minishop/{view.slug})</span>
+            {view.slug} <span className="text-muted-foreground">(미니샵 주소 {minishopLabel(view.slug)})</span>
           </span>
         </Row>
         <Row label="로그인 ID">{view.loginEmail ?? '-'}</Row>

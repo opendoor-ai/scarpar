@@ -1,6 +1,7 @@
 // 허브(배너 광고) 화면 — 메인: 스마트·파트너·와이드·플러스 / 분류·검색: 프리미엄·스페셜·멤버스
 // 배너 관리의 텍스트·색상·상품 칸을 그룹별 약속(배너 관리 안내 글)대로 화면에 그립니다.
 
+import { productPath } from '@/components/store/store-links'
 import Link from 'next/link'
 import { ArrowRight, Phone, Store } from 'lucide-react'
 
@@ -68,7 +69,7 @@ function HubHeader({ title, description }: { title: string; description: string 
 function MiniProduct({ p, dark }: { p: PlatformProductCard; dark?: boolean }) {
   return (
     <Link
-      href={`/minishop/${p.orgSlug}/products/${p.card.product_no}`}
+      href={productPath(p.orgSlug, p.card.product_no)}
       className={cn(
         'flex min-w-0 flex-col overflow-hidden rounded-lg border transition-colors',
         dark ? 'border-white/20 bg-white/95 text-foreground hover:bg-white' : 'border-border bg-card hover:border-primary/40',
@@ -160,7 +161,7 @@ export async function PartnerHub({ banners }: { banners: LiveBanner[] }) {
               {items.length > 0 ? (
                 <div className="mt-auto grid grid-cols-3 gap-1.5 border-t border-border p-2">
                   {items.map((p) => (
-                    <Link key={p.card.id} href={`/minishop/${p.orgSlug}/products/${p.card.product_no}`} title={p.card.name} className="aspect-square overflow-hidden rounded bg-[#e9e9e9]">
+                    <Link key={p.card.id} href={productPath(p.orgSlug, p.card.product_no)} title={p.card.name} className="aspect-square overflow-hidden rounded bg-[#e9e9e9]">
                       {p.card.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={p.card.image} alt="" loading="lazy" className="size-full object-contain" />

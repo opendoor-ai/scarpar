@@ -1,3 +1,4 @@
+import { minishopUrl } from '@/lib/domains'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PackageSearch } from 'lucide-react'
@@ -52,7 +53,7 @@ export async function generateMetadata({
   const description = categoryName
     ? `${org.name}의 ${categoryName} 제품 목록입니다. 사양 확인과 전화·문자 문의가 가능합니다.`
     : `${org.name}의 전체 제품 목록입니다. 산업기계·중고기계 사양 확인과 전화·문자 문의가 가능합니다.`
-  const canonical = `${env.APP_URL}/minishop/${org.slug}/products${activeCat ? `?${categoryQuery(activeCat)}` : ''}`
+  const canonical = minishopUrl(org.slug, `/products${activeCat ? `?${categoryQuery(activeCat)}` : ''}`)
 
   return {
     title,

@@ -2,6 +2,7 @@
 
 // 공급사 입점 신청 — 신청(일반회원) / 승인·거절(플랫폼 관리자)
 
+import { RESERVED_SLUGS } from '@/lib/domains'
 import { revalidatePath } from 'next/cache'
 
 import { requireUser } from '@/lib/auth'
@@ -13,7 +14,6 @@ import type { ActionResult } from '@/lib/types'
 import { applicationSchema, rejectSchema, type ApplicationInput } from './schemas'
 
 /** 예약어 — 시스템 주소와 겹치지 않게 */
-const RESERVED_SLUGS = new Set(['admin', 'api', 'products', 'login', 'signup', 'track', 's', 'www', 'jadong', 'minishop'])
 
 function splitKeywords(value: string | undefined): string[] {
   return (value ?? '')

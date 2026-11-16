@@ -2,6 +2,7 @@
 
 // 관리자 상품 Q&A 목록 — 상태별 보기, 답변 작성·수정, 숨김·삭제
 
+import { productPath } from '@/components/store/store-links'
 import { useMemo, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -113,7 +114,7 @@ function QuestionItem({ q, storeSlug }: { q: QuestionRow; storeSlug: string }) {
         ) : null}
         {q.product ? (
           <Link
-            href={`/minishop/${storeSlug}/products/${q.product.product_no}#product-qna`}
+            href={`${productPath(storeSlug, q.product.product_no)}#product-qna`}
             target="_blank"
             className="font-medium text-foreground hover:underline"
           >

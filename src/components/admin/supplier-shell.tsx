@@ -3,6 +3,7 @@
 // 공급사 관리자 화면 틀 (카페24 공급사관리자페이지처럼)
 // 짙은 남색 위쪽 띠 + 큰 메뉴(상점관리·상품관리·문의관리·디자인관리·광고·성과) + 왼쪽 세부 메뉴
 
+import { storePath } from '@/components/store/store-links'
 import * as React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -49,7 +50,7 @@ export function SupplierShell({
   const active = findActive(pathname)
   const section = SUPPLIER_SECTIONS.find((s) => s.key === active?.section) ?? SUPPLIER_SECTIONS[0]
   const [mobileOpen, setMobileOpen] = React.useState(false)
-  const shopUrl = `/minishop/${orgSlug}`
+  const shopUrl = storePath(orgSlug)
 
   function openMobilePreview() {
     window.open(shopUrl, 'minishop-mobile', 'width=420,height=860,menubar=no,toolbar=no,location=no')

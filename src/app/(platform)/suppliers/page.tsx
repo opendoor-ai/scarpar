@@ -1,6 +1,7 @@
 // 공급사 미니샵 — 입점한 모든 공급사 로고 카드 (ㄱㄴㄷ · A~Z 색인, 검색) → 미니샵 바로가기
 // 공급사 등록·기본정보에서 올린 공급사명(한글)·영문명·회사 로고가 그대로 보여요.
 
+import { storePath } from '@/components/store/store-links'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Search, Store } from 'lucide-react'
@@ -111,7 +112,7 @@ export default async function SuppliersPage({ searchParams }: { searchParams: Pr
           {orgs.map((o) => (
             <li key={o.id}>
               <Link
-                href={`/minishop/${o.slug}`}
+                href={storePath(o.slug)}
                 className="group flex h-full flex-col border border-border bg-white transition-colors hover:border-foreground/60 dark:bg-card"
               >
                 <span className="flex h-28 items-center justify-center px-4 py-3">

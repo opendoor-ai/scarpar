@@ -1,6 +1,7 @@
 // 공급사 미니샵 머리글
 // 맨 위 얇은 띠: 전자동기계광고로 돌아가기 / 본 머리글: 공급사 로고·이름·취급품목, 메뉴, 검색, 전화 문의
 
+import { platformUrl } from '@/lib/domains'
 import Link from 'next/link'
 import { ChevronLeft, Phone, Search } from 'lucide-react'
 
@@ -42,16 +43,16 @@ export function StoreHeader({
       {/* 전자동기계광고로 돌아가기 */}
       <div className="border-b border-border bg-muted/50">
         <div className="mx-auto flex h-8 max-w-6xl items-center justify-between gap-3 px-4 text-xs text-muted-foreground sm:px-6">
-          <Link href="/" className="inline-flex items-center gap-1 hover:text-foreground">
+          <Link href={platformUrl()} className="inline-flex items-center gap-1 hover:text-foreground">
             <ChevronLeft className="size-3.5" />
             <span className="font-semibold text-primary">{SITE_NAME}</span>
             <span className="hidden sm:inline">입점 공급사</span>
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/products" className="hover:text-foreground">
+            <Link href={platformUrl('/products')} className="hover:text-foreground">
               전체 제품
             </Link>
-            <Link href="/suppliers" className="hover:text-foreground">
+            <Link href={platformUrl('/suppliers')} className="hover:text-foreground">
               다른 공급사
             </Link>
           </div>

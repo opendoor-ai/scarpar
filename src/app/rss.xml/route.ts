@@ -1,5 +1,6 @@
 // /rss.xml — 최신 등록·점프 상품 50개 (네이버 서치어드바이저 "RSS 제출"용)
 
+import { minishopUrl } from '@/lib/domains'
 import { env } from '@/lib/env'
 import { formatPrice } from '@/lib/money'
 import { SITE_NAME } from '@/lib/site'
@@ -40,7 +41,7 @@ export async function GET() {
     .map((r) => {
       const org = Array.isArray(r.org) ? r.org[0] : r.org
       if (!org) return ''
-      const link = `${base}/minishop/${org.slug}/products/${r.product_no}`
+      const link = minishopUrl(org.slug, `/products/${r.product_no}`)
       const title = [r.name, r.model_name].filter(Boolean).join(' ')
       const desc = [r.short_description || r.spec_summary, r.brand ? `제조사 ${r.brand}` : '', `판매가 ${formatPrice(r.price)}`, `공급사 ${org.name}`]
         .filter(Boolean)

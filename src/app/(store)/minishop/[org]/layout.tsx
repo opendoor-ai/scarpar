@@ -1,3 +1,4 @@
+import { minishopUrl } from '@/lib/domains'
 import type { CSSProperties } from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
@@ -39,7 +40,7 @@ export async function generateMetadata({
   return {
     title: { default: `${homeTitle} | ${SITE_NAME}`, template: `%s · ${org.name}` },
     description,
-    alternates: { canonical: `${env.APP_URL}/minishop/${org.slug}` },
+    alternates: { canonical: minishopUrl(org.slug) },
     openGraph: { title: org.name, description, siteName: SITE_NAME, locale: 'ko_KR', type: 'website' },
   }
 }

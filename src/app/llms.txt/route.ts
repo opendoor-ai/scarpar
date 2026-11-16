@@ -1,6 +1,7 @@
 // /llms.txt — AI(ChatGPT·Claude·Perplexity 등)가 사이트를 빠르게 이해하도록 만든 요약 안내 (AEO)
 // 형식: https://llmstxt.org — 제목, 한 줄 요약, 주요 페이지 링크, 자주 묻는 질문
 
+import { minishopUrl } from '@/lib/domains'
 import { DEFAULT_FAQ } from '@/lib/default-faq'
 import { env } from '@/lib/env'
 import { categoryQuery, getPlatformCategories, visibleCategories } from '@/lib/platform-categories'
@@ -58,7 +59,7 @@ export async function GET() {
     out.push('## 입점 공급사', '')
     for (const o of (orgs ?? []) as { name: string; slug: string; item_keywords: string[] | null }[]) {
       const kw = (o.item_keywords ?? []).slice(0, 6).join(', ')
-      out.push(`- [${o.name}](${base}/minishop/${o.slug})${kw ? `: ${kw}` : ''}`)
+      out.push(`- [${o.name}](${minishopUrl(o.slug)})${kw ? `: ${kw}` : ''}`)
     }
     out.push('')
   }

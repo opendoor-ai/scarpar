@@ -1,5 +1,6 @@
 // 공급사 미니샵 바닥글 — 공급사 정보(담당자·연락처·주소·홈페이지) + 전자동기계광고 안내
 
+import { platformUrl } from '@/lib/domains'
 import Link from 'next/link'
 import { ExternalLink, Mail, MapPin, Phone, User } from 'lucide-react'
 
@@ -93,13 +94,13 @@ export function StoreFooter({
             거래 조건은 해당 공급사에 문의하세요.
           </p>
           <div className="flex shrink-0 gap-3">
-            <Link href="/" className="font-medium text-primary hover:underline">
+            <Link href={platformUrl()} className="font-medium text-primary hover:underline">
               {SITE_NAME} 홈
             </Link>
-            <Link href="/products" className="hover:text-foreground">
+            <Link href={platformUrl('/products')} className="hover:text-foreground">
               더 많은 산업기계 보기
             </Link>
-            <a href={`/minishop/${org.slug}/admin`} className="hover:text-foreground" rel="nofollow">
+            <a href={platformUrl(`/minishop/${org.slug}/admin`)} className="hover:text-foreground" rel="nofollow">
               공급사 관리자
             </a>
           </div>

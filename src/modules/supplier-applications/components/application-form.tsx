@@ -2,6 +2,7 @@
 
 // 공급사 입점 신청 양식 (일반회원)
 
+import { ROOT_DOMAIN, subdomainsEnabled } from '@/lib/domains'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -78,7 +79,7 @@ export function ApplicationForm({ defaultEmail }: { defaultEmail?: string }) {
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="app-desired_slug">미니샵 주소 (영문) *</Label>
               <div className="flex items-center gap-1 text-sm">
-                <span className="shrink-0 text-muted-foreground">/minishop/</span>
+                {subdomainsEnabled ? null : <span className="shrink-0 text-muted-foreground">/minishop/</span>}
                 <Input
                   id="app-desired_slug"
                   value={values.desired_slug}
@@ -86,6 +87,7 @@ export function ApplicationForm({ defaultEmail }: { defaultEmail?: string }) {
                   placeholder="hanil-machine"
                   required
                 />
+                {subdomainsEnabled ? <span className="shrink-0 text-muted-foreground">.{ROOT_DOMAIN}</span> : null}
               </div>
             </div>
             {field('contact_name', '담당자명 *', { required: true, placeholder: '예: 대표 홍길동' })}

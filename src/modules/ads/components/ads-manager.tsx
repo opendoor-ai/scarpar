@@ -2,6 +2,7 @@
 
 // 광고 관리 화면 — 배너 광고 / 유료 상단 노출 (목록 + 등록·수정 창)
 
+import { productPath } from '@/components/store/store-links'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { ExternalLink, ImageIcon, Megaphone, Pencil, Plus, Trash2 } from 'lucide-react'
@@ -180,7 +181,7 @@ export function PromotionsTab({ promotions, nowIso }: { promotions: PromotionRow
                     <TableCell className="max-w-64">
                       {p.product && p.org ? (
                         <a
-                          href={`/minishop/${p.org.slug}/products/${p.product.product_no}`}
+                          href={productPath(p.org.slug, p.product.product_no)}
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center gap-1 truncate hover:underline"

@@ -1,5 +1,6 @@
 'use client'
 
+import { storePath } from '@/components/store/store-links'
 import * as React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -52,7 +53,7 @@ function PageEditor({ page, orgSlug, orgName, categories, revisions }: PageEdito
   const hasDraft = page.draft_blocks !== null || dirty
   // Best-effort storefront URL — this slice doesn't own the (store) route implementation, so the
   // exact path for non-home pages is inferred (/minishop/[org]/[slug]) rather than confirmed against it.
-  const viewHref = page.type === 'home' ? `/minishop/${orgSlug}` : `/minishop/${orgSlug}/${page.slug}`
+  const viewHref = page.type === 'home' ? storePath(orgSlug) : storePath(orgSlug, `/${page.slug}`)
 
   function handleBlocksChange(next: CmsBlock[]) {
     setBlocks(next)

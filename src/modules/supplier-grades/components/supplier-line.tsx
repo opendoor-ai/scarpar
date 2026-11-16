@@ -2,6 +2,7 @@
 
 // 공급사 관리 — 한 줄 + 펼치는 관리 칸 (운영 상태 · 등급 · 기본 정보 · 변경 기록)
 
+import { storePath } from '@/components/store/store-links'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronDown, ExternalLink, History, Pause, Play, Save } from 'lucide-react'
@@ -139,7 +140,7 @@ export function SupplierLine({ s, grades, defaultGrade }: { s: SupplierRow; grad
               {s.name}
               {s.isPlatform ? <span className="ml-1 rounded bg-primary/10 px-1 text-[10px] text-primary">플랫폼</span> : null}
             </span>
-            <a href={`/minishop/${s.slug}`} target="_blank" rel="noopener" className="inline-flex items-center gap-0.5 text-muted-foreground hover:text-foreground">
+            <a href={storePath(s.slug)} target="_blank" rel="noopener" className="inline-flex items-center gap-0.5 text-muted-foreground hover:text-foreground">
               아이디 {s.slug}
               <ExternalLink className="size-3" />
             </a>
@@ -199,7 +200,7 @@ export function SupplierLine({ s, grades, defaultGrade }: { s: SupplierRow; grad
               ))}
               <span className="ml-auto flex gap-1 pb-1">
                 <a
-                  href={`/minishop/${s.slug}`}
+                  href={storePath(s.slug)}
                   target="_blank"
                   rel="noopener"
                   className="inline-flex h-7 items-center gap-1 rounded-md border border-border bg-background px-2 text-xs hover:bg-muted"

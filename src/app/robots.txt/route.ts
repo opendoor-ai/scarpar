@@ -20,6 +20,10 @@ const ALWAYS_DISALLOW = [
   '/minishop/*/cart',
   '/minishop/*/checkout',
   '/minishop/*/order/',
+  // 공급사 서브도메인(아이디.jeonjadong.com)에서의 같은 화면
+  '/cart',
+  '/checkout',
+  '/order/',
   '/products?q=',
 ]
 

@@ -1,5 +1,6 @@
 // 미니샵 배너 — 공급사가 자기 미니샵 홈 맨 위에 보여줄 배너 (PC/모바일, 기간, 순서)
 
+import { storePath } from '@/components/store/store-links'
 import Link from 'next/link'
 
 import { PageHeader } from '@/components/ui/page-header'
@@ -29,7 +30,7 @@ export default async function StoreBannersPage() {
         title="미니샵 배너"
         description="우리 미니샵 첫 화면 맨 위에 보여줄 배너를 관리합니다. 여러 개면 5초마다 넘어가요."
         actions={
-          <Link href={`/minishop/${ctx.org.slug}`} target="_blank" className="text-sm text-muted-foreground hover:underline">
+          <Link href={storePath(ctx.org.slug)} target="_blank" className="text-sm text-muted-foreground hover:underline">
             미니샵 열기 ↗
           </Link>
         }

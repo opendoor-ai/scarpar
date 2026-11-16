@@ -1,3 +1,4 @@
+import { minishopUrl } from '@/lib/domains'
 import { requireOrg } from '@/lib/auth'
 import { requireModule } from '@/lib/modules'
 import { settingStr } from '@/lib/settings'
@@ -13,7 +14,7 @@ export default async function StorefrontSettingsPage() {
   const ctx = await requireOrg()
   requireModule(ctx.org, 'storefront')
 
-  const storefrontUrl = `${env.APP_URL}/minishop/${ctx.org.slug}`
+  const storefrontUrl = minishopUrl(ctx.org.slug)
 
   return (
     <>

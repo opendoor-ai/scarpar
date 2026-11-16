@@ -6,8 +6,9 @@ import { usePathname } from 'next/navigation'
 // 미니샵 안에서 없는 상품·페이지로 들어왔을 때 (404)
 export default function StoreNotFound() {
   const pathname = usePathname() ?? ''
-  const orgSlug = pathname.split('/')[2] ?? ''
-  const productsHref = orgSlug ? `/minishop/${orgSlug}/products` : '/'
+  // 서브도메인(아이디.jeonjadong.com)에서는 주소가 /products, 아니면 /minishop/아이디/products
+  const orgSlug = pathname.startsWith('/minishop/') ? pathname.split('/')[2] ?? '' : ''
+  const productsHref = orgSlug ? `/minishop/${orgSlug}/products` : '/products'
 
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-6 text-center">

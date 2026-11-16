@@ -2,6 +2,7 @@
 // 배너는 그룹(banner_groups)에 속하고, 그룹이 꺼져 있으면 보이지 않아요.
 // 그룹에 "배너 코드(템플릿)"가 있으면 그 코드로 HTML을 만들어 보여줍니다.
 
+import { productPath } from '@/components/store/store-links'
 import { cache } from 'react'
 
 import { getPrimaryImages } from '@/components/store/get-primary-images'
@@ -177,7 +178,7 @@ async function loadTemplateProducts(ids: string[]): Promise<Map<string, Template
     map.set(r.id, {
       no: r.product_no,
       name: r.name,
-      link: `/minishop/${org.slug}/products/${r.product_no}`,
+      link: productPath(org.slug, r.product_no),
       image: imgs[r.id] ?? null,
       price: Number(r.price ?? 0),
       compare_at_price: r.compare_at_price ? Number(r.compare_at_price) : null,

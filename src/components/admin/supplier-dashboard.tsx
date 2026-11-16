@@ -1,5 +1,7 @@
 // 공급사 관리자 첫 화면 — 내 상품·문의 현황, 점프, 미니샵 바로가기
 
+import { storePath } from '@/components/store/store-links'
+import { minishopLabel } from '@/lib/domains'
 import Link from 'next/link'
 import { ArrowUpToLine, ExternalLink, MessageCircleQuestion, MessageSquareText, Package, PackagePlus, Store } from 'lucide-react'
 
@@ -44,7 +46,7 @@ export async function SupplierDashboard({ ctx }: { ctx: OrgContext }) {
           <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400">공급사 관리자</p>
           <h1 className="text-[22px] font-semibold tracking-tight">{ctx.org.name}</h1>
           <p className="text-sm text-muted-foreground">
-            미니샵 주소: <span className="font-medium text-foreground">/minishop/{ctx.org.slug}</span>
+            미니샵 주소: <span className="font-medium text-foreground">{minishopLabel(ctx.org.slug)}</span>
             {jump.grade ? (
               <span className="ml-2 rounded-full px-2 py-0.5 text-xs font-bold text-white" style={{ backgroundColor: jump.grade.color }}>
                 {jump.grade.name}
@@ -54,7 +56,7 @@ export async function SupplierDashboard({ ctx }: { ctx: OrgContext }) {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline">
-            <a href={`/minishop/${ctx.org.slug}`} target="_blank" rel="noopener">
+            <a href={storePath(ctx.org.slug)} target="_blank" rel="noopener">
               <ExternalLink className="size-4" />내 미니샵 보기
             </a>
           </Button>

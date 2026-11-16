@@ -3,6 +3,7 @@
 // 공급사 생성 (플랫폼 관리자 전용) — 공급사명 · 공급사 아이디(미니샵 주소) · 대표 전화번호
 // 일반 회원은 "공급사 입점 신청"을 쓰고, 승인되면 자동으로 만들어져요.
 
+import { minishopLabel } from '@/lib/domains'
 import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -142,7 +143,7 @@ export function CreateOrgStepper({ heading }: CreateOrgStepperProps) {
                       />
                     </FormControl>
                     <FormDescription>
-                      미니샵 주소가 돼요: <b className="text-foreground">/minishop/{slug || '아이디'}</b> · 영문 소문자·숫자·하이픈(-)만 쓸 수
+                      미니샵 주소가 돼요: <b className="text-foreground">{minishopLabel(slug || '아이디')}</b> · 영문 소문자·숫자·하이픈(-)만 쓸 수
                       있고, 나중에 바꾸기 어려워요.
                     </FormDescription>
                     <FormMessage />

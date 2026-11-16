@@ -1,3 +1,4 @@
+import { minishopUrl } from '@/lib/domains'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import QRCode from 'qrcode'
@@ -119,7 +120,7 @@ export async function generateMetadata({
     seoDescription ||
     fillTemplate(seo.productDescription, vars).slice(0, 200) ||
     `${org.name}의 ${product.name}${product.brand ? ` (${product.brand})` : ''} 제품 정보와 문의`
-  const url = `${env.APP_URL}${productPath(org.slug, productNo)}`
+  const url = minishopUrl(org.slug, `/products/${productNo}`)
   const fullTitle = `${seoTitle ?? (templTitle || product.name)} | ${SITE_NAME}`
 
   return {
@@ -202,7 +203,7 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
     .filter((url): url is string => Boolean(url))
 
   const questionCount = await getQuestionCount(product.id)
-  const productUrl = `${env.APP_URL}${productPath(org.slug, product.product_no)}`
+  const productUrl = minishopUrl(org.slug, `/products/${product.product_no}`)
   const qrDataUrl = await QRCode.toDataURL(productUrl, {
     margin: 1,
     width: 320,
@@ -233,11 +234,11 @@ export default async function ProductPage({ params }: PageProps<{ org: string; n
         org={org}
         url={productUrl}
         images={imageUrls}
-        storeUrl={`${env.APP_URL}${storePath(org.slug)}`}
-        productsUrl={`${env.APP_URL}${storePath(org.slug, '/products')}`}
+        storeUrl={minishopUrl(org.slug)}
+        productsUrl={minishopUrl(org.slug, '/products')}
         categoryTrail={categoryTrail.map((c) => ({
           name: c.name,
-          url: `${env.APP_URL}${storePath(org.slug, '/products')}?${c.query}`,
+          url: `${minishopUrl(org.slug, '/products')}?${c.query}`,
         }))}
       />
       {/* 현재 위치 */}
